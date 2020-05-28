@@ -29,31 +29,36 @@ type PrivateRoutePropsTypes = {
 }
 
 const Main = () => {
-  return <h1>Hello, Physicains!</h1>
+  return <h1>Hello, Physicians!</h1>
 }
 
 const Inner = () => {
   return <h1>Inner page content</h1>;
 };
 
-const Login = () => {
-  let history = useHistory();
-  let location = useLocation();
+type LocationStatePropsTypes = {
+  state: {
+    from: string
+  }
+}
 
-  let {from}: any = location.state || {from: {pathname: "/"}};
-  let login = () => {
+const Login = () => {
+  const history = useHistory();
+  const location: LocationStatePropsTypes = useLocation();
+
+  const login = () => {
     loggedIn = true;
-    history.replace(from);
+    history.replace(location.state && location.state.from ? location.state.from : '/');
   };
 
   return (
     <div>
-      <p>Page {from.pathname.slice(1)} is private, please log in</p>
+      <p>Page is private, please log in</p>
       <button onClick={login}>Log in</button>
     </div>
   );
 };
 
 const PrivateRoute = ({children, props}: PrivateRoutePropsTypes) =>
-  <Route {...props} render={({location}) => loggedIn ? (children) :
+  <Route {...props} render={({location}): ReactElement => loggedIn ? (children) :
     <Redirect to={{pathname: '/login', state: {from: location}}} />} />;
