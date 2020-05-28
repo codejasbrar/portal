@@ -4,6 +4,8 @@ Domain: [physicianportal.insidetracker.com](https://physicianportal.insidetracke
 
 ## Project frontend repo
 
+TypeScript, SCSS, React
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
