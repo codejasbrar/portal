@@ -1,0 +1,19 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.Logo {
+    &Container {
+
+
+        @include breakpoint($mobile) {
+            svg {
+                width: 170px;
+                height: 25px;
+
+                g [class="pp_text"] {
+                    display: none;
+                }
+            }
+        }
+    }
+}

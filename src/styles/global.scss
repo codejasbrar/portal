@@ -1,5 +1,22 @@
 @import "variables";
+@import "mixins";
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@700&display=swap');
 
-h1 {
-    color: $red;
+html {
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    line-height: 20px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+button {
+    background: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
 }

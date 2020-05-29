@@ -1,0 +1,14 @@
+@import "variables";
+@import "mixins";
+
+.container {
+    max-width: 1170px;
+    margin: 0 auto;
+
+    @include breakpoint($desktop) {
+        max-width: none;
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
