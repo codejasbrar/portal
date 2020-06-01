@@ -4,10 +4,9 @@
 .Logo {
     &Container {
 
-
-        @include breakpoint($mobile) {
+        @include breakpoint($tablet) {
             svg {
-                width: 170px;
+                width:  170px;
                 height: 25px;
 
                 g [class="pp_text"] {

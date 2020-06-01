@@ -4,8 +4,8 @@ import {useHistory} from "react-router-dom";
 
 type GoToPropsTypes = {
   path: string,
-  children: ReactElement,
-  className: string
+  children: ReactElement | string,
+  className?: string
 };
 
 const GoTo = (props: GoToPropsTypes) => {

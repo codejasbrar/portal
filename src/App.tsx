@@ -6,7 +6,6 @@ import "./styles/global.scss";
 
 //Components
 import {BrowserRouter as Router, Switch, Route, useHistory, Redirect, useLocation} from 'react-router-dom';
-import {RouteProps} from 'react-router';
 import Header from "./components/Header/Header";
 import {useDispatch, useSelector} from "react-redux";
 import {logIn} from "./actions/authActions";
@@ -24,14 +23,14 @@ const App = () => {
     if (sessionStorage.getItem('token')) {
       loadUserByToken(dispatch);
     }
-  }, []);
+  }, [dispatch]);
 
   return <Router>
     <Header />
     <Switch>
       <Route exact path="/" component={Main} />
       <Route path="/login" component={Login} />
-      <PrivateRoute props={{path: "/inner"}} loggedIn={auth.loggedIn || !!sessionStorage.getItem('token')}>
+      <PrivateRoute loggedIn={auth.loggedIn || !!sessionStorage.getItem('token')}>
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
     </Switch>
@@ -42,13 +41,12 @@ export default App;
 
 type PrivateRoutePropsTypes = {
   children: ReactElement,
-  props: RouteProps,
   loggedIn: boolean
-}
+};
 
 const Main = () => {
   return <h1>Hello, Physicians!</h1>
-}
+};
 
 const Inner = () => {
   const user: User = useSelector((store: Storage) => ({...userStateToProps(store)}));
@@ -59,7 +57,7 @@ type LocationStatePropsTypes = {
   state: {
     from: string
   }
-}
+};
 
 const Login = () => {
   const history = useHistory();
@@ -78,8 +76,8 @@ const Login = () => {
       <button onClick={login}>Log in</button>
     </div>
   );
-}
+};
 
-const PrivateRoute = ({children, props, loggedIn}: PrivateRoutePropsTypes) =>
-  <Route {...props} render={({location}): ReactElement => loggedIn ? (children) :
+const PrivateRoute = ({children, loggedIn}: PrivateRoutePropsTypes) =>
+  <Route render={({location}): ReactElement => loggedIn ? (children) :
     <Redirect to={{pathname: '/login', state: {from: location}}} />} />;

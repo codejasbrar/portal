@@ -5,7 +5,7 @@ import styles from "./Header.module.scss";
 
 //Components
 import Logo from "../Logo/Logo";
-import AuthPanel from "../UserPanel/AuthPanel";
+import AuthPanel from "../AuthPanel/AuthPanel";
 
 //PropsTypes
 type HeaderPropsTypes = {};

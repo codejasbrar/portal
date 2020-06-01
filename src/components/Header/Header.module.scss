@@ -3,15 +3,23 @@
 @import "../../styles/common";
 
 .Header {
-    height: 70px;
-    width: 100%;
+    height:           70px;
+    width:            100%;
     background-color: $dark_bg;
 
+    @include breakpoint($tablet) {
+        height: 60px;
+    }
+
     &Container {
-        display: flex;
-        align-items: center;
+        display:         flex;
+        align-items:     center;
         justify-content: space-between;
-        height: 100%;
+        height:          100%;
+
+        @include breakpoint($tablet) {
+            justify-content: center;
+        }
     }
 }
 

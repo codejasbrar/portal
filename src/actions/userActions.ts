@@ -10,6 +10,6 @@ export const userLoadSuccess = (userData: User) => ({type: USER_SUCCESS, payload
 
 export const loadUserByToken = (dispatch: Dispatch<object>) => {
   dispatch(userLoadRequest());
-  dispatch(userLoadSuccess({first_name: 'Mike', last_name: 'Wazovskiy'}))
+  dispatch(userLoadSuccess({first_name: 'Mark', last_name: 'Ruffalo'}))
 };
 
