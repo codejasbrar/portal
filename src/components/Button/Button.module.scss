@@ -1,0 +1,24 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.Button {
+    width:          100%;
+    height:         36px;
+    font-family:    "Open Sans Semibold", sans-serif;
+    letter-spacing: 0.3px;
+    border-radius:  3px;
+
+    &Secondary {
+        background-color: $gray;
+        color:            #fff;
+
+        &:hover {
+            background-color: lighten($gray, 8);
+        }
+
+        &:focus {
+            background-color: darken($gray, 8);
+        }
+    }
+}
