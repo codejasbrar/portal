@@ -46,7 +46,8 @@ const socialLinks = [
 const Footer = () => <footer className={styles.Footer}>
   <div className={`${styles.container} ${styles.FooterContainer}`}>
     <div className={styles.FooterCopyright}>
-      <p className={styles.FooterText}>© 2009-2020 Segterra, Inc. All rights reserved. InsideTracker is a personalized
+      <p className={styles.FooterText}>© 2009-{new Date().getFullYear()} Segterra, Inc. All rights reserved.
+        InsideTracker is a personalized
         nutrition model by&nbsp;Segterra. </p>
       <p className={styles.FooterText}>Technology protected by U.S. Patent 8762167 and other patent pending
         applications.</p>
