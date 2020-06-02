@@ -13,6 +13,7 @@ import {authStateToProps, userStateToProps} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import {User} from "./interfaces/User";
 import {AuthState} from "./interfaces/AuthState";
+import Footer from "./components/Footer/Footer";
 
 const App = () => {
   //const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
     </Switch>
+    <Footer />
   </Router>
 };
 

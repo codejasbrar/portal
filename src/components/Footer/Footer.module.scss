@@ -1,0 +1,115 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.Footer {
+    background:     $dark_bg;
+
+    //temp styles
+
+    position:       fixed;
+    bottom:         0;
+    width:          100%;
+
+    //end temp styles
+
+    padding-top:    40px;
+    padding-bottom: 140px;
+    color:          #fff;
+
+    @include breakpoint($tablet) {
+        padding-bottom: 32px;
+    }
+
+    &Container {
+        display:         flex;
+        justify-content: space-between;
+
+        @include breakpoint($tablet) {
+            flex-direction:  column-reverse;
+            justify-content: center;
+            align-items:     center;
+        }
+    }
+
+    &Copyright {
+        @include breakpoint($tablet) {
+            text-align: center;
+            margin-top: 20px;
+        }
+    }
+
+    &Text {
+        font-size:      0.85em;
+        color:          $text_gray_2;
+        letter-spacing: 0.4px;
+        line-height:    18px;
+        font-weight:    300;
+
+        @include breakpoint($tablet) {
+            display: inline;
+        }
+    }
+
+    &Label {
+        font-weight: 600;
+        line-height: 25px;
+
+        @include breakpoint($tablet) {
+            display: none;
+        }
+    }
+
+    &Contacts {
+        min-width:   270px;
+        margin-left: 40px;
+
+        @include breakpoint($tablet) {
+            margin-left: 0;
+        }
+    }
+}
+
+.Social {
+
+    border-bottom: 1px solid $text_gray_2;
+    margin-bottom: 24px;
+
+    @include breakpoint($tablet) {
+        display: none;
+    }
+
+    &Icons {
+        margin-top:    20px;
+        margin-bottom: 24px;
+    }
+
+    &Icon {
+        margin-right: 9px;
+    }
+}
+
+.Contacts {
+
+    @include breakpoint($tablet) {
+        text-align: center;
+    }
+
+    &Text {
+        letter-spacing: 0.4px;
+        line-height:    26px;
+        color:          $text_gray;
+        display:        block;
+        font-weight:    300;
+
+        @include breakpoint($tablet) {
+            font-size:      1.2em;
+            line-height:    30px;
+            letter-spacing: 0.4px;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
