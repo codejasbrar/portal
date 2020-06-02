@@ -22,7 +22,7 @@ const App = () => {
 
   useEffect(() => {
     if (sessionStorage.getItem('token')) {
-      loadUserByToken(dispatch);
+      dispatch(loadUserByToken());
     }
   }, [dispatch]);
 
@@ -67,8 +67,8 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const login = () => {
-    logIn(dispatch);
-    loadUserByToken(dispatch);
+    dispatch(logIn());
+    dispatch(loadUserByToken());
     history.replace(location.state && location.state.from ? location.state.from : '/');
   };
 
