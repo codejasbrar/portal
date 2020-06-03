@@ -12,11 +12,11 @@ export const errorLoginAction = (error: Error) => ({type: LOGIN_ERROR, payload: 
 export const logoutAction = () => ({type: LOGOUT});
 
 
-export const logIn = (dispatch: Dispatch<object>): void => {
+export const logIn = () => (dispatch: Dispatch<object>): void => {
   dispatch(requestLoginAction());
   dispatch(successLoginAction('token'))
 };
 
-export const logOut = (dipatch: Dispatch<object>): void => {
-  dipatch(logoutAction());
+export const logOut = () => (dispatch: Dispatch<object>): void => {
+  dispatch(logoutAction());
 };

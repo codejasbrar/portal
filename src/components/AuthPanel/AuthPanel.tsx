@@ -27,7 +27,7 @@ const AuthPanel = () => {
   const auth = useSelector((store: Storage): AuthState => ({...authStateToProps(store)}));
   const history = useHistory();
 
-  if (auth.loggedIn && !Object.keys(user).length) loadUserByToken(dispatch);
+  if (auth.loggedIn && !Object.keys(user).length) dispatch(loadUserByToken());
 
   const [openedDropdown, setOpenedDropdown] = useState(false);
   const [openedAside, setOpenedAside] = useState(false);
@@ -35,7 +35,7 @@ const AuthPanel = () => {
   const loggedIn = auth && auth.loggedIn;
 
   const handleLogOut = () => {
-    logOut(dispatch);
+    dispatch(logOut());
     closeAside();
   };
 
@@ -81,7 +81,7 @@ const AuthPanel = () => {
             </div>
           </ClickOutside>
         </div> :
-        <GoTo className={`${styles.UserName} ${styles.loginBtn}`} path="/login">Log in</GoTo>}
+        <GoTo className={`${styles.UserName} ${styles.loginBtn}`} path="/login">Log In</GoTo>}
       <button type="button" onClick={openAside} className={styles.AsideOpener}><BurgerIcon /></button>
       <ClickOutside onClickOutside={closeAside}>
         <aside className={`${styles.UserPanelMobile} ${openedAside ? '' : styles.UserPanelMobileHided}`}>
@@ -92,7 +92,7 @@ const AuthPanel = () => {
             </div>
             <div className={styles.AsideBtnBlock}>
               {loggedIn ? <Button onClick={handleLogOut} secondary>Log out</Button> :
-                <Button onClick={goToLogin} secondary>Log in</Button>}
+                <Button onClick={goToLogin} secondary>Log In</Button>}
             </div>
             <div className={styles.AsideBottom}>
               <a href="mailto:contactus@insidetracker.com" className={styles.AsideLink}>contactus@insidetracker.com</a>

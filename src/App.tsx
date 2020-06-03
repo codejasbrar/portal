@@ -13,6 +13,7 @@ import {authStateToProps, userStateToProps} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import {User} from "./interfaces/User";
 import {AuthState} from "./interfaces/AuthState";
+import Footer from "./components/Footer/Footer";
 
 const App = () => {
   //const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ const App = () => {
 
   useEffect(() => {
     if (sessionStorage.getItem('token')) {
-      loadUserByToken(dispatch);
+      dispatch(loadUserByToken());
     }
   }, [dispatch]);
 
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
     </Switch>
+    <Footer />
   </Router>
 };
 
@@ -65,8 +67,8 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const login = () => {
-    logIn(dispatch);
-    loadUserByToken(dispatch);
+    dispatch(logIn());
+    dispatch(loadUserByToken());
     history.replace(location.state && location.state.from ? location.state.from : '/');
   };
 
