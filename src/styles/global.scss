@@ -35,3 +35,7 @@ a {
         color: inherit;
     }
 }
+
+input:focus, input:active {
+    outline: none;
+}

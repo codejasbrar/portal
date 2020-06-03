@@ -5,32 +5,41 @@ import "normalize.css/normalize.css";
 import "./styles/global.scss";
 
 //Components
-import {BrowserRouter as Router, Switch, Route, useHistory, Redirect, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import Header from "./components/Header/Header";
 import {useDispatch, useSelector} from "react-redux";
-import {logIn} from "./actions/authActions";
-import {authStateToProps, userStateToProps} from "./selectors/selectors";
+import {authState, userState} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import {User} from "./interfaces/User";
 import {AuthState} from "./interfaces/AuthState";
 import Footer from "./components/Footer/Footer";
+import Login from "./pages/Login/Login";
+import Spinner from "./components/Spinner/Spinner";
 
 const App = () => {
-  //const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const auth = useSelector((store: Storage): AuthState => ({...authStateToProps(store)}));
+  const auth = useSelector((store: Storage): AuthState => ({...authState(store)}));
+  const user = useSelector((store: Storage): User => ({...userState(store)}));
 
   useEffect(() => {
-    if (sessionStorage.getItem('token')) {
-      dispatch(loadUserByToken());
-    }
-  }, [dispatch]);
+    (async () => {
+      if (localStorage.getItem('token') && !Object.keys(user).length) {
+        await dispatch(loadUserByToken());
+      }
+      setLoading(false);
+    })();
+  }, [dispatch, user]);
+
+  console.log(2);
 
   return <Router>
     <Header />
+    <Spinner show={loading} />
     <Switch>
       <Route exact path="/" component={Main} />
       <Route path="/login" component={Login} />
+      <Route path="/logout" component={() => <Login mode="logout" />} />
       <PrivateRoute loggedIn={auth.loggedIn || !!sessionStorage.getItem('token')}>
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
@@ -51,33 +60,8 @@ const Main = () => {
 };
 
 const Inner = () => {
-  const user: User = useSelector((store: Storage) => ({...userStateToProps(store)}));
+  const user: User = useSelector((store: Storage) => ({...userState(store)}));
   return <h1>Welcome back, {user.first_name} {user.last_name}</h1>;
-};
-
-type LocationStatePropsTypes = {
-  state: {
-    from: string
-  }
-};
-
-const Login = () => {
-  const history = useHistory();
-  const location: LocationStatePropsTypes = useLocation();
-  const dispatch = useDispatch();
-
-  const login = () => {
-    dispatch(logIn());
-    dispatch(loadUserByToken());
-    history.replace(location.state && location.state.from ? location.state.from : '/');
-  };
-
-  return (
-    <div>
-      <p>Page is private, please log in</p>
-      <button onClick={login}>Log in</button>
-    </div>
-  );
 };
 
 const PrivateRoute = ({children, loggedIn}: PrivateRoutePropsTypes) =>

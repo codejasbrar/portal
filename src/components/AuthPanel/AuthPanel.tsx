@@ -10,10 +10,9 @@ import {ReactComponent as BurgerIcon} from "../../icons/burger.svg";
 //Components
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "../../interfaces/User";
-import {authStateToProps, userStateToProps} from "../../selectors/selectors";
+import {authState, userState} from "../../selectors/selectors";
 import {AuthState} from "../../interfaces/AuthState";
 import {logOut} from "../../actions/authActions";
-import {loadUserByToken} from "../../actions/userActions";
 import GoTo from "../GoTo/GoTo";
 import ClickOutside from "../ClickOutside/ClickOutside";
 import Overlay from "../Overlay/Overlay";
@@ -23,19 +22,19 @@ import {useHistory} from "react-router-dom";
 
 const AuthPanel = () => {
   const dispatch = useDispatch();
-  const user = useSelector((store: Storage): User => ({...userStateToProps(store)}));
-  const auth = useSelector((store: Storage): AuthState => ({...authStateToProps(store)}));
+  const user = useSelector((store: Storage): User => ({...userState(store)}));
+  const auth = useSelector((store: Storage): AuthState => ({...authState(store)}));
   const history = useHistory();
-
-  if (auth.loggedIn && !Object.keys(user).length) dispatch(loadUserByToken());
 
   const [openedDropdown, setOpenedDropdown] = useState(false);
   const [openedAside, setOpenedAside] = useState(false);
 
-  const loggedIn = auth && auth.loggedIn;
+  const loggedIn = auth && auth.loggedIn && Object.keys(user).length;
+
 
   const handleLogOut = () => {
     dispatch(logOut());
+    history.replace("/logout");
     closeAside();
   };
 

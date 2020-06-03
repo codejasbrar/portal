@@ -1,0 +1,48 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.Login {
+    min-height:      calc(100vh - 100px);
+    display:         flex;
+    justify-content: center;
+
+    &Background {
+        background-position: center;
+        background-size:     cover;
+    }
+}
+
+.Form {
+    &Wrapper {
+        border-radius:    5px;
+        box-sizing:       border-box;
+        max-width:        500px;
+        position:         relative;
+        background-color: #ffffff;
+        z-index:          2;
+        margin:           100px auto 260px;
+        padding:          34px 80px 47px;
+        text-align:       center;
+        box-shadow:       0 4px 12px 1px rgba(35, 45, 55, 0.15);
+    }
+
+    &Title {
+        margin:         0;
+        color:          $text;
+        letter-spacing: 0.2px;
+        font-size:      30px;
+        line-height:    1.7;
+        font-weight:    600;
+    }
+
+    &Subtitle {
+        margin:         24px -30px;
+        color:          $text;
+        letter-spacing: 0.2px;
+        font-size:      16px;
+        line-height:    1.5;
+        font-weight:    400;
+        white-space:    nowrap;
+    }
+}
