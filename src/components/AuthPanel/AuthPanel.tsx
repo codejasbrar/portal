@@ -33,7 +33,7 @@ const AuthPanel = () => {
 
   const handleLogOut = () => {
     dispatch(logOut());
-    history.replace("/logout");
+    history.replace("/authentication/logout");
     closeDropDownHandler();
     closeAside();
   };
@@ -57,7 +57,7 @@ const AuthPanel = () => {
   };
 
   const goToLogin = () => {
-    history.replace("/login");
+    history.replace("/authentication/login");
     closeAside();
   };
 
@@ -82,7 +82,7 @@ const AuthPanel = () => {
             </div>
           </ClickOutside>
         </div> :
-        <GoTo className={`${styles.UserName} ${styles.loginBtn}`} path="/login">Log In</GoTo>}
+        <GoTo className={`${styles.UserName} ${styles.loginBtn}`} path="/authentication/login">Log In</GoTo>}
       <button type="button" onClick={openAside} className={styles.AsideOpener}><BurgerIcon /></button>
       <ClickOutside onClickOutside={closeAside}>
         <aside className={`${styles.UserPanelMobile} ${openedAside ? '' : styles.UserPanelMobileHided}`}>

@@ -11,7 +11,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {loggedIn} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import Footer from "./components/Footer/Footer";
-import Login from "./pages/Login/Login";
+import Authentication from "./pages/Authentication/Authentication";
 import Spinner from "./components/Spinner/Spinner";
 import Main from "./pages/Main/Main";
 import Inner from "./pages/Inner/Inner";
@@ -37,8 +37,8 @@ const App = () => {
     {loading && <Spinner />}
     <Switch>
       <Route exact path="/" component={Main} />
-      <Route path="/login" component={Login} />
-      <Route path="/logout" component={() => <Login mode="logout" />} />
+      <Route path="/authentication" component={Authentication} />
+      {/*<Route path="/logout" component={() => <Authentication mode="logout" />} />*/}
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
@@ -57,4 +57,4 @@ type PrivateRoutePropsTypes = {
 
 const PrivateRoute = ({children, loggedIn}: PrivateRoutePropsTypes) =>
   <Route render={({location}): ReactElement => loggedIn ? (children) :
-    <Redirect to={{pathname: '/login', state: {from: location}}} />} />;
+    <Redirect to={{pathname: '/authentication', state: {from: location}}} />} />;

@@ -28,11 +28,13 @@ const LoginForm = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    if (!isValidEmail(username)) {
+    if (!username.length) {
+      setLocalError("Email can't be empty");
+      return;
+    } else if (!isValidEmail(username)) {
       setLocalError('Email is not valid');
       return;
-    }
-    if (!password.length) {
+    } else if (!password.length) {
       setLocalError("Password can't be empty");
       return;
     }
@@ -65,7 +67,7 @@ const LoginForm = () => {
 
   return <>
     {isLoading && <Spinner />}
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={styles.Form}>
       {auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
       {!auth.error && localError && <span className={styles.FormError}>{localError}</span>}
       <Input placeholder="Email" autofocus name="username" value={username} onChange={setUsername} label="Email" />
@@ -77,7 +79,7 @@ const LoginForm = () => {
         label="Password" />
       <div className={styles.Bottom}>
         <Checkbox name="remember" checked={remember} onChange={setRemember} label="Remember me" />
-        <Link to="/forgot-password" className={styles.BottomLink}>Forgot password</Link>
+        <Link to="/authentication/reset-password" className={styles.BottomLink}>Forgot password</Link>
       </div>
       <div className={styles.FormBtn}><Button type="submit">Log in now</Button></div>
     </form>
