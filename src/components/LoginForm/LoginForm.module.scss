@@ -1,5 +1,42 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
 
 .FormBtn {
     max-width: 112px;
     margin:    0 auto;
+}
+
+.Form {
+    &Error {
+        font-size:     0.85em;
+        color:         $error;
+        font-weight:   600;
+        margin-top:    31px;
+        margin-bottom: -15px;
+    }
+}
+
+.Bottom {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    margin-bottom:   40px;
+    padding-top:     12px;
+
+    &Link {
+        font-size:       0.9em;
+        font-weight:     600;
+        transition:      all 0.2s ease-in-out;
+        cursor:          pointer;
+        text-decoration: none;
+        color:           $primary;
+
+        &:visited {
+            color: $primary;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 import {Dispatch} from "react";
 import AuthApiService, {AuthData, IAuth} from "../services/AuthApiService";
+import {userLogoutAction} from "./userActions";
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -18,10 +19,11 @@ export const logIn = (authData: AuthData) => async (dispatch: Dispatch<object>):
   await AuthApiService.authenticate(authData).then((response) => {
     dispatch(successLoginAction(response.data));
   }).catch((errorData) => {
-    dispatch(errorLoginAction(errorData.response.data))
+    dispatch(errorLoginAction(errorData.response.data));
   });
 };
 
 export const logOut = () => (dispatch: Dispatch<object>): void => {
   dispatch(logoutAction());
+  dispatch(userLogoutAction());
 };

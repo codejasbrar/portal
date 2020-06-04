@@ -1,0 +1,12 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+
+.Main {
+    height:          calc(100vh - 300px);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    text-align:      center;
+}

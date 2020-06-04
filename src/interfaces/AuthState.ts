@@ -3,22 +3,26 @@ import {AuthData, IAuth, LoginError} from "../services/AuthApiService";
 
 export interface AuthState {
   loggedIn: boolean,
-  error?: LoginError
+  error?: LoginError,
+  loading: boolean
 }
 
 interface AuthRequest {
   type: typeof LOGIN_REQUEST,
-  payload: AuthData
+  payload: AuthData,
+  loading: boolean
 }
 
 interface AuthSuccess {
   type: typeof LOGIN_SUCCESS,
-  payload: IAuth
+  payload: IAuth,
+  loading: boolean
 }
 
 interface AuthError {
   type: typeof LOGIN_ERROR,
-  payload: LoginError
+  payload: LoginError,
+  loading: boolean
 }
 
 export type AuthActionsTypes = AuthRequest & AuthSuccess & AuthError;

@@ -19,7 +19,7 @@ const Checkbox = (props: CheckboxPropsTypes) => {
     props.onChange(e.target.checked);
   };
 
-  return <div>
+  return <div className={styles.CheckboxWrapper}>
     <span className={`${styles.CheckboxFake} ${props.checked ? styles.CheckboxFakeChecked : ''}`}>{props.checked &&
     <TickIcon />}</span>
     <label className={styles.CheckboxLabel}><input type="checkbox"

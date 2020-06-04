@@ -8,39 +8,38 @@ import "./styles/global.scss";
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import Header from "./components/Header/Header";
 import {useDispatch, useSelector} from "react-redux";
-import {authState, userState} from "./selectors/selectors";
+import {loggedIn} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
-import {User} from "./interfaces/User";
-import {AuthState} from "./interfaces/AuthState";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
 import Spinner from "./components/Spinner/Spinner";
+import Main from "./pages/Main/Main";
+import Inner from "./pages/Inner/Inner";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const auth = useSelector((store: Storage): AuthState => ({...authState(store)}));
-  const user = useSelector((store: Storage): User => ({...userState(store)}));
+  const isLoggedIn = useSelector((store: Storage) => (loggedIn(store)));
 
   useEffect(() => {
     (async () => {
-      if (localStorage.getItem('token') && !Object.keys(user).length) {
+      if (localStorage.getItem('token')) {
         await dispatch(loadUserByToken());
       }
       setLoading(false);
     })();
-  }, [dispatch, user]);
+  }, [dispatch, isLoggedIn]);
 
-  console.log(2);
+  console.log('App rendered');
 
   return <Router>
     <Header />
-    <Spinner show={loading} />
+    {loading && <Spinner />}
     <Switch>
       <Route exact path="/" component={Main} />
       <Route path="/login" component={Login} />
       <Route path="/logout" component={() => <Login mode="logout" />} />
-      <PrivateRoute loggedIn={auth.loggedIn || !!sessionStorage.getItem('token')}>
+      <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <Route path="/inner" component={Inner} />
       </PrivateRoute>
     </Switch>
@@ -55,14 +54,6 @@ type PrivateRoutePropsTypes = {
   loggedIn: boolean
 };
 
-const Main = () => {
-  return <h1>Hello, Physicians!</h1>
-};
-
-const Inner = () => {
-  const user: User = useSelector((store: Storage) => ({...userState(store)}));
-  return <h1>Welcome back, {user.first_name} {user.last_name}</h1>;
-};
 
 const PrivateRoute = ({children, loggedIn}: PrivateRoutePropsTypes) =>
   <Route render={({location}): ReactElement => loggedIn ? (children) :

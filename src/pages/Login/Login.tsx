@@ -35,7 +35,7 @@ const Login = (props: LoginPropsTypes) => {
   }, [history, props.mode]);
 
   return (
-    <div className={styles.LoginBackground}
+    <section className={styles.LoginBackground}
       style={{'backgroundImage': `url(${bgArray[Math.floor(Math.random() * 6)]})`}}>
       <div className={styles.container}>
         <div className={styles.Login}>
@@ -47,7 +47,7 @@ const Login = (props: LoginPropsTypes) => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

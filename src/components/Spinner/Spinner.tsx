@@ -1,13 +1,19 @@
-import React from "react";
+import React, {useEffect} from "react";
+
+import BodyScroll from "../../helpers/bodyScrollLock";
 
 import styles from "./Spinner.module.css";
 
-type SpinnerPropsTypes = {
-  show: boolean
-};
 
-const Spinner = (props: SpinnerPropsTypes) => {
-  return (<div className={`${styles.spinnerWrapper} ${props.show ? styles.spinnerWrapperShow : ''}`}>
+const Spinner = () => {
+
+  useEffect(() => {
+    BodyScroll.disable();
+    return () => {
+      BodyScroll.enable();
+    }
+  }, []);
+  return (<div className={`${styles.spinnerWrapper} ${styles.spinnerWrapperShow}`}>
       <div className={styles.spinner}>
         <div className={styles.spinnerCircle}>
           <svg className={styles.circular} viewBox="25 25 50 50">

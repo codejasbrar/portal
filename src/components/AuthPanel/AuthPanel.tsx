@@ -10,31 +10,31 @@ import {ReactComponent as BurgerIcon} from "../../icons/burger.svg";
 //Components
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "../../interfaces/User";
-import {authState, userState} from "../../selectors/selectors";
-import {AuthState} from "../../interfaces/AuthState";
+import {loggedIn, userState} from "../../selectors/selectors";
 import {logOut} from "../../actions/authActions";
 import GoTo from "../GoTo/GoTo";
 import ClickOutside from "../ClickOutside/ClickOutside";
 import Overlay from "../Overlay/Overlay";
 import Button from "../Button/Button";
 import {useHistory} from "react-router-dom";
+import BodyScroll from "../../helpers/bodyScrollLock";
 
 
 const AuthPanel = () => {
   const dispatch = useDispatch();
   const user = useSelector((store: Storage): User => ({...userState(store)}));
-  const auth = useSelector((store: Storage): AuthState => ({...authState(store)}));
+  const isLoggedIn = useSelector((store: Storage) => (loggedIn(store)));
   const history = useHistory();
 
   const [openedDropdown, setOpenedDropdown] = useState(false);
   const [openedAside, setOpenedAside] = useState(false);
 
-  const loggedIn = auth && auth.loggedIn && Object.keys(user).length;
-
+  const authed = isLoggedIn && Object.keys(user).length;
 
   const handleLogOut = () => {
     dispatch(logOut());
     history.replace("/logout");
+    closeDropDownHandler();
     closeAside();
   };
 
@@ -47,10 +47,12 @@ const AuthPanel = () => {
   };
 
   const openAside = () => {
+    BodyScroll.disable();
     setOpenedAside(true);
   };
 
   const closeAside = () => {
+    BodyScroll.enable();
     setOpenedAside(false);
   };
 
@@ -66,7 +68,7 @@ const AuthPanel = () => {
 
   return (
     <div className={styles.UserPanel}>
-      {loggedIn ?
+      {authed ?
         <div className={styles.UserPanelDesktop}>
           <UserLogo />
           <ClickOutside onClickOutside={closeDropDownHandler}>
@@ -86,11 +88,11 @@ const AuthPanel = () => {
         <aside className={`${styles.UserPanelMobile} ${openedAside ? '' : styles.UserPanelMobileHided}`}>
           <div className={styles.Aside}>
             <div className={styles.AsideTop}>
-              {loggedIn && <UserLogo />}
-              {loggedIn && <p className={styles.UserName}>{user.first_name} {user.last_name}</p>}
+              {authed && <UserLogo />}
+              {authed && <p className={styles.UserName}>{user.first_name} {user.last_name}</p>}
             </div>
             <div className={styles.AsideBtnBlock}>
-              {loggedIn ? <Button onClick={handleLogOut} secondary>Log out</Button> :
+              {authed ? <Button onClick={handleLogOut} secondary>Log out</Button> :
                 <Button onClick={goToLogin} secondary>Log In</Button>}
             </div>
             <div className={styles.AsideBottom}>
