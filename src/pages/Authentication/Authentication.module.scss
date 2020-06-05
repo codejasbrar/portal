@@ -1,0 +1,23 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.Auth {
+    min-height:      calc(100vh - 100px);
+    display:         flex;
+    justify-content: center;
+
+    @include breakpoint($mobile) {
+        min-height: auto;
+    }
+
+    &Background {
+        background-position: center;
+        background-size:     cover;
+
+        @include breakpoint($mobile) {
+            background-image: none !important;
+            background-color: #fff;
+        }
+    }
+}

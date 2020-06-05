@@ -35,3 +35,15 @@ a {
         color: inherit;
     }
 }
+
+input:focus, input:active {
+    outline: none;
+}
+
+section {
+    padding-top: 70px;
+}
+
+h1 {
+    line-height: 1.2;
+}
