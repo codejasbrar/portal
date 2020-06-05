@@ -24,7 +24,6 @@ const ResetPassword = () => {
   const searchStringParams = searchToObject(location.search);
 
   useEffect(() => {
-    console.log(searchStringParams);
     if (searchStringParams && searchStringParams.token) {
       dispatch(loadUserByToken());
     } else {

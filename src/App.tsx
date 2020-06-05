@@ -30,8 +30,6 @@ const App = () => {
     })();
   }, [dispatch, isLoggedIn]);
 
-  console.log('App rendered');
-
   return <Router>
     <Header />
     {loading && <Spinner />}

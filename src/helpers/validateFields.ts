@@ -14,7 +14,6 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
   let message = '';
   fieldsArray.reverse().forEach((field: FieldObject) => {
     if (!field.value.length) {
-      console.log(field);
       message = `${field.name} can't be empty`;
       valid = false;
     } else {
@@ -49,7 +48,7 @@ export default ValidateFields;
 
 
 const isValidPassword = (pass: string): boolean => {
-  return (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/).test(pass); //Minimum eight characters, at least one letter and one number:
+  return (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\-@#!?%*^<>&$~±§]{8,}$/).test(pass); //Minimum eight characters, at least one letter and one number:
 };
 
 const isValidEmail = (email: string) => {
