@@ -7,8 +7,9 @@ import {Provider} from "react-redux";
 import thunk from "redux-thunk";
 import rootReducer from "./reducers/root";
 
+
 // @ts-ignore
-const store = createStore(rootReducer, compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
+const store = process.env.NODE_ENV === 'development' ? createStore(rootReducer, compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())) : createStore(rootReducer, applyMiddleware(thunk));
 
 ReactDOM.render(
   <Provider store={store}>
