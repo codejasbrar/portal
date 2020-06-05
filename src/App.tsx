@@ -37,8 +37,7 @@ const App = () => {
     {loading && <Spinner />}
     <Switch>
       <Route exact path="/" component={Main} />
-      <Route path="/authentication" component={Authentication} />
-      {/*<Route path="/logout" component={() => <Authentication mode="logout" />} />*/}
+      <Route path="/authentication" render={(props => (isLoggedIn ? <Redirect to="/" /> : <Authentication />))} />
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <Route path="/inner" component={Inner} />
       </PrivateRoute>

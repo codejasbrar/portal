@@ -3,7 +3,7 @@ import React from "react";
 import LoginForm from "../../../components/LoginForm/LoginForm";
 
 //Styles
-import styles from "../Authentication.module.scss";
+import styles from "../../../components/LoginForm/LoginForm.module.scss";
 
 const Logout = () =>
   <div className={styles.FormWrapper}>

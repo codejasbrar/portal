@@ -11,8 +11,8 @@ import Input from "../Input/Input";
 import Button from "../Button/Button";
 import Checkbox from "../Checbox/Checkbox";
 import {authState, loading} from "../../selectors/selectors";
-import isValidEmail from "../../helpers/isValidEmail";
 import Spinner from "../Spinner/Spinner";
+import ValidateFields from "../../helpers/validateFields";
 
 
 const LoginForm = () => {
@@ -28,23 +28,19 @@ const LoginForm = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    if (!username.length) {
-      setLocalError("Email can't be empty");
-      return;
-    } else if (!isValidEmail(username)) {
-      setLocalError('Email is not valid');
-      return;
-    } else if (!password.length) {
-      setLocalError("Password can't be empty");
-      return;
-    }
-    setLocalError('');
+    const validation = ValidateFields([{
+      name: "Email",
+      type: "email",
+      value: username
+    }, {
+      name: "Password",
+      type: "text",
+      value: password
+    }]);
+    setLocalError(validation.message);
+    if (!validation.valid) return;
     dispatch(logIn({username, password}));
-    if (remember) {
-      rememberCredentials()
-    } else {
-      removeCredentials();
-    }
+    remember ? rememberCredentials() : removeCredentials();
   };
 
   const rememberCredentials = () => {
@@ -68,8 +64,8 @@ const LoginForm = () => {
   return <>
     {isLoading && <Spinner />}
     <form onSubmit={handleSubmit} className={styles.Form}>
-      {auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
-      {!auth.error && localError && <span className={styles.FormError}>{localError}</span>}
+      {!localError && auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
+      {localError && <span className={styles.FormError}>{localError}</span>}
       <Input placeholder="Email" autofocus name="username" value={username} onChange={setUsername} label="Email" />
       <Input placeholder="Password"
         name="password"
@@ -79,7 +75,7 @@ const LoginForm = () => {
         label="Password" />
       <div className={styles.Bottom}>
         <Checkbox name="remember" checked={remember} onChange={setRemember} label="Remember me" />
-        <Link to="/authentication/reset-password" className={styles.BottomLink}>Forgot password</Link>
+        <Link to="/authentication/recovery" className={styles.BottomLink}>Forgot password</Link>
       </div>
       <div className={styles.FormBtn}><Button type="submit">Log in now</Button></div>
     </form>

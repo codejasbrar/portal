@@ -16,6 +16,8 @@ import bg7 from "../../images/login/bg7.jpg";
 import {Route, Switch, Redirect} from "react-router-dom";
 import Login from "./Steps/Login";
 import Logout from "./Steps/Logout";
+import PasswordRecovery from "./Steps/PasswordRecovery";
+import Verification from "./Steps/Verification";
 import ResetPassword from "./Steps/ResetPassword";
 
 const bgArray = [bg1, bg2, bg3, bg4, bg5, bg6, bg7];
@@ -28,10 +30,13 @@ const Authentication = () => {
       <div className={styles.container}>
         <div className={styles.Auth}>
           <Switch>
+            <Route path="/authentication/" exact={true} render={() => <Redirect to="/authentication/login" />} />
             <Route path="/authentication/login" component={Login} />
             <Route path="/authentication/logout" component={Logout} />
+            <Route path="/authentication/recovery" component={PasswordRecovery} />
+            <Route path="/authentication/verification" component={Verification} />
             <Route path="/authentication/reset-password" component={ResetPassword} />
-            <Route path="/authentication" exact={true} render={() => <Redirect to="/authentication/login" />} />
+            <Route render={() => <Redirect to="/authentication/login" />} />
           </Switch>
         </div>
       </div>
