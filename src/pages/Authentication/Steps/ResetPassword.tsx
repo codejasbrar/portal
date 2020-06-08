@@ -29,7 +29,7 @@ const ResetPassword = () => {
     } else {
       history.replace('/authentication')
     }
-  }, []);
+  }, [dispatch, history, searchStringParams]);
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();

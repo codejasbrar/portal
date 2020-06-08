@@ -35,7 +35,7 @@ const Verification = () => {
   };
 
   const preValidatePhone = (num: string) => {
-    if ((/[A-Za-z$,&_`~=!"';@§±:#<>%^*./?|}{\[\]]/).test(num)) return;
+    if ((/[A-Za-z$,&_`~=!"';@§±:#<>%^*./?|}{[\]]/).test(num)) return;
     setPhone(num);
   };
 
