@@ -8,6 +8,4 @@ const config: Config = {
   apiHostName: process.env.REACT_APP_API_HOST,
 } as Config;
 
-console.log(process.env.REACT_APP_API_HOST);
-
 export default config
