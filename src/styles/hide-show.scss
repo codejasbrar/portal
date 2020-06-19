@@ -1,0 +1,61 @@
+@import "variables";
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.hideTablet {
+    @include breakpoint($tablet) {
+        display: none;
+    }
+}
+
+.showTablet {
+    @include breakpointMin($show_tablet) {
+        display: none;
+    }
+}
+
+.hideTabletHorizontal {
+    @include breakpoint($tablet_horizontal) {
+        display: none;
+    }
+}
+
+.showTabletHorizontal {
+    @include breakpointMin($show_tablet_horizontal) {
+        display: none;
+    }
+}
+
+.hideBigMobile {
+    @include breakpoint($big_mobile) {
+        display: none;
+    }
+}
+
+.showBigMobile {
+    @include breakpointMin($show_big_mobile) {
+        display: none;
+    }
+}
+
+.hideMobile {
+    @include breakpoint($mobile) {
+        display: none;
+    }
+}
+
+.showMobile {
+    @include breakpointMin($show_mobile) {
+        display: none;
+    }
+}
+
+.hidden {
+    visibility: hidden;
+}

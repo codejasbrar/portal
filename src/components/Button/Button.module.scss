@@ -7,27 +7,27 @@
     font-family:      "Open Sans Semibold", sans-serif;
     letter-spacing:   0.3px;
     border-radius:    3px;
-    background-color: $primary_btn;
+    background-color: $primary--hover;
     color:            #fff;
 
     &:hover {
-        background-color: lighten($primary_btn, 8);
+        background-color: lighten($primary--hover, 8);
     }
 
     &:active {
-        background-color: darken($primary_btn, 8);
+        background-color: darken($primary--hover, 8);
     }
 
     &Secondary {
-        background-color: $gray;
+        background-color: $gray4;
         color:            #fff;
 
         &:hover {
-            background-color: lighten($gray, 8);
+            background-color: lighten($gray4, 8);
         }
 
         &:active {
-            background-color: darken($gray, 8);
+            background-color: darken($gray4, 8);
         }
     }
 }

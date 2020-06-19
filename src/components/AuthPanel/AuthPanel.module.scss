@@ -23,7 +23,7 @@
             width:            270px;
             top:              0;
             bottom:           0;
-            background-color: $light_bg;
+            background-color: $gray2;
             transition:       transform 0.3s linear;
             z-index:          1;
         }
@@ -36,7 +36,7 @@
     &Logo {
         height:           40px;
         width:            40px;
-        background-color: $gray;
+        background-color: $gray4;
         border-radius:    50%;
         display:          flex;
         justify-content:  center;
@@ -49,7 +49,7 @@
         }
 
         &Char {
-            color:          $text_gray;
+            color:          $gray6;
             font-family:    "Open Sans Condensed", sans-serif;
             font-size:      1.4em;
             line-height:    26px;
@@ -141,7 +141,7 @@
 
     &BtnBlock {
         padding:       16px 16px 24px;
-        border-bottom: 1px solid $gray_2;
+        border-bottom: 1px solid $gray3;
     }
 
     &Bottom {
@@ -150,11 +150,15 @@
 
     &Link {
         font-size:      0.86em;
-        color:          $text_gray;
+        color:          $gray6;
         font-family:    "Open Sans", sans-serif;
         letter-spacing: 0.3px;
         line-height:    30px;
         display:        block;
+
+        &:visited {
+            color: $gray6;
+        }
     }
 }
 

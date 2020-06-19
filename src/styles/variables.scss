@@ -1,21 +1,43 @@
 //Colors
-$text:        #232d37;
-$dark_bg:     $text;
-$light_bg:    #37414b;
-$gray:        #6e7882;
-$gray_1:      #e5e5e5;
-$gray_2:      #4b555f;
-$text_gray:   #c3c8cd;
-$text_gray_2: #87919b;
+$text:                   #232d37;
+$dark_bg:                $text;
 
-$primary:     #00AAFF;
-$primary_btn: #46c3ff;
+$gray1:                  #e5e5e5;
+$gray2:                  #37414B;
+$gray3:                  #4b555f;
+$gray4:                  #6E7882;
+$gray5:                  #87919B;
+$gray6:                  #C3C8CD;
+$gray7:                  #E1E4E6;
+$gray8:                  #F5F5F5;
 
-$error:       #C80000;
+$primary:                #00AAFF;
+$primary--hover:         #46c3ff;
+$primary--active:        #0096e1;
+$primary--active-text:   #055f8c;
 
+$error:                  #C80000;
 
 //Breakponts
-$desktop:     1200px;
-$big-tablet:  900px;
-$tablet:      768px;
-$mobile:      600px;
+$infelicity:             30px;
+$max_width:              1170px;
+$desktop:                $max_width+($infelicity*2); //1230px
+$big_width:              1100px;
+$mid_width:              940px;
+$tablet_horizontal:      768px+($infelicity*3); //858px
+$big_tablet:             820px;
+$tablet:                 768px+$infelicity; //798px
+$min-tablet:             1px+$tablet; //799px
+$big_mobile_horizontal:  600px+($infelicity*3); //690px
+$big_mobile:             600px+$infelicity; //630px
+$middle_mobile:          530px;
+$mobile:                 420px+$infelicity; //450px
+
+
+//  Sizes for show classes
+//-------------------------
+$show_tablet_horizontal: $tablet_horizontal + 1px; //859px
+$show_tablet:            $tablet + 1px; //799px
+$show_big_mobile:        $big_mobile + 1px; //631px
+$show_mobile:            $mobile + 1px; //451px
+//-------------------------
