@@ -16,6 +16,7 @@ import ValidateFields from "../../helpers/validateFields";
 
 
 const LoginForm = () => {
+
   const dispatch = useDispatch();
   const auth = useSelector((store: Storage) => ({...authState(store)}));
   const isLoading = useSelector((store: Storage) => (loading(store)));
@@ -60,6 +61,12 @@ const LoginForm = () => {
       history.replace("/inner");
     }
   }, [auth.loggedIn, history]);
+
+  useEffect(() => {
+    if (auth.tempData) {
+      history.replace("/authentication/security-code")
+    }
+  }, [auth.tempData]);
 
   return <>
     {isLoading && <Spinner />}

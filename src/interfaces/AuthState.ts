@@ -4,7 +4,8 @@ import {AuthData, IAuth, LoginError} from "../services/AuthApiService";
 export interface AuthState {
   loggedIn: boolean,
   error?: LoginError,
-  loading: boolean
+  loading: boolean,
+  tempData?: AuthData
 }
 
 interface AuthRequest {
