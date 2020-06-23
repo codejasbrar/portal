@@ -2,11 +2,10 @@ import axios from "axios";
 import config from "../config";
 
 const createAxios = () => axios.create({
-  baseURL: 'http://52.188.111.171:8080',
+  baseURL: config.apiHostName,
   headers: {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Accept': '*/*'
+    'Access-Control-Allow-Origin': '*'
   }
 });
 
