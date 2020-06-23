@@ -1,6 +1,6 @@
 type FieldObject = {
   name: string,
-  type: "email" | "password" | "text",
+  type: "email" | "password" | "text" | "code",
   value: string
 }
 
@@ -30,6 +30,12 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
             valid = false;
           } else if (!isValidPassword(field.value)) {
             message = "Must contain at least one number and one letter";
+            valid = false;
+          }
+          break;
+        case "code":
+          if (field.value.length !== 6 && !(/\D/g).test(field.value)) {
+            message = "Required 6 digit security code";
             valid = false;
           }
           break;

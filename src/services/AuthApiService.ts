@@ -11,7 +11,8 @@ export interface IAuth {
 
 export interface AuthData {
   username: string,
-  password: string
+  password: string,
+  securityCode?: string
 }
 
 export interface LoginError {

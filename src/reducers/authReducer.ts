@@ -1,4 +1,4 @@
-import {LOGIN_ERROR, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT} from "../actions/authActions";
+import {LOGIN_ERROR, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, CODE_REQUIRED, CODE_INCORRECT} from "../actions/authActions";
 import {AuthActionsTypes, AuthState} from "../interfaces/AuthState";
 
 const initialState: AuthState = {
@@ -16,7 +16,8 @@ export default (state = initialState, action: AuthActionsTypes) => {
         ...state,
         loggedIn: true,
         error: null,
-        loading: false
+        loading: false,
+        tempData: undefined
       };
     case LOGOUT:
       localStorage.removeItem('token');
@@ -25,12 +26,26 @@ export default (state = initialState, action: AuthActionsTypes) => {
         loggedIn: false,
         error: null
       };
+    case CODE_REQUIRED:
+      return {
+        ...state,
+        loggedIn: false,
+        loading: false,
+        tempData: action.payload
+      };
+    case CODE_INCORRECT:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      };
     case LOGIN_ERROR:
       return {
         ...state,
         loggedIn: false,
         error: action.payload,
-        loading: false
+        loading: false,
+        tempData: undefined
       };
     default:
       return state;

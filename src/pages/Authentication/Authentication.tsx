@@ -17,8 +17,9 @@ import {Route, Switch, Redirect} from "react-router-dom";
 import Login from "./Steps/Login";
 import Logout from "./Steps/Logout";
 import PasswordRecovery from "./Steps/PasswordRecovery";
-import Verification from "./Steps/Verification";
+import SmsVerification from "./Steps/SmsVerification";
 import ResetPassword from "./Steps/ResetPassword";
+import Verification from "./Steps/Verification";
 
 const bgArray = [bg1, bg2, bg3, bg4, bg5, bg6, bg7];
 
@@ -34,7 +35,8 @@ const Authentication = () => {
             <Route path="/authentication/login" component={Login} />
             <Route path="/authentication/logout" component={Logout} />
             <Route path="/authentication/recovery" component={PasswordRecovery} />
-            <Route path="/authentication/verification" component={Verification} />
+            <Route path="/authentication/security-code" component={Verification} />
+            <Route path="/authentication/verification" component={SmsVerification} />
             <Route path="/authentication/reset-password" component={ResetPassword} />
             <Route render={() => <Redirect to="/authentication/login" />} />
           </Switch>
