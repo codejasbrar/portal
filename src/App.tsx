@@ -44,7 +44,7 @@ const App = () => {
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <>
           <Route path="/inner" component={Inner} />
-          <Route path={['/orders/pending', '/orders/approved', '/orders/test', '/orders/test-approved']} component={OrdersPage} />
+          <Route path={['/orders/pending', '/orders/approved', '/orders/test', '/orders/test-approved', '/orders/navigation']} component={OrdersPage} />
         </>
       </PrivateRoute>
     </Switch>

@@ -11,3 +11,9 @@
         @content;
     }
 }
+
+@mixin appearance {
+    appearance:   none;
+    user-select:  none;
+    touch-action: manipulation;
+}

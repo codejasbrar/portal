@@ -1,0 +1,49 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+@import "../../../styles/common";
+
+
+.arrowLeft, .arrowRight {
+    padding: 10px;
+
+    svg {
+        width:  8px;
+        height: 12px;
+        fill:   $primary;
+    }
+
+    &:disabled {
+        opacity: 0.3;
+    }
+}
+
+.arrowLeft {
+    transform: translateY(2px);
+}
+
+.arrowRight {
+    transform: rotate(180deg);
+}
+
+.text {
+    color:          $text;
+    font-family:    "Open Sans", Arial, sans-serif;
+    font-size:      14px;
+    letter-spacing: 0.3px;
+    line-height:    20px;
+    padding-top:    10px;
+
+    .semibold {
+        font-weight: 600;
+    }
+}
+
+.pagination {
+    margin-top:  10px;
+    display:     flex;
+    align-items: center;
+
+    &Arrows {
+        margin-left: auto;
+    }
+}

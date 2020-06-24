@@ -4,13 +4,11 @@ import React from "react";
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
 
-type NavigationPropsTypes = {
-  show: boolean
-};
+type NavigationPropsTypes = {};
 
 const Navigation = (props: NavigationPropsTypes) =>
 
-  <div className={`${styles.navigation} ${props.show ? styles.navigationShow : ''}`}>
+  <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Orders</h2>
     <nav className={styles.navList}>
