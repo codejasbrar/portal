@@ -8,6 +8,9 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
+import {useSelector} from "react-redux";
+import {ordersState} from "../../../selectors/selectors";
+import {Order} from "../../../interfaces/Order";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -24,7 +27,7 @@ function useCurrentWitdh() {
     return () => {
       window.removeEventListener('resize', resizeListener);
     }
-  }, [])
+  }, []);
 
   return width;
 }
@@ -137,8 +140,27 @@ const NoMatches = () => (
   </div>
 );
 
-const PendingOrdersPage = () =>
-  <section className={styles.orders}>
+const reformatDate = (order: Order) => {
+  const date = new Date(order.received);
+  return {
+    ...order,
+    received: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
+  }
+};
+
+
+const PendingOrdersPage = () => {
+  const orders = useSelector(ordersState);
+  const [data, setData] = useState(orders);
+
+  useEffect(() => {
+    if (orders && orders.length) {
+      setData(orders);
+    }
+  }, [orders]);
+
+
+  return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -147,7 +169,7 @@ const PendingOrdersPage = () =>
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data}
+          data={data.map(reformatDate)}
           columns={columns}
           options={options}
         />
@@ -174,5 +196,6 @@ const PendingOrdersPage = () =>
       </div>
     }
   </section>
+}
 
 export default PendingOrdersPage;

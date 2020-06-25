@@ -7,6 +7,10 @@ import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
+import {useDispatch, useSelector} from "react-redux";
+import {ordersState} from "../../selectors/selectors";
+import {loadOrdersByStatus} from "../../actions/ordersActions";
+import Spinner from "../../components/Spinner/Spinner";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -29,7 +33,19 @@ function useCurrentWitdh() {
 }
 
 const OrdersPage = () => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      await dispatch(loadOrdersByStatus('PENDING'));
+      await dispatch(loadOrdersByStatus('APPROVED'));
+      setLoading(false);
+    })();
+  }, []);
+
   return <>
+    {loading && <Spinner />}
     <section className={styles.wrapper}>
       <div className={styles.container}>
         <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
