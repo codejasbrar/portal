@@ -3,26 +3,45 @@ import Navigation from "../../components/Navigation/Navigation";
 import {Route} from "react-router-dom";
 import PendingOrdersPage from "./PendingOrdersPage/PendingOrdersPage";
 import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
+import MobileNavigation from "../../components/Navigation/MobileNavigation";
+import {useDispatch} from "react-redux";
+import {loadOrdersByStatus} from "../../actions/ordersActions";
+import Spinner from "../../components/Spinner/Spinner";
+
+const getWidth = () => window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
 
 const OrdersPage = () => {
-  const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  let [width, setWidth] = useState(getWidth());
 
-  const onClickShow = (e: any) => {
-    setShow(true);
-  }
+  useEffect(() => {
+    (async () => {
+      await dispatch(loadOrdersByStatus('PENDING'));
+      await dispatch(loadOrdersByStatus('APPROVED'));
+      setLoading(false);
+    })();
+    const resizeListener = () => {
+      setWidth(getWidth())
+    };
+    window.addEventListener('resize', resizeListener);
+    return () => {
+      window.removeEventListener('resize', resizeListener);
+    }
+  }, []);
 
   return <>
+    {loading && <Spinner />}
     <section className={styles.wrapper}>
       <div className={styles.container}>
         <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
         <div className={styles.containerFlex}>
-          <a onClick={onClickShow} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>Main menu</a>
-          <div onClick={() => setShow(false)}>
-            <Navigation show={show} />
-          </div>
+          {width > 858 ? <Navigation /> : <Route path="/orders/navigation" component={MobileNavigation} />}
           <Route path="/orders/pending" component={PendingOrdersPage} />
           <Route path="/orders/approved" component={ApprovedOrdersPage} />
           <Route path="/orders/test" component={TestPendingOrdersPage} />

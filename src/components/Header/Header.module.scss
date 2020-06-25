@@ -7,7 +7,7 @@
     width:            100%;
     background-color: $dark_bg;
     position:         fixed;
-    z-index:          10;
+    z-index:          999;
 
     @include breakpoint($tablet) {
         height: 60px;

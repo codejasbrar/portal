@@ -5,11 +5,15 @@
 .wrapper {
     padding-top: 138px;
     position:    relative;
-    height:      100vh;
 
     @include breakpoint($tablet_horizontal) {
         padding-top: 88px;
     }
+}
+
+.orders {
+    width:          100%;
+    padding-bottom: 190px;
 }
 
 .containerFlex {
@@ -28,6 +32,7 @@
     position:       relative;
     padding-left:   20px;
     cursor:         pointer;
+    margin-bottom:  40px;
     display:        none;
 
     @include breakpoint($tablet_horizontal) {
@@ -36,6 +41,10 @@
 
     &:hover {
         text-decoration: underline;
+    }
+
+    &:visited {
+        color: $primary;
     }
 
     &:before {
@@ -47,5 +56,102 @@
         transform:        translateY(-50%);
         width:            9px;
         height:           14px;
+    }
+}
+
+.tableWrap {
+    width:     100%;
+    max-width: 900px;
+}
+
+.sortBlock {
+    top:              0;
+    z-index:          100;
+    position:         sticky;
+    background-color: #fff;
+    color:            $text;
+    font-size:        14px;
+    font-family:      "Open Sans", Arial, sans-serif;
+    font-weight:      600;
+    line-height:      1.5rem;
+    border-bottom:    1px solid $gray6 !important;
+    letter-spacing:   0.3px;
+    display:          table-cell;
+    padding:          16px;
+    text-align:       left;
+    box-sizing:       border-box;
+    width:            100%;
+    outline:          0;
+    vertical-align:   middle;
+
+    span {
+        padding-left: 8px;
+    }
+}
+
+.mobileOrders {
+    &Item {
+        border-top: 1px solid $gray7;
+        width:      100%;
+        padding:    12px 0 17px;
+
+        &:last-child {
+            border-bottom: 1px solid $gray7;
+        }
+
+        .btnPrimary {
+            margin-top: 13px;
+        }
+    }
+
+    &Title,
+    &Text {
+        color:          $text;
+        font-family:    "Open Sans", Arial, sans-serif;
+        font-size:      14px;
+        font-weight:    600;
+        letter-spacing: 0.3px;
+        padding:        4px 0px;
+    }
+
+    &Text {
+        font-weight: 400;
+    }
+
+    .btnPrimary {
+        width:     100%;
+        max-width: 288px;
+
+        @include breakpoint($mobile) {
+            max-width: 100%;
+        }
+    }
+}
+
+.heading20 {
+
+    @include breakpoint($tablet_horizontal) {
+        margin-bottom: 10px;
+    }
+}
+
+.ordersResultsInfo {
+    color:          $gray5;
+    font-family:    "Open Sans", Arial, sans-serif;
+    font-size:      14px;
+    letter-spacing: 0.3px;
+    margin-bottom:  20px;
+}
+
+.sorry {
+    margin-top:  20px;
+    padding-top: 18px;
+    border-top:  1px solid $gray7;
+
+    &Text {
+        color:          $text;
+        font-family:    "Open Sans", Arial, sans-serif;
+        font-size:      14px;
+        letter-spacing: 0.3px;
     }
 }

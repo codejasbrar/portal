@@ -8,7 +8,8 @@ import {ordersState} from "../../selectors/selectors";
 
 type NavigationPropsTypes = {};
 
-const Navigation = (props: NavigationPropsTypes) => {
+const MobileNavigation = (props: NavigationPropsTypes) => {
+
   const orders = useSelector(ordersState);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
@@ -18,8 +19,8 @@ const Navigation = (props: NavigationPropsTypes) => {
     }
   }, [orders]);
 
-  return <div className={styles.navigation}>
-    <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
+  return <div className={styles.mobileNavigation}>
+    <h1 className={styles.heading30}>Physician portal</h1>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Orders</h2>
     <nav className={styles.navList}>
       <NavLink to={'/orders/pending'} className={styles.navlink}
@@ -49,6 +50,6 @@ const Navigation = (props: NavigationPropsTypes) => {
       </NavLink>
     </nav>
   </div>
-};
+}
 
-export default Navigation;
+export default MobileNavigation;
