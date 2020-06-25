@@ -16,10 +16,14 @@ import Spinner from "./components/Spinner/Spinner";
 import Main from "./pages/Main/Main";
 import Inner from "./pages/Inner/Inner";
 
+import LabSlipApiService from "./services/LabSlipApiService";
+
+new LabSlipApiService();
+
 const App = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((store: Storage) => (loggedIn(store)));
+  const isLoggedIn = useSelector(loggedIn);
 
   useEffect(() => {
     (async () => {

@@ -18,8 +18,8 @@ import ValidateFields from "../../helpers/validateFields";
 const LoginForm = () => {
 
   const dispatch = useDispatch();
-  const auth = useSelector((store: Storage) => ({...authState(store)}));
-  const isLoading = useSelector((store: Storage) => (loading(store)));
+  const auth = useSelector(authState);
+  const isLoading = useSelector(loading);
   const history = useHistory();
   const storedPassword = localStorage.getItem('password');
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
