@@ -16,22 +16,6 @@ const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-function useCurrentWitdh() {
-  let [width, setWidth] = useState(getWidth());
-
-  useEffect(() => {
-    const resizeListener = () => {
-      setWidth(getWidth())
-    };
-    window.addEventListener('resize', resizeListener);
-    return () => {
-      window.removeEventListener('resize', resizeListener);
-    }
-  }, []);
-
-  return width;
-}
-
 const columns = [
   {
     name: "id",
@@ -72,27 +56,6 @@ const columns = [
   },
 ];
 
-const data = [
-  {id: "23244", received: "4/23/2020", customerId: "33267", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2019", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2018", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "4/23/2020", customerId: "33267", criteriaMet: false},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "7777", received: "7/23/2020", customerId: "7778", criteriaMet: true},
-  {id: "9830", received: "9/23/2020", customerId: "33267", criteriaMet: false},
-];
-
 const options: MUIDataTableOptions = {
   filterType: 'checkbox',
   filter: false,
@@ -102,7 +65,7 @@ const options: MUIDataTableOptions = {
   searchOpen: true,
   search: false,
   responsive: "scrollFullHeight",
-  rowsPerPage: 10,
+  rowsPerPage: 25,
   selectToolbarPlacement: 'none',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -148,24 +111,50 @@ const reformatDate = (order: Order) => {
   }
 };
 
-
 const PendingOrdersPage = () => {
   const orders = useSelector(ordersState);
   const [data, setData] = useState(orders);
+  const [searchText, setSearchText] = useState('');
+  let [width, setWidth] = useState(getWidth());
 
   useEffect(() => {
     if (orders && orders.length) {
-      setData(orders);
+      setData(orders.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+
+    const resizeListener = () => {
+      setWidth(getWidth())
+    };
+    window.addEventListener('resize', resizeListener);
+    return () => {
+      window.removeEventListener('resize', resizeListener);
     }
   }, [orders]);
 
+  const searchFilter = (item: any) =>
+    (String(item.id).indexOf(searchText) !== -1)
+    || (String(item.customerId).indexOf(searchText) !== -1)
+      ? 1 : 0;
+
+  const ordersToView = data
+    .map(reformatDate)
+    .filter(searchFilter)
+    .sort(((a: any, b: any) => {
+      const aDate = new Date(a.received);
+      const bDate = new Date(b.received);
+
+      return aDate > bDate ? 1 : -1;
+    }));
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
     <h2 className={styles.heading20}>Orders pending approval</h2>
-    {useCurrentWitdh() > 700 ?
+    {width > 700 ?
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
@@ -176,23 +165,24 @@ const PendingOrdersPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>(3 results)</p>
+        <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
         <button className={styles.btnPrimary}>Approve all orders</button>
-        <SearchBarMobile />
-        {data.map((item: any, i) => (
-          <div key={i} className={styles.mobileOrdersItem}>
-            <p className={styles.mobileOrdersTitle}>Order
-              ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
-            <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
-            </p>
-            <p className={styles.mobileOrdersTitle}>Customer
-              ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-            <p className={styles.mobileOrdersTitle}>Criteria
-              met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
-            <button className={styles.btnPrimary}>Approve</button>
-          </div>
-        ))}
-        {/*<NoMatches/>*/}
+        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        {ordersToView
+          .map((item: any, i) => (
+            <div key={i} className={styles.mobileOrdersItem}>
+              <p className={styles.mobileOrdersTitle}>Order
+                ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
+              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
+              </p>
+              <p className={styles.mobileOrdersTitle}>Customer
+                ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
+              <p className={styles.mobileOrdersTitle}>Criteria
+                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+              <button className={styles.btnPrimary}>Approve</button>
+            </div>
+          ))}
+        {ordersToView.length === 0 && <NoMatches />}
       </div>
     }
   </section>
