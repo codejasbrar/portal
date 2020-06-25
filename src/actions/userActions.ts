@@ -12,6 +12,6 @@ export const userLogoutAction = () => ({type: USER_LOGOUT});
 
 export const loadUserByToken = () => (dispatch: Dispatch<object>) => {
   dispatch(userLoadRequest());
-  dispatch(userLoadSuccess({first_name: 'Mark', last_name: 'Ruffalo'}))
+  dispatch(userLoadSuccess({first_name: 'John', last_name: 'McClane'}))
 };
 

@@ -16,8 +16,8 @@ import Spinner from "../../../components/Spinner/Spinner";
 
 const Verification = () => {
   const dispatch = useDispatch();
-  const auth = useSelector((store: Storage) => ({...authState(store)}));
-  const isLoading = useSelector((store: Storage) => (loading(store)));
+  const auth = useSelector(authState);
+  const isLoading = useSelector(loading);
   const history = useHistory();
   const [error, setError] = useState('');
   const [localError, setLocalError] = useState('');

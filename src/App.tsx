@@ -23,7 +23,7 @@ new LabSlipApiService();
 const App = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((store: Storage) => (loggedIn(store)));
+  const isLoggedIn = useSelector(loggedIn);
 
   useEffect(() => {
     (async () => {

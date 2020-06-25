@@ -4,8 +4,11 @@ import config from "../config";
 const createAxios = () => axios.create({
   baseURL: config.apiHostName,
   headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
+    common: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Accept': "*/*",
+    }
   }
 });
 
