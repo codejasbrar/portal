@@ -1,0 +1,51 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.wrapper {
+    padding-top: 138px;
+    position:    relative;
+    height:      100vh;
+
+    @include breakpoint($tablet_horizontal) {
+        padding-top: 88px;
+    }
+}
+
+.containerFlex {
+    display: flex;
+
+    @include breakpoint($tablet_horizontal) {
+        display: block;
+    }
+}
+
+.menuLink {
+    color:          $primary;
+    font-family:    "Open Sans", Arial, sans-serif;
+    font-size:      14px;
+    letter-spacing: 0.3px;
+    position:       relative;
+    padding-left:   20px;
+    cursor:         pointer;
+    display:        none;
+
+    @include breakpoint($tablet_horizontal) {
+        display: block;
+    }
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    &:before {
+        content:          '';
+        position:         absolute;
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14' viewBox='0 0 9 14'%3E%3Cg%3E%3Cg transform='rotate(-270 4.5 7)'%3E%3Cpath fill='%230af' d='M9.472 3L4.501 7.944-.472 3-2 4.522 4.5 11 11 4.522z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        left:             0;
+        top:              50%;
+        transform:        translateY(-50%);
+        width:            9px;
+        height:           14px;
+    }
+}
