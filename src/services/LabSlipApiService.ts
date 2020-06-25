@@ -7,7 +7,6 @@ export type TestStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTE
 
 export default class LabSlipApiService {
   static getOrdersByStatus = async (status: OrderStatus) => await authorized.get(`/getOrdersByStatus/${status}`).then(data => data);
-
   static saveApprovedOrders = async (hashes: string[]) => await authorized.post('/saveApprovedOrders', {hashes})
 
   static getTestsByStatus = async (status: TestStatus) => await authorized.get(`/getResultsByStatus/${status}`).then(data => data);

@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 
 import BodyScroll from "../../helpers/bodyScrollLock";
 
-import styles from "./Spinner.module.css";
+import styles from "./Spinner.module.scss";
 
 
 const Spinner = () => {
