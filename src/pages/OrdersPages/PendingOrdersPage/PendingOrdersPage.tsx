@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
+
 import styles from "../OrdersPages.module.scss";
+
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
@@ -12,8 +14,6 @@ import {Order} from "../../../interfaces/Order";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {log} from "util";
-import {dark} from "@material-ui/core/styles/createPalette";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -59,7 +59,7 @@ const columns = [
   },
 ];
 
-const options = (onSelect: any) => ({
+const options = (onSelect: any, onSaved: any) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -69,7 +69,7 @@ const options = (onSelect: any) => ({
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectToolbarPlacement: 'center',
+  selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
   textLabels: {
@@ -95,6 +95,7 @@ const options = (onSelect: any) => ({
   customToolbar: () => '',
   customToolbarSelect: (selected) => <ApproveButton mode="order"
     text={"Approve orders"}
+    onSaved={onSaved}
     selected={onSelect(selected.data)} />,
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
@@ -122,9 +123,20 @@ const PendingOrdersPage = () => {
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
 
+  const onSaved = async () => {
+    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
+    const orders = response.data;
+    if (orders && orders.length) {
+      setData(orders.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+
+    setData(orders);
+  };
 
   useEffect(() => {
-
     (async () => {
       const response = await LabSlipApiService.getOrdersByStatus('PENDING');
       const orders = response.data;
@@ -139,7 +151,7 @@ const PendingOrdersPage = () => {
       setLoading(false);
     })();
 
-  useEffect(() => {
+
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -149,15 +161,12 @@ const PendingOrdersPage = () => {
     }
   }, []);
 
-  options.onRowsSelect = (item, selected) => onSelect(selected);
-
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
     || (String(item.customerId).indexOf(searchText) !== -1)
       ? 1 : 0;
 
   const ordersToView = data
-    .filter(order => !order.approved)
     .map(reformatDate)
     .filter(searchFilter)
     // .sort(((a: any, b: any) => {
@@ -167,9 +176,7 @@ const PendingOrdersPage = () => {
     //   return aDate > bDate ? 1 : -1;
     // }));
 
-  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => {
-    return selectedRows.map(row => ordersToView[row.dataIndex]);
-  };
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
   if (loading) {
     return <Spinner />;
@@ -186,13 +193,13 @@ const PendingOrdersPage = () => {
           title={''}
           data={data.map(reformatDate)}
           columns={columns}
-          options={options(onSelect)}
+          options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
-        <button className={styles.btnPrimary}>Approve all orders</button>
+        <ApproveButton mode="order" onSaved={onSaved} selected={data} text={"Approve all orders"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -205,7 +212,11 @@ const PendingOrdersPage = () => {
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
               <p className={styles.mobileOrdersTitle}>Criteria
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
-              <button className={styles.btnPrimary}>Approve</button>
+              <ApproveButton className={styles.btnApproveMobile}
+                mode="order"
+                onSaved={onSaved}
+                selected={[item]}
+                text={"Approve"} />
             </div>
           ))}
         {ordersToView.length === 0 && <NoMatches />}
