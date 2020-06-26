@@ -57,7 +57,6 @@ const columns = [
 ];
 
 const options: MUIDataTableOptions = {
-  filterType: 'checkbox',
   filter: false,
   download: false,
   print: false,
@@ -66,7 +65,8 @@ const options: MUIDataTableOptions = {
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
+  selectableRows: 'multiple',
+  selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
   textLabels: {
@@ -87,12 +87,11 @@ const options: MUIDataTableOptions = {
     });
     return items;
   },
+  selectableRowsOnClick: true,
   customFooter: CommonPagination,
-  customToolbarSelect: () => <>Selected toolbar</>,
+  customToolbarSelect: () => <><button className={styles.btnPrimary}>Approved</button></>,
   customSearchRender: SearchBar,
-  customToolbar: () => <div>
-    <button className={styles.btnPrimary}>Approved</button>
-  </div>
+  customToolbar: () => <></>,
 } as MUIDataTableOptions;
 
 const NoMatches = () => (

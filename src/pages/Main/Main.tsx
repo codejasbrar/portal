@@ -9,7 +9,7 @@ const Main = (props: MainPropsTypes) =>
   <section className={styles.Main}>
     <div className={styles.container}>
       <h1>Hello! This is a temp home page.</h1>
-      You can go to <a href="/inner" style={{color: "blueviolet"}}>Private page</a> after login :)
+      You can go to <a href="/orders/pending" style={{color: "blueviolet"}}>Private page</a> after login :)
       <h3>Now provides next routes:</h3>
       <ul className={styles.list}>
         <li className={styles.listItem}><a href="/authentication/verification">/authentication/verification</a></li>

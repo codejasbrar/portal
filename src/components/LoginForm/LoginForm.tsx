@@ -58,7 +58,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (auth.loggedIn) {
-      history.replace("/inner");
+      history.replace("/orders/pending");
     }
   }, [auth.loggedIn, history]);
 

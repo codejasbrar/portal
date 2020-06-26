@@ -7,17 +7,19 @@ import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {loadOrdersByStatus} from "../../actions/ordersActions";
 import Spinner from "../../components/Spinner/Spinner";
+import {ordersState} from "../../selectors/selectors";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
 const OrdersPage = () => {
-  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const orders = useSelector(ordersState);
   let [width, setWidth] = useState(getWidth());
 
   useEffect(() => {

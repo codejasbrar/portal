@@ -43,7 +43,6 @@ const App = () => {
       <Route path="/authentication" render={(props => (isLoggedIn ? <Redirect to="/" /> : <Authentication />))} />
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <>
-          <Route path="/inner" component={Inner} />
           <Route path={['/orders/pending', '/orders/approved', '/orders/test', '/orders/test-approved', '/orders/navigation']} component={OrdersPage} />
         </>
       </PrivateRoute>
