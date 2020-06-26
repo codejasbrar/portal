@@ -4,12 +4,14 @@ import React, {useEffect, useState} from "react";
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
 import LabSlipApiService from "../../services/LabSlipApiService";
+//import {ordersState, testsState} from "../../selectors/selectors";
 
 type NavigationPropsTypes = {};
 
 const MobileNavigation = (props: NavigationPropsTypes) => {
   const [pendingOrdersCount, setPendingOrdersCount] = useState();
   const [approvedOrdersCount, setApprovedOrdersCount] = useState();
+  const [pendingTestsCount, setPendingTestsCount] = useState();
 
   useEffect(() => {
 
@@ -21,6 +23,12 @@ const MobileNavigation = (props: NavigationPropsTypes) => {
       setPendingOrdersCount(responseWithPending.data.length);
     })();
   }, []);
+
+  // useEffect(() => {
+  //   if (tests && tests.length) {
+  //       setPendingTestsCount(orders.filter(tests => !tests.approved).length);
+  //   }
+  // }, [tests]);
 
   return <div className={styles.mobileNavigation}>
     <h1 className={styles.heading30}>Physician portal</h1>
@@ -45,7 +53,7 @@ const MobileNavigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        <span className={styles.navlinkNumber}>(13)</span>
+        <span className={styles.navlinkNumber}>{pendingTestsCount ? `(${pendingTestsCount})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/test-approved'} className={styles.navlink}
         exact={true}

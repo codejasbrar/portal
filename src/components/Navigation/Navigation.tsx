@@ -10,6 +10,7 @@ type NavigationPropsTypes = {};
 const Navigation = (props: NavigationPropsTypes) => {
   const [pendingOrdersCount, setPendingOrdersCount] = useState();
   const [approvedOrdersCount, setApprovedOrdersCount] = useState();
+  const [pendingTestsCount, setPendingTestsCount] = useState();
 
   useEffect(() => {
 
@@ -21,6 +22,12 @@ const Navigation = (props: NavigationPropsTypes) => {
       setPendingOrdersCount(responseWithPending.data.length);
     })();
   }, []);
+
+  // useEffect(() => {
+  //   if (tests && tests.length) {
+  //     setPendingTestsCount(tests.filter(tests => !tests.approved).length);
+  //   }
+  // }, [tests]);
 
   return <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
@@ -45,7 +52,7 @@ const Navigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        <span className={styles.navlinkNumber}>(13)</span>
+        <span className={styles.navlinkNumber}>{pendingTestsCount ? `(${pendingTestsCount})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/test-approved'} className={styles.navlink}
         exact={true}

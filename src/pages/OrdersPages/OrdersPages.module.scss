@@ -16,6 +16,16 @@
     padding-bottom: 190px;
 }
 
+.tests {
+    width:          100%;
+    padding-bottom: 190px;
+    table {
+        a {
+            color: #00aaff;;
+        }
+    }
+}
+
 .containerFlex {
     display: flex;
 
@@ -127,6 +137,45 @@
     }
 }
 
+.mobileTests {
+    &Item {
+        border-top: 1px solid $gray7;
+        width:      100%;
+        padding:    12px 0 17px;
+
+        &:last-child {
+            border-bottom: 1px solid $gray7;
+        }
+
+        .btnPrimary {
+            margin-top: 13px;
+        }
+    }
+
+    &Title,
+    &Text {
+        color:          $text;
+        font-family:    "Open Sans", Arial, sans-serif;
+        font-size:      14px;
+        font-weight:    600;
+        letter-spacing: 0.3px;
+        padding:        4px 0px;
+    }
+
+    &Text {
+        font-weight: 400;
+    }
+
+    .btnPrimary {
+        width:     100%;
+        max-width: 288px;
+
+        @include breakpoint($mobile) {
+            max-width: 100%;
+        }
+    }
+}
+
 .heading20 {
 
     @include breakpoint($tablet_horizontal) {
@@ -134,7 +183,7 @@
     }
 }
 
-.ordersResultsInfo {
+.ordersResultsInfo, .testsResultsInfo {
     color:          $gray5;
     font-family:    "Open Sans", Arial, sans-serif;
     font-size:      14px;
