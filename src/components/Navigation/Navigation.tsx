@@ -3,20 +3,24 @@ import React, {useEffect, useState} from "react";
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {ordersState} from "../../selectors/selectors";
+import LabSlipApiService from "../../services/LabSlipApiService";
 
 type NavigationPropsTypes = {};
 
 const Navigation = (props: NavigationPropsTypes) => {
-  const orders = useSelector(ordersState);
-  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState();
+  const [approvedOrdersCount, setApprovedOrdersCount] = useState();
 
   useEffect(() => {
-    if (orders && orders.length) {
-      setPendingOrdersCount(orders.filter(order => !order.approved).length);
-    }
-  }, [orders]);
+
+    (async () => {
+      const responseWithApproved = await LabSlipApiService.getOrdersByStatus('APPROVED');
+      const responseWithPending = await LabSlipApiService.getOrdersByStatus('PENDING');
+
+      setApprovedOrdersCount(responseWithApproved.data.length);
+      setPendingOrdersCount(responseWithPending.data.length);
+    })();
+  }, []);
 
   return <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
@@ -32,6 +36,7 @@ const Navigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Approved
+        <span className={styles.navlinkNumber}>{approvedOrdersCount ? `(${approvedOrdersCount})` : ''}</span>
       </NavLink>
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>

@@ -8,9 +8,9 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {useSelector} from "react-redux";
-import {ordersState} from "../../../selectors/selectors";
 import {Order} from "../../../interfaces/Order";
+import LabSlipApiService from "../../../services/LabSlipApiService";
+import Spinner from "../../../components/Spinner/Spinner";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -34,7 +34,7 @@ const columns = [
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         <td style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(1)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
     }
   },
@@ -89,7 +89,9 @@ const options: MUIDataTableOptions = {
   },
   selectableRowsOnClick: true,
   customFooter: CommonPagination,
-  customToolbarSelect: () => <><button className={styles.btnPrimary}>Approved</button></>,
+  customToolbarSelect: () => <>
+    <button className={styles.btnPrimary}>Approved</button>
+  </>,
   customSearchRender: SearchBar,
   customToolbar: () => <></>,
 } as MUIDataTableOptions;
@@ -111,18 +113,27 @@ const reformatDate = (order: Order) => {
 };
 
 const PendingOrdersPage = () => {
-  const orders = useSelector(ordersState);
-  const [data, setData] = useState(orders);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
   let [width, setWidth] = useState(getWidth());
 
+
   useEffect(() => {
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
-    }
+
+    (async () => {
+      const response = await LabSlipApiService.getOrdersByStatus('PENDING');
+      const orders = response.data;
+      if (orders && orders.length) {
+        setData(orders.map((item: any) => {
+          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+          return item;
+        }));
+      }
+
+      setData(orders);
+      setLoading(false);
+    })();
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -131,7 +142,7 @@ const PendingOrdersPage = () => {
     return () => {
       window.removeEventListener('resize', resizeListener);
     }
-  }, [orders]);
+  }, []);
 
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
@@ -147,6 +158,10 @@ const PendingOrdersPage = () => {
 
       return aDate > bDate ? 1 : -1;
     }));
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
@@ -168,7 +183,7 @@ const PendingOrdersPage = () => {
         <button className={styles.btnPrimary}>Approve all orders</button>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
-          .map((item: any, i) => (
+          .map((item: any, i: any) => (
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Order
                 ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>

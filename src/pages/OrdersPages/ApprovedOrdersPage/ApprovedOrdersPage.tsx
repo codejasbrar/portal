@@ -8,9 +8,9 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {useSelector} from "react-redux";
-import {ordersState} from "../../../selectors/selectors";
 import {Order} from "../../../interfaces/Order";
+import LabSlipApiService from "../../../services/LabSlipApiService";
+import Spinner from "../../../components/Spinner/Spinner";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -34,7 +34,7 @@ const columns = [
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         <td style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(1)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
     }
   },
@@ -55,7 +55,7 @@ const columns = [
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         <td style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(1)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
     }
   },
@@ -115,20 +115,17 @@ const reformatDate = (order: Order) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const orders = useSelector(ordersState);
-  const [data, setData] = useState(orders);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
   let [width, setWidth] = useState(getWidth());
 
-  console.log(orders)
-
   useEffect(() => {
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
-    }
+    (async () => {
+      const response = await LabSlipApiService.getOrdersByStatus('APPROVED');
+      setData(response.data);
+      setLoading(false);
+    })();
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -137,7 +134,7 @@ const ApprovedOrdersPage = () => {
     return () => {
       window.removeEventListener('resize', resizeListener);
     }
-  }, [orders]);
+  }, []);
 
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
@@ -153,6 +150,10 @@ const ApprovedOrdersPage = () => {
 
       return aDate > bDate ? 1 : -1;
     }));
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>

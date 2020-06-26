@@ -13,14 +13,15 @@ export const loadOrdersError = (error: Error) => ({type: GET_ORDERS_ERROR, paylo
 
 export const loadOrdersByStatus = (status: OrderStatus) => async (dispatch: Dispatch<object>): Promise<any> => {
   dispatch(loadOrdersRequest());
-  await LabSlipApiService.getOrdersByStatus(status).then((response) => {
+  try {
+    const response = await LabSlipApiService.getOrdersByStatus(status);
     dispatch(loadOrdersSuccess(response.data))
-  }).catch((error) => {
-    const errorData = error.response.data;
+  } catch (exception) {
+    const errorData = exception.response.data;
     if (errorData.status === 403 || errorData.message === "Unauthorized") {
       dispatch(logOut());
     } else {
       dispatch(loadOrdersError(errorData))
     }
-  })
+  }
 };
