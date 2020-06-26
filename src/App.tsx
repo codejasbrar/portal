@@ -14,7 +14,6 @@ import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";
 import Spinner from "./components/Spinner/Spinner";
 import Main from "./pages/Main/Main";
-import Inner from "./pages/Inner/Inner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
