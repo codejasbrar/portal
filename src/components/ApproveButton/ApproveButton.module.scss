@@ -3,7 +3,7 @@
 
 .modalContent {
 
-    .modalContentTitle {
+    &Title {
         font-family:    "Open Sans Semibold", sans-serif;
         margin:         0 0 14px 0;
         letter-spacing: 0.4px;
@@ -13,7 +13,7 @@
         font-weight:    600;
     }
 
-    .modalContentText {
+    &Text {
         font-family:    "Open Sans", sans-serif;
         color:          $text;
         font-size:      14px;
@@ -21,9 +21,21 @@
         line-height:    20px;
     }
 
-    .modalContentBold {
+    &Bold {
         font-family: "Open Sans Semibold", sans-serif;
         font-weight: 600;
+    }
+
+    &List {
+        font-family:     "Open Sans Semibold", sans-serif;
+        padding:         15px 0 0 0;
+        list-style-type: none;
+        font-weight:     600;
+        margin:          0;
+    }
+
+    &Item {
+        text-transform: capitalize;
     }
 }
 
@@ -40,6 +52,13 @@
 
 .modalApprove {
     max-width: 400px;
+
+    @media screen and (max-width: $mobile) {
+        margin:    0 16px;
+        width:     100%;
+        max-width: none;
+        min-width: auto;
+    }
 }
 
 [class*="MUIDataTableToolbarSelect-root"] {

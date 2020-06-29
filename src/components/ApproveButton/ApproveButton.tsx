@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from "react";
 
-//Styles
-import styles from "./ApproveButton.module.scss";
-
-
 import Button from "../Button/Button";
 import Popup from "../Popup/Popup";
 import {Order} from "../../interfaces/Order";
 import LabSlipApiService from "../../services/LabSlipApiService";
+
+//Styles
+import styles from "./ApproveButton.module.scss";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -21,9 +20,11 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [showPopup, setShowPopup] = useState(false);
 
   const ItemsList = () => <div>
-    <p>Are you sure you want to approve the following {props.mode}s?</p>
-    <ul>
-      {props.selected.map(item => <li key={item.id}>{props.mode} ID: {item.id}</li>)}
+    <p className={styles.modalContentText}>
+      Are you sure you want to approve the following {props.mode}s?
+    </p>
+    <ul className={styles.modalContentList}>
+      {props.selected.map(item => <li key={item.id} className={styles.modalContentItem}>{props.mode} ID: {item.id}</li>)}
     </ul>
   </div>;
 
@@ -41,7 +42,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
       <div className={styles.modalContent}>
         <h2 className={styles.modalContentTitle}>Submit for approval</h2>
         {props.selected.length < 10 ? <ItemsList /> :
-          <p className={styles.modalContentText}>You-have selected
+          <p className={styles.modalContentText}>You have selected
             <span className={styles.modalContentBold}> ({props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
             for approval. Are you sure you want to approve?</p>}
         <div className={styles.btnBlock}>
