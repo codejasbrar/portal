@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../config";
 
-const createAxios = () => axios.create({
+const baseConfig = {
   baseURL: config.apiHostName,
   headers: {
     common: {
@@ -10,13 +10,10 @@ const createAxios = () => axios.create({
       'Accept': "*/*",
     }
   }
-});
+};
+
+const createAxios = () => axios.create(baseConfig);
 
 const client = createAxios();
 
-const authorized = createAxios();
-
-authorized.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
-
-export {authorized};
 export default client;

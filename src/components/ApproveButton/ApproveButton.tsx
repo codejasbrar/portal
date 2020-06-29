@@ -7,6 +7,7 @@ import LabSlipApiService from "../../services/LabSlipApiService";
 
 //Styles
 import styles from "./ApproveButton.module.scss";
+import {Test} from "../../interfaces/Test";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -24,7 +25,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
       Are you sure you want to approve the following {props.mode}s?
     </p>
     <ul className={styles.modalContentList}>
-      {props.selected.map(item => <li key={item.id}
+      {props.selected.map((item: any) => <li key={item.id}
         className={styles.modalContentItem}>{props.mode === 'result' ? 'Test result' : 'Order'} ID: <span>{item.id}</span>
       </li>)}
     </ul>
@@ -33,7 +34,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   </div>;
 
   const onApprove = async () => {
-    const hashes = props.selected.map(item => item.hash);
+    const hashes = props.selected.map((item: any) => item.hash);
     props.mode === 'order' ? await LabSlipApiService.saveApprovedOrders(hashes) :
       await LabSlipApiService.saveApprovedResults(hashes);
     setShowPopup(false);

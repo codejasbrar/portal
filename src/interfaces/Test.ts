@@ -4,5 +4,5 @@ export interface Test {
   approved: string,
   customerId: number,
   orderId: number,
-  panicValueBiomarkers: string[]
+  panicValueBiomarkers: string[],
 }

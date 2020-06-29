@@ -5,7 +5,7 @@ export interface AuthState {
   loggedIn: boolean,
   error?: LoginError,
   loading: boolean,
-  tempData?: AuthData
+  tempData?: AuthData,
 }
 
 interface AuthRequest {

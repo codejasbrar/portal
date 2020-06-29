@@ -9,8 +9,10 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
+import {useDispatch, useSelector} from "react-redux";
+import {ordersApprovedState} from "../../../selectors/selectors";
+import {loadOrdersByStatus} from "../../../actions/ordersActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -115,24 +117,21 @@ const reformatDate = (order: Order) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
-  let [width, setWidth] = useState(getWidth());
+  const [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
+  const orders = useSelector(ordersApprovedState);
 
   useEffect(() => {
-    (async () => {
-      const response = await LabSlipApiService.getOrdersByStatus('APPROVED');
-      setData(response.data);
-      // setData(response.data.sort(((a: any, b: any) => {
-      //   const aDate = new Date(a.received);
-      //   const bDate = new Date(b.received);
-      //
-      //   return aDate > bDate ? -1 : 1;
-      // })));
-      setLoading(false);
-    })();
+    onLoad();
+  }, [orders]);
 
+  const onLoad = () => {
+    if (orders && orders.length) setData(orders);
+  };
+
+  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -149,17 +148,7 @@ const ApprovedOrdersPage = () => {
 
   const ordersToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.received);
-    //   const bDate = new Date(b.received);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
-
-  if (loading) {
-    return <Spinner />;
-  }
+    .filter(searchFilter);
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>

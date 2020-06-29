@@ -9,19 +9,32 @@ import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
+import {useDispatch, useSelector} from "react-redux";
+import {ordersState, testsState} from "../../selectors/selectors";
+import {loadOrdersByStatus} from "../../actions/ordersActions";
+import {loadTestsByStatus} from "../../actions/testsActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
 const OrdersPage = () => {
+  const [width, setWidth] = useState(getWidth());
   const [loading, setLoading] = useState(true);
-  let [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
+      await dispatch(loadOrdersByStatus("PENDING"));
+      await dispatch(loadOrdersByStatus("APPROVED"));
+      await dispatch(loadTestsByStatus("PENDING"));
+      await dispatch(loadTestsByStatus("APPROVED"));
       setLoading(false);
     })();
+  }, []);
+
+
+  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -30,6 +43,7 @@ const OrdersPage = () => {
       window.removeEventListener('resize', resizeListener);
     }
   }, []);
+
 
   return <>
     {loading && <Spinner />}

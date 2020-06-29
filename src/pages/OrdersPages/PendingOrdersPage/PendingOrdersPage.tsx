@@ -13,6 +13,11 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Order} from "../../../interfaces/Order";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
+import Token from "../../../helpers/localToken";
+import {logOut, refreshTokenAction} from "../../../actions/authActions";
+import {useDispatch, useSelector} from "react-redux";
+import {loadOrdersByStatus} from "../../../actions/ordersActions";
+import {ordersPendingState} from "../../../selectors/selectors";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 
 const getWidth = () => window.innerWidth
@@ -69,6 +74,7 @@ const options = (onSelect: any, onSaved: any) => ({
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
+  selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -119,29 +125,31 @@ const reformatDate = (order: Order) => {
 
 const PendingOrdersPage = () => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
+  const orders = useSelector(ordersPendingState);
 
   const onSaved = async () => {
-    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
-    const orders = response.data;
+    await dispatch(loadOrdersByStatus('PENDING'));
+    onLoad();
+  };
+
+  useEffect(() => {
+    onLoad();
+  }, [orders]);
+
+  const onLoad = () => {
     if (orders && orders.length) {
       setData(orders.map((item: any) => {
         item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
         return item;
       }));
     }
-
-    setData(orders);
   };
 
   useEffect(() => {
-
-    onSaved().then(() => {
-      setLoading(false);
-    });
-
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -158,19 +166,10 @@ const PendingOrdersPage = () => {
 
   const ordersToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.received);
-    //   const bDate = new Date(b.received);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
+    .filter(searchFilter);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
-  if (loading) {
-    return <Spinner />;
-  }
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>

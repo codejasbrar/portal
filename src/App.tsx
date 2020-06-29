@@ -8,7 +8,7 @@ import "./styles/global.scss";
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import Header from "./components/Header/Header";
 import {useDispatch, useSelector} from "react-redux";
-import {loggedIn} from "./selectors/selectors";
+import {loggedIn, refreshToken} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";
@@ -16,6 +16,8 @@ import Spinner from "./components/Spinner/Spinner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
+import Token from "./helpers/localToken";
+import {refreshTokenAction} from "./actions/authActions";
 
 
 new LabSlipApiService();
@@ -27,12 +29,19 @@ const App = () => {
 
   useEffect(() => {
     (async () => {
-      if (localStorage.getItem('token')) {
-        await dispatch(loadUserByToken());
+      const tokenData = Token.get();
+      if (tokenData.token) {
+        if (Token.isTokenExpired()) {
+          await dispatch(refreshTokenAction(tokenData.refreshToken as string));
+          await dispatch(loadUserByToken());
+        } else {
+          await dispatch(loadUserByToken());
+        }
       }
       setLoading(false);
     })();
   }, [dispatch, isLoggedIn]);
+
 
   return <Router>
     <Header />
