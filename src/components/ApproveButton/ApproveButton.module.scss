@@ -36,6 +36,13 @@
 
     &Item {
         text-transform: capitalize;
+        font-family:    "Open Sans", sans-serif;
+        font-weight:    600;
+
+        span {
+            font-weight:    400;
+            letter-spacing: -0.3px;
+        }
     }
 }
 

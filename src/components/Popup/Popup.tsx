@@ -7,7 +7,8 @@ import BodyScroll from "../../helpers/bodyScrollLock";
 type PopupPropsTypes = {
   children: ReactElement,
   show: boolean,
-  classes?: string
+  classes?: string,
+  onClose: () => void
 };
 
 const Popup = (props: PopupPropsTypes) => {
@@ -21,8 +22,8 @@ const Popup = (props: PopupPropsTypes) => {
       BodyScroll.enable();
     }
   }, [props.show]);
-  return props.show ? <div className={styles.modalOverlay}>
-    <div className={`${styles.modal} ${props.classes ? props.classes : ''}`}>
+  return props.show ? <div className={styles.modalOverlay} onClick={() => props.onClose()}>
+    <div className={`${styles.modal} ${props.classes ? props.classes : ''}`} onClick={(e) => e.stopPropagation()}>
       {props.children}
     </div>
   </div> : <></>;

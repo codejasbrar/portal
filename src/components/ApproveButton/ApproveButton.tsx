@@ -24,7 +24,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
       Are you sure you want to approve the following {props.mode}s?
     </p>
     <ul className={styles.modalContentList}>
-      {props.selected.map(item => <li key={item.id} className={styles.modalContentItem}>{props.mode} ID: {item.id}</li>)}
+      {props.selected.map(item => <li key={item.id}
+        className={styles.modalContentItem}>{props.mode} ID: <span>{item.id}</span></li>)}
     </ul>
   </div>;
 
@@ -38,7 +39,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     <Button className={props.className ? props.className : ''}
       disabled={!props.selected.length}
       onClick={() => setShowPopup(true)}>{props.text}</Button>
-    <Popup show={showPopup} classes={styles.modalApprove}>
+    <Popup show={showPopup} classes={styles.modalApprove} onClose={() => setShowPopup(false)}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalContentTitle}>Submit for approval</h2>
         {props.selected.length < 10 ? <ItemsList /> :
