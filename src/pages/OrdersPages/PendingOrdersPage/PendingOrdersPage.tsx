@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
+
 import styles from "../OrdersPages.module.scss";
+
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
@@ -11,6 +13,7 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Order} from "../../../interfaces/Order";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
+import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -56,7 +59,8 @@ const columns = [
   },
 ];
 
-const options: MUIDataTableOptions = {
+const options = (onSelect: any, onSaved: any) => ({
+  filterType: 'checkbox',
   filter: false,
   download: false,
   print: false,
@@ -65,7 +69,6 @@ const options: MUIDataTableOptions = {
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -74,7 +77,7 @@ const options: MUIDataTableOptions = {
       noMatch: "No results found",
     }
   },
-  customSort(items, index, isDesc) {
+  customSort(items: any, index: number, isDesc: string) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
       const bDate = new Date(b.data[index]);
@@ -89,12 +92,14 @@ const options: MUIDataTableOptions = {
   },
   selectableRowsOnClick: true,
   customFooter: CommonPagination,
-  customToolbarSelect: () => <>
-    <button className={styles.btnPrimary}>Approved</button>
-  </>,
+  customToolbar: () => '',
+  customToolbarSelect: (selected) => <ApproveButton mode="order"
+    text={"Approve orders"}
+    onSaved={onSaved}
+    selected={onSelect(selected.data)} />,
   customSearchRender: SearchBar,
-  customToolbar: () => <></>,
-} as MUIDataTableOptions;
+} as MUIDataTableOptions);
+
 
 const NoMatches = () => (
   <div className={styles.sorry}>
@@ -116,11 +121,22 @@ const PendingOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
-  let [width, setWidth] = useState(getWidth());
+  const [width, setWidth] = useState(getWidth());
 
+  const onSaved = async () => {
+    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
+    const orders = response.data;
+    if (orders && orders.length) {
+      setData(orders.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+
+    setData(orders);
+  };
 
   useEffect(() => {
-
     (async () => {
       const response = await LabSlipApiService.getOrdersByStatus('PENDING');
       const orders = response.data;
@@ -134,6 +150,7 @@ const PendingOrdersPage = () => {
       setData(orders);
       setLoading(false);
     })();
+
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -159,6 +176,8 @@ const PendingOrdersPage = () => {
     //   return aDate > bDate ? 1 : -1;
     // }));
 
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -174,13 +193,13 @@ const PendingOrdersPage = () => {
           title={''}
           data={data.map(reformatDate)}
           columns={columns}
-          options={options}
+          options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
-        <button className={styles.btnPrimary}>Approve all orders</button>
+        <ApproveButton mode="order" onSaved={onSaved} selected={data} text={"Approve all orders"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -193,7 +212,11 @@ const PendingOrdersPage = () => {
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
               <p className={styles.mobileOrdersTitle}>Criteria
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
-              <button className={styles.btnPrimary}>Approve</button>
+              <ApproveButton className={styles.btnApproveMobile}
+                mode="order"
+                onSaved={onSaved}
+                selected={[item]}
+                text={"Approve"} />
             </div>
           ))}
         {ordersToView.length === 0 && <NoMatches />}

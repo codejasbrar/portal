@@ -9,11 +9,12 @@ type ButtonPropsTypes = {
   secondary?: boolean,
   glass?: boolean,
   onClick?: () => void,
-  type?: "button" | "submit" | "reset"
+  type?: "button" | "submit" | "reset",
+  disabled?: boolean
 };
 
 const Button = (props: ButtonPropsTypes) =>
-  <button type={props.type || "button"}
+  <button disabled={props.disabled} type={props.type || "button"}
     className={`${styles.Button} ${props.secondary ? styles.ButtonSecondary : ''} ${props.glass ? styles.ButtonGlass : ''} ${props.className ? props.className : ''}`}
     onClick={props.onClick}>
     {props.children}

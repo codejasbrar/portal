@@ -1,0 +1,80 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.modalContent {
+
+    &Title {
+        font-family:    "Open Sans Semibold", sans-serif;
+        margin:         0 0 14px 0;
+        letter-spacing: 0.4px;
+        color:          $text;
+        font-size:      20px;
+        line-height:    30px;
+        font-weight:    600;
+    }
+
+    &Text {
+        font-family:    "Open Sans", sans-serif;
+        color:          $text;
+        font-size:      14px;
+        letter-spacing: 0.3px;
+        line-height:    20px;
+    }
+
+    &Bold {
+        font-family: "Open Sans Semibold", sans-serif;
+        font-weight: 600;
+    }
+
+    &List {
+        font-family:     "Open Sans Semibold", sans-serif;
+        padding:         15px 0 0 0;
+        list-style-type: none;
+        font-weight:     400;
+        margin:          0;
+    }
+
+    &Item {
+        text-transform: capitalize;
+    }
+}
+
+.btnBlock {
+    justify-content: flex-end;
+    display:         flex;
+    margin-top:      24px;
+
+    .btn {
+        max-width:   87px;
+        margin-left: 20px;
+    }
+}
+
+.modalApprove {
+    max-width: 400px;
+
+    @include breakpoint($mobile) {
+        margin:    0 16px;
+        width:     100%;
+        max-width: none;
+        min-width: auto;
+    }
+}
+
+[class*="MUIDataTableToolbarSelect-root"] {
+    box-shadow:       none !important;
+    background-color: transparent !important;
+    position:         absolute !important;
+    right:            0;
+    width:            150px;
+    top:              0;
+    padding-top:      14px !important;
+
+    div h6 {
+        display: none;
+    }
+}
+
+[class*="MUIDataTable-paper"] {
+    position: relative;
+}
