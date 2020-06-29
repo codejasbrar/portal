@@ -17,17 +17,13 @@ const Navigation = (props: NavigationPropsTypes) => {
     (async () => {
       const responseWithApproved = await LabSlipApiService.getOrdersByStatus('APPROVED');
       const responseWithPending = await LabSlipApiService.getOrdersByStatus('PENDING');
+      const responseTestsWithPending = await LabSlipApiService.getTestsByStatus('PENDING');
 
       setApprovedOrdersCount(responseWithApproved.data.length);
       setPendingOrdersCount(responseWithPending.data.length);
+      setPendingTestsCount(responseTestsWithPending.data.length)
     })();
   }, []);
-
-  // useEffect(() => {
-  //   if (tests && tests.length) {
-  //     setPendingTestsCount(tests.filter(tests => !tests.approved).length);
-  //   }
-  // }, [tests]);
 
   return <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
