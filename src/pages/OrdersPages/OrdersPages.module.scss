@@ -19,9 +19,10 @@
 .tests {
     width:          100%;
     padding-bottom: 190px;
+
     table {
         a {
-            color: #00aaff;;
+            color: $primary;
         }
     }
 }
@@ -183,12 +184,21 @@
     }
 }
 
-.ordersResultsInfo, .testsResultsInfo {
+.ordersResultsInfo,
+.testsResultsInfo {
     color:          $gray5;
     font-family:    "Open Sans", Arial, sans-serif;
     font-size:      14px;
     letter-spacing: 0.3px;
     margin-bottom:  20px;
+}
+
+.mobileTestsLink {
+    color: $primary;
+
+    &:visited {
+        color: $primary;
+    }
 }
 
 .sorry {

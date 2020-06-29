@@ -200,7 +200,8 @@ const TestsPage = () => {
           .map((item: any, i) => (
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
-                ID: <span className={styles.mobileTestsText}>{item.id}</span></p>
+                ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
+                  to={`/test/${item.id}`}>{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order
