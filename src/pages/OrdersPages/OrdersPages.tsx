@@ -7,8 +7,6 @@ import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
-import {useDispatch} from "react-redux";
-import {loadOrdersByStatus} from "../../actions/ordersActions";
 import Spinner from "../../components/Spinner/Spinner";
 
 const getWidth = () => window.innerWidth
@@ -16,14 +14,11 @@ const getWidth = () => window.innerWidth
   || document.body.clientWidth;
 
 const OrdersPage = () => {
-  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   let [width, setWidth] = useState(getWidth());
 
   useEffect(() => {
     (async () => {
-      await dispatch(loadOrdersByStatus('PENDING'));
-      await dispatch(loadOrdersByStatus('APPROVED'));
       setLoading(false);
     })();
     const resizeListener = () => {

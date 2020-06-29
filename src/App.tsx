@@ -14,7 +14,6 @@ import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";
 import Spinner from "./components/Spinner/Spinner";
 import Main from "./pages/Main/Main";
-import Inner from "./pages/Inner/Inner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
@@ -43,7 +42,6 @@ const App = () => {
       <Route path="/authentication" render={(props => (isLoggedIn ? <Redirect to="/" /> : <Authentication />))} />
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
         <>
-          <Route path="/inner" component={Inner} />
           <Route path={['/orders/pending', '/orders/approved', '/orders/test', '/orders/test-approved', '/orders/navigation']} component={OrdersPage} />
         </>
       </PrivateRoute>
