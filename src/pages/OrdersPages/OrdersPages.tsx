@@ -8,6 +8,7 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
+import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -44,6 +45,7 @@ const OrdersPage = () => {
           <Route path="/orders/approved" component={ApprovedOrdersPage} />
           <Route path="/orders/test" component={TestPendingOrdersPage} />
           <Route path="/orders/test-approved" component={TestApprovedPage} />
+          <Route path="/orders/test-details" component={TestDetailsPage} />
         </div>
       </div>
     </section>

@@ -16,6 +16,8 @@ import Spinner from "./components/Spinner/Spinner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
+import TestDetailsPage from "./pages/OrdersPages/TestDetailsPage/TestDetailsPage";
+
 
 new LabSlipApiService();
 

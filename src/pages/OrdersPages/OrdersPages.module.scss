@@ -70,6 +70,19 @@
     }
 }
 
+.menuLinkBack {
+    display: block;
+    margin-bottom: 91px;
+
+    @include breakpoint($big_mobile) {
+        margin-bottom: 34px;
+
+        &Mobile {
+            display: none;
+        }
+    }
+}
+
 .tableWrap {
     width:     100%;
     max-width: 900px;
@@ -136,6 +149,14 @@
             max-width: 100%;
         }
     }
+    .mobileOrdersName {
+        color: $text;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        line-height: 1.5;
+        margin-bottom: 19px;
+    }
 }
 
 .mobileTests {
@@ -178,7 +199,6 @@
 }
 
 .heading20 {
-
     @include breakpoint($tablet_horizontal) {
         margin-bottom: 10px;
     }
@@ -217,3 +237,172 @@
 .btnApproveMobile {
     margin-top: 24px;
 }
+
+/*Test Details Page styles BEGIN---*/
+.contentWrapper {
+    justify-content: space-between;
+    padding-bottom: 190px;
+}
+
+.adminSection {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    flex-shrink: 1;
+    margin-right: 20px;
+
+    @include breakpoint($big_mobile) {
+        margin-right: 0;
+        margin-bottom: 33px;
+    }
+}
+
+.resultsTable {
+    max-width: 700px;
+    flex-shrink: 4;
+    padding-bottom: 0;
+    margin-top: 60px;
+    margin-left: 0;
+
+    @include breakpoint($big_mobile) {
+        margin-top: 0;
+    }
+    thead {
+        tr th {
+            &:last-child {
+                div {
+                    text-align: right;
+                    padding-right: 5px;
+                }
+            }
+        }
+    }
+    tbody tr {
+        td {
+            //text-align: right;
+
+            &:first-child {
+                text-align: left;
+            }
+        }
+    }
+}
+
+.navigationTitle {
+    @include breakpoint($tablet) {
+        font-size: 20px;
+    }
+}
+
+.testInfo {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 9px;
+    background: $gray8;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 40px 40px;
+    margin-top: 24px;
+
+    @include breakpoint($big_mobile) {
+        padding: 23px 24px 24px;
+        margin-top: 11px;
+    }
+
+
+    &String {
+        color: $text;
+        line-height: 1.42;
+        padding-bottom: 5px;
+    }
+
+    &Bold {
+        font-weight: 600;
+    }
+
+    &Btn {
+        width: 100%;
+        margin-top: 20px;
+
+        @include breakpoint($big_mobile) {
+            margin-top: 15px;
+        }
+    }
+}
+
+.comment {
+
+    &Field {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 350px;
+        min-height: 108px;
+        color: $text;
+        background-color: #ffffff;
+        border: 1px solid $gray6;
+        border-radius: 0;
+        font-size: 14px;
+        line-height: 1.4;
+        resize: none;
+        overflow: auto;
+        letter-spacing: 0.2px;
+        transition: all 0.2s ease-in-out;
+        padding: 11px 12px;
+        margin: 40px 0px 15px;
+
+        @include breakpoint($big_mobile) {
+            margin-top: 30px;
+        }
+    }
+
+    &BtnWrapper {
+        max-width: 350px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    &Btn {
+
+    }
+
+    &List {
+        margin-top: 40px;
+
+        @include breakpoint($big_mobile) {
+            margin-top: 30px;
+        }
+    }
+
+    &Item {
+        max-width: 350px;
+        width: 100%;
+        border-top: 1px solid $gray7;
+
+        &Author {
+            color: $text;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            line-height: 1.42;
+            margin: 19px 0 1px;
+        }
+
+        &Date {
+            color: $gray5;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+
+        &Text {
+            color: $text;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+            margin: 8px 0 17px;
+        }
+    }
+}
+
+/*---Test Details Page styles END*/
