@@ -10,15 +10,18 @@ type NavigationPropsTypes = {};
 const Navigation = (props: NavigationPropsTypes) => {
   const [pendingOrdersCount, setPendingOrdersCount] = useState();
   const [approvedOrdersCount, setApprovedOrdersCount] = useState();
+  const [pendingTestsCount, setPendingTestsCount] = useState();
 
   useEffect(() => {
 
     (async () => {
       const responseWithApproved = await LabSlipApiService.getOrdersByStatus('APPROVED');
       const responseWithPending = await LabSlipApiService.getOrdersByStatus('PENDING');
+      const responseTestsWithPending = await LabSlipApiService.getTestsByStatus('PENDING');
 
       setApprovedOrdersCount(responseWithApproved.data.length);
       setPendingOrdersCount(responseWithPending.data.length);
+      setPendingTestsCount(responseTestsWithPending.data.length)
     })();
   }, []);
 
@@ -45,7 +48,7 @@ const Navigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        <span className={styles.navlinkNumber}>(13)</span>
+        <span className={styles.navlinkNumber}>{pendingTestsCount ? `(${pendingTestsCount})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/test-approved'} className={styles.navlink}
         exact={true}

@@ -8,6 +8,7 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
+import {loadTestsByStatus} from "../../actions/testsActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth

@@ -124,6 +124,12 @@ const ApprovedOrdersPage = () => {
     (async () => {
       const response = await LabSlipApiService.getOrdersByStatus('APPROVED');
       setData(response.data);
+      // setData(response.data.sort(((a: any, b: any) => {
+      //   const aDate = new Date(a.received);
+      //   const bDate = new Date(b.received);
+      //
+      //   return aDate > bDate ? -1 : 1;
+      // })));
       setLoading(false);
     })();
 
@@ -144,12 +150,12 @@ const ApprovedOrdersPage = () => {
   const ordersToView = data
     .map(reformatDate)
     .filter(searchFilter)
-    .sort(((a: any, b: any) => {
-      const aDate = new Date(a.received);
-      const bDate = new Date(b.received);
-
-      return aDate > bDate ? 1 : -1;
-    }));
+    // .sort(((a: any, b: any) => {
+    //   const aDate = new Date(a.received);
+    //   const bDate = new Date(b.received);
+    //
+    //   return aDate > bDate ? 1 : -1;
+    // }));
 
   if (loading) {
     return <Spinner />;

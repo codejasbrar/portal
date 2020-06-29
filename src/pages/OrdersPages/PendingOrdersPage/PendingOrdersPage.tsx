@@ -152,12 +152,12 @@ const PendingOrdersPage = () => {
   const ordersToView = data
     .map(reformatDate)
     .filter(searchFilter)
-    .sort(((a: any, b: any) => {
-      const aDate = new Date(a.received);
-      const bDate = new Date(b.received);
-
-      return aDate > bDate ? 1 : -1;
-    }));
+    // .sort(((a: any, b: any) => {
+    //   const aDate = new Date(a.received);
+    //   const bDate = new Date(b.received);
+    //
+    //   return aDate > bDate ? 1 : -1;
+    // }));
 
   if (loading) {
     return <Spinner />;
