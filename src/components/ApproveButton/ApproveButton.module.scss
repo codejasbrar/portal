@@ -68,7 +68,7 @@
     }
 }
 
-[class*="MUIDataTableToolbarSelect-root"] {
+[class*="MUIDataTableToolbarSelect-root"], [class*="jss"] {
     box-shadow:       none !important;
     background-color: transparent !important;
     position:         absolute !important;
