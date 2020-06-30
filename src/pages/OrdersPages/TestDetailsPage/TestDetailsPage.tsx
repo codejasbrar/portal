@@ -23,7 +23,7 @@ const getWidth = () => window.innerWidth
 
 const columns = [
   {
-    name: "biomarker",
+    name: "panicValueBiomarkers",
     label: "Biomarker",
     options: {
       filter: true,
@@ -52,7 +52,7 @@ const columns = [
     }
   },
   {
-    name: "unit",
+    name: "unitsPerEm",
     label: "Unit",
     options: {
       filter: true,
@@ -61,10 +61,61 @@ const columns = [
   },
 ];
 
+const options: MUIDataTableOptions = {
+  filter: false,
+  download: false,
+  print: false,
+  viewColumns: false,
+  searchOpen: false,
+  search: false,
+  responsive: "scrollFullHeight",
+  rowsPerPage: 25,
+  selectToolbarPlacement: 'none',
+  rowsPerPageOptions: [],
+  rowHover: true,
+  selectableRows: 'none',
+  textLabels: {
+    body: {
+      noMatch: "No results found",
+    }
+  },
+  customSort(items, index, isDesc) {
+    items.sort((a: any, b: any) => {
+      const aDate = new Date(a.data[index]);
+      const bDate = new Date(b.data[index]);
+
+      if (isDesc === 'asc') {
+        return aDate > bDate ? -1 : 1;
+      }
+
+      return aDate > bDate ? 1 : -1;
+    });
+    return items;
+  },
+  customFooter: CommonPagination,
+
+} as MUIDataTableOptions;
+
+const NoMatches = () => (
+  <div className={styles.sorry}>
+    <p className={styles.sorryText}>
+      No results found
+    </p>
+  </div>
+);
+
+const reformatDate = (order: Order) => {
+  const date = new Date(order.received);
+  return {
+    ...order,
+    result: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
+  }
+};
+
 const TestDetailsPage = () => {
   let [width, setWidth] = useState(getWidth());
   const orders = useSelector(ordersState);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(orders);
 
@@ -92,67 +143,23 @@ const TestDetailsPage = () => {
     }
   }, []);
 
-  const options: MUIDataTableOptions = {
-    filter: false,
-    download: false,
-    print: false,
-    viewColumns: false,
-    searchOpen: false,
-    search: false,
-    responsive: "scrollFullHeight",
-    rowsPerPage: 25,
-    selectToolbarPlacement: 'none',
-    rowsPerPageOptions: [],
-    rowHover: true,
-    selectableRows: 'none',
-    textLabels: {
-      body: {
-        noMatch: "No results found",
-      }
-    },
-    customSort(items, index, isDesc) {
-      items.sort((a: any, b: any) => {
-        const aDate = new Date(a.data[index]);
-        const bDate = new Date(b.data[index]);
 
-        if (isDesc === 'asc') {
-          return aDate > bDate ? -1 : 1;
-        }
-
-        return aDate > bDate ? 1 : -1;
-      });
-      return items;
-    },
-    customFooter: CommonPagination,
-
-  } as MUIDataTableOptions;
-  const NoMatches = () => (
-    <div className={styles.sorry}>
-      <p className={styles.sorryText}>
-        No results found
-      </p>
-    </div>
-  );
-
-  const reformatDate = (order: Order) => {
-    const date = new Date(order.received);
-    return {
-      ...order,
-      result: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
-    }
-  };
   const ordersToView = data
     .map(reformatDate)
-    .sort(((a: any, b: any) => {
-      const aDate = new Date(a.result);
-      const bDate = new Date(b.result);
+    // .sort(((a: any, b: any) => {
+    //   const aDate = new Date(a.result);
+    //   const bDate = new Date(b.result);
+    //
+    //   return aDate > bDate ? 1 : -1;
+    // }));
 
-      return aDate > bDate ? 1 : -1;
-    }));
+  if (loading) {
+    return <Spinner />;
+  }
 
   return <>
     {loading && <Spinner />}
-    <section className={styles.wrapper}>
+    <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       <div className={styles.container}>
         <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
@@ -176,7 +183,7 @@ const TestDetailsPage = () => {
               </p>
               <p className={styles.testInfoString}>
                 <span className={styles.testInfoBold}>Gender: </span>
-                Female
+                {/*{item.customerGender}*/}
               </p>
               <p className={styles.testInfoString}>
                 <span className={styles.testInfoBold}>Age: </span>
@@ -228,19 +235,18 @@ const TestDetailsPage = () => {
               :
               <div className={styles.mobileOrders}>
                 <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                {/*<p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>*/}
                 {ordersToView
                   .map((item: any, i) => (
                     <div key={i} className={styles.mobileOrdersItem}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.id}</span></p>
+                        <span className={styles.mobileOrdersText}>{item.panicValueBiomarkers}</span></p>
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.mobileOrdersText}>{item.result}</span>
                       </p>
                       <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
                         <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
                       <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+                        <span className={styles.mobileOrdersText}>{item.unitsPerEm}</span></p>
                     </div>
                   ))}
                 {ordersToView.length === 0 && <NoMatches />}

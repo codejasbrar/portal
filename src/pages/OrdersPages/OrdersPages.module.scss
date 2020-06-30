@@ -74,7 +74,7 @@
     display: block;
     margin-bottom: 91px;
 
-    @include breakpoint($big_mobile) {
+    @include breakpoint($tablet_horizontal) {
         margin-bottom: 34px;
 
         &Mobile {
@@ -239,6 +239,7 @@
 }
 
 /*Test Details Page styles BEGIN---*/
+
 .contentWrapper {
     justify-content: space-between;
     padding-bottom: 190px;

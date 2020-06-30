@@ -33,22 +33,32 @@ const OrdersPage = () => {
 
   return <>
     {loading && <Spinner />}
-    <section className={styles.wrapper}>
-      <div className={styles.container}>
-        <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
-        <div className={styles.containerFlex}>
-          {width > 858 ? <Navigation /> : <Route path="/orders/navigation" component={MobileNavigation} />}
-          <Route path="/orders" exact>
-            <Redirect to="/orders/pending" />
-          </Route>
-          <Route path="/orders/pending" component={PendingOrdersPage} />
-          <Route path="/orders/approved" component={ApprovedOrdersPage} />
-          <Route path="/orders/test" component={TestPendingOrdersPage} />
-          <Route path="/orders/test-approved" component={TestApprovedPage} />
-          <Route path="/orders/test-details" component={TestDetailsPage} />
+    <Route path={[
+      "/orders/navigation",
+      "/orders/pending",
+      "/orders/approved",
+      "/orders/test",
+      "/orders/test-approved"
+    ]}>
+      <section className={styles.wrapper}>
+        <div className={styles.container}>
+          <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
+          <div className={styles.containerFlex}>
+            {width > 858 ? <Navigation /> : <Route path="/orders/navigation" component={MobileNavigation} />}
+
+            <Route path="/orders" exact>
+              <Redirect to="/orders/pending" />
+            </Route>
+
+            <Route path="/orders/pending" component={PendingOrdersPage} />
+            <Route path="/orders/approved" component={ApprovedOrdersPage} />
+            <Route path="/orders/test" component={TestPendingOrdersPage} />
+            <Route path="/orders/test-approved" component={TestApprovedPage} />
+          </div>
         </div>
-      </div>
     </section>
+    </Route>
+    <Route path="/orders/test-details" component={TestDetailsPage} />
   </>
 }
 

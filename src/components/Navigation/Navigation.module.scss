@@ -31,7 +31,7 @@
     text-decoration: none;
     background:      transparent;
     color:           $text;
-    padding:         8px 10px 8px 20px;
+    padding:         8px 0 8px 20px;
 
     @include breakpoint($tablet_horizontal) {
         display:       block;
