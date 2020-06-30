@@ -3,7 +3,6 @@ import {Test} from "../interfaces/Test";
 import {Dispatch} from "react";
 import {logOut, refreshTokenAction} from "./authActions";
 import Token from "../helpers/localToken";
-import {loadOrdersError, loadOrdersSuccess} from "./ordersActions";
 
 export const GET_TESTS_BY_STATUS = 'GET_TESTS_BY_STATUS';
 export const GET_TESTS_SUCCESS = 'GET_TESTS_SUCCESS';

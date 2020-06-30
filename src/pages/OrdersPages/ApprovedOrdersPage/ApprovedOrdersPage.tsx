@@ -9,10 +9,9 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import Spinner from "../../../components/Spinner/Spinner";
-import {useDispatch, useSelector} from "react-redux";
+import {Test} from "../../../interfaces/Test";
+import {useSelector} from "react-redux";
 import {ordersApprovedState} from "../../../selectors/selectors";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -108,11 +107,13 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (order: Order) => {
-  const date = new Date(order.received);
+export const reformatDate = (order: Order | Test) => {
+  const dateRecived = new Date(order.received);
+  const dateApproved = order.approved ? new Date(order.approved) : ''
   return {
     ...order,
-    received: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
+    received: `${dateRecived.getMonth()}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
+    approved: dateApproved ? `${dateApproved.getMonth()}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
   }
 };
 
@@ -120,7 +121,6 @@ const ApprovedOrdersPage = () => {
   const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
-  const dispatch = useDispatch();
   const orders = useSelector(ordersApprovedState);
 
   useEffect(() => {

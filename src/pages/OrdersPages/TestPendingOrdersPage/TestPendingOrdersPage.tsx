@@ -9,14 +9,12 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
-import LabSlipApiService from "../../../services/LabSlipApiService";
-import Spinner from "../../../components/Spinner/Spinner";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useDispatch, useSelector} from "react-redux";
-import {ordersPendingState, testsPendingState} from "../../../selectors/selectors";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
+import {testsPendingState} from "../../../selectors/selectors";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {Order} from "../../../interfaces/Order";
+import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -128,14 +126,6 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (test: Test) => {
-  const date = new Date(test.received);
-  return {
-    ...test,
-    received: `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
-  }
-};
-
 const TestsPage = () => {
   const [data, setData] = useState([] as Test[]);
   const [searchText, setSearchText] = useState('');
@@ -158,8 +148,8 @@ const TestsPage = () => {
   }, []);
 
   const onSaved = async () => {
-    await dispatch(loadTestsByStatus('PENDING'));
-    onLoad();
+    await Promise.all([dispatch(loadTestsByStatus('PENDING')),
+      dispatch(loadTestsByStatus("APPROVED"))]);
   };
 
   const onLoad = () => {
@@ -178,13 +168,7 @@ const TestsPage = () => {
 
   const testsToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-  // .sort(((a: any, b: any) => {
-  //   const aDate = new Date(a.received);
-  //   const bDate = new Date(b.received);
-  //
-  //   return aDate > bDate ? 1 : -1;
-  // }));
+    .filter(searchFilter);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 

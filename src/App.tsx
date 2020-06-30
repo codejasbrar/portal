@@ -8,7 +8,7 @@ import "./styles/global.scss";
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import Header from "./components/Header/Header";
 import {useDispatch, useSelector} from "react-redux";
-import {loggedIn, refreshToken} from "./selectors/selectors";
+import {loggedIn} from "./selectors/selectors";
 import {loadUserByToken} from "./actions/userActions";
 import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";

@@ -11,14 +11,11 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import LabSlipApiService from "../../../services/LabSlipApiService";
-import Spinner from "../../../components/Spinner/Spinner";
-import Token from "../../../helpers/localToken";
-import {logOut, refreshTokenAction} from "../../../actions/authActions";
 import {useDispatch, useSelector} from "react-redux";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {ordersPendingState} from "../../../selectors/selectors";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
+import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -115,16 +112,8 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (order: Order) => {
-  const date = new Date(order.received);
-  return {
-    ...order,
-    received: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
-  }
-};
 
 const PendingOrdersPage = () => {
-  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
@@ -132,8 +121,8 @@ const PendingOrdersPage = () => {
   const orders = useSelector(ordersPendingState);
 
   const onSaved = async () => {
-    await dispatch(loadOrdersByStatus('PENDING'));
-    onLoad();
+    await Promise.all([dispatch(loadOrdersByStatus('PENDING')),
+      dispatch(loadOrdersByStatus("APPROVED"))]);
   };
 
   useEffect(() => {
@@ -170,7 +159,7 @@ const PendingOrdersPage = () => {
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
-
+  console.log(data);
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu

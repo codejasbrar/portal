@@ -8,6 +8,7 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
+import {useDispatch} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import {useDispatch, useSelector} from "react-redux";
 import {ordersState, testsState} from "../../selectors/selectors";
@@ -25,14 +26,15 @@ const OrdersPage = () => {
 
   useEffect(() => {
     (async () => {
-      await dispatch(loadOrdersByStatus("PENDING"));
-      await dispatch(loadOrdersByStatus("APPROVED"));
-      await dispatch(loadTestsByStatus("PENDING"));
-      await dispatch(loadTestsByStatus("APPROVED"));
+      await Promise.all([
+        dispatch(loadOrdersByStatus("PENDING")),
+        dispatch(loadOrdersByStatus("APPROVED")),
+        dispatch(loadTestsByStatus("PENDING")),
+        dispatch(loadTestsByStatus("APPROVED"))
+      ]);
       setLoading(false);
     })();
   }, []);
-
 
   useEffect(() => {
     const resizeListener = () => {

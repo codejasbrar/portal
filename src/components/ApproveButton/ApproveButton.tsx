@@ -7,7 +7,7 @@ import LabSlipApiService from "../../services/LabSlipApiService";
 
 //Styles
 import styles from "./ApproveButton.module.scss";
-import {Test} from "../../interfaces/Test";
+import Spinner from "../Spinner/Spinner";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -19,6 +19,7 @@ type ApproveButtonPropsTypes = {
 
 const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
@@ -34,17 +35,19 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   </div>;
 
   const onApprove = async () => {
+    setLoading(true);
     const hashes = props.selected.map((item: any) => item.hash);
     props.mode === 'order' ? await LabSlipApiService.saveApprovedOrders(hashes) :
       await LabSlipApiService.saveApprovedResults(hashes);
+    await props.onSaved();
     setShowPopup(false);
-    props.onSaved();
   };
 
   return <>
     <Button className={props.className ? props.className : ''}
       disabled={!props.selected.length}
       onClick={() => setShowPopup(true)}>{props.text}</Button>
+    {loading && <Spinner />}
     <Popup show={showPopup} classes={styles.modalApprove} onClose={() => setShowPopup(false)}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalContentTitle}>Submit for approval</h2>
