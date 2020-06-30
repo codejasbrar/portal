@@ -129,8 +129,6 @@ const TestApprovedPage = () => {
   const [width, setWidth] = useState(getWidth());
   const tests = useSelector(testsApprovedState);
 
-  console.log(data);
-
   useEffect(() => {
     onLoad();
   }, [tests]);
