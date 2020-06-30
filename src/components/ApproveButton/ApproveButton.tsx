@@ -25,12 +25,17 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     </p>
     <ul className={styles.modalContentList}>
       {props.selected.map(item => <li key={item.id}
-        className={styles.modalContentItem}>{props.mode} ID: <span>{item.id}</span></li>)}
+        className={styles.modalContentItem}>{props.mode === 'result' ? 'Test result' : 'Order'} ID: <span>{item.id}</span>
+      </li>)}
     </ul>
+    {props.mode === 'result' &&
+    <p className={styles.modalContentText}>Results will be released to the customer as soon as they are approved.</p>}
   </div>;
 
   const onApprove = async () => {
-    await LabSlipApiService.saveApprovedOrders(props.selected.map((item)=>item.hash));
+    const hashes = props.selected.map(item => item.hash);
+    props.mode === 'order' ? await LabSlipApiService.saveApprovedOrders(hashes) :
+      await LabSlipApiService.saveApprovedResults(hashes);
     setShowPopup(false);
     props.onSaved();
   };

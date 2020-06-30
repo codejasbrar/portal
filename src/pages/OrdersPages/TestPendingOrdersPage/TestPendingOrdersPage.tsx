@@ -11,6 +11,7 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Test} from "../../../interfaces/Test";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
+import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -73,7 +74,7 @@ const columns = [
   },
 ];
 
-const options: MUIDataTableOptions = {
+const options = (onSelect: any, onSaved: any) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -83,7 +84,7 @@ const options: MUIDataTableOptions = {
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
+  selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
   textLabels: {
@@ -105,12 +106,13 @@ const options: MUIDataTableOptions = {
     return items;
   },
   customFooter: CommonPagination,
-  customToolbarSelect: () => <>Selected toolbar</>,
+  customToolbarSelect: (selected) => <ApproveButton mode="result"
+    text={"Approve results"}
+    onSaved={onSaved}
+    selected={onSelect(selected.data)} />,
   customSearchRender: SearchBar,
-  customToolbar: () => <div>
-    <button className={styles.btnPrimary}>Approve results</button>
-  </div>
-} as MUIDataTableOptions;
+  customToolbar: () => ''
+} as MUIDataTableOptions);
 
 const NoMatches = () => (
   <div className={styles.sorry}>
@@ -135,19 +137,10 @@ const TestsPage = () => {
   let [width, setWidth] = useState(getWidth());
 
   useEffect(() => {
-    (async () => {
-      const response = await LabSlipApiService.getTestsByStatus('PENDING');
-      const orders = response.data;
-      if (orders && orders.length) {
-        setData(orders.map((item: any) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        }));
-      }
-
-      setData(orders);
+    onSaved().then(() => {
       setLoading(false);
-    })();
+    });
+
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -158,6 +151,19 @@ const TestsPage = () => {
     }
   }, []);
 
+  const onSaved = async () => {
+    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
+    const orders = response.data;
+    if (orders && orders.length) {
+      setData(orders.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+
+    setData(orders);
+  };
+
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
     || (String(item.customerId).indexOf(searchText) !== -1)
@@ -166,12 +172,14 @@ const TestsPage = () => {
   const testsToView = data
     .map(reformatDate)
     .filter(searchFilter)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.received);
-    //   const bDate = new Date(b.received);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
+  // .sort(((a: any, b: any) => {
+  //   const aDate = new Date(a.received);
+  //   const bDate = new Date(b.received);
+  //
+  //   return aDate > bDate ? 1 : -1;
+  // }));
+
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
   if (loading) {
     return <Spinner />;
@@ -188,13 +196,13 @@ const TestsPage = () => {
           title={''}
           data={data.map(reformatDate)}
           columns={columns}
-          options={options}
+          options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({testsToView.length} results)</p>
-        <button className={styles.btnPrimary}>Approve all tests</button>
+        <ApproveButton mode="result" onSaved={onSaved} selected={data} text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -209,9 +217,13 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
               <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
+                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
               </p>
-              <button className={styles.btnPrimary}>Approve</button>
+              <ApproveButton className={styles.btnApproveMobile}
+                mode="result"
+                onSaved={onSaved}
+                selected={[item]}
+                text={"Approve"} />
             </div>
           ))}
         {testsToView.length === 0 && <NoMatches />}
