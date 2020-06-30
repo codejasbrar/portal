@@ -67,21 +67,3 @@
         min-width: auto;
     }
 }
-
-[class*="MUIDataTableToolbarSelect-root"], [class*="jss"] {
-    box-shadow:       none !important;
-    background-color: transparent !important;
-    position:         absolute !important;
-    right:            0;
-    width:            150px;
-    top:              0;
-    padding-top:      14px !important;
-
-    div h6 {
-        display: none;
-    }
-}
-
-[class*="MUIDataTable-paper"] {
-    position: relative;
-}
