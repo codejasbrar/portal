@@ -13,7 +13,6 @@ import {loadUserByToken} from "./actions/userActions";
 import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";
 import Spinner from "./components/Spinner/Spinner";
-import Main from "./pages/Main/Main";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
@@ -38,12 +37,13 @@ const App = () => {
     <Header />
     {loading && <Spinner />}
     <Switch>
-      <Route exact path="/" component={Main} />
-      <Route path="/authentication" render={(props => (isLoggedIn ? <Redirect to="/" /> : <Authentication />))} />
+      <Route exact path="/">
+        <Redirect to="/orders/pending" />
+      </Route>
+      <Route path="/authentication"
+        render={() => (isLoggedIn ? <Redirect to="/orders/pending" /> : <Authentication />)} />
       <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
-        <>
-          <Route path={['/orders/pending', '/orders/approved', '/orders/test', '/orders/test-approved', '/orders/navigation']} component={OrdersPage} />
-        </>
+        <Route path='/orders' component={OrdersPage} />
       </PrivateRoute>
     </Switch>
     <Footer />

@@ -13,6 +13,7 @@ export default () => (createMuiTheme as any)({
       },
       paper: {
         boxShadow: "none",
+        position: "relative"
       }
     },
     MUIDataTableBodyCell: {
@@ -88,6 +89,21 @@ export default () => (createMuiTheme as any)({
         fontFamily: "Open Sans!important",
         color: '#232d37',
         textAlign: 'left!important',
+      }
+    },
+    MUIDataTableToolbarSelect: {
+      root: {
+        boxShadow: 'none !important',
+        backgroundColor: 'transparent !important',
+        position: 'absolute !important',
+        right: 0,
+        width: '150px',
+        top: 0,
+        paddingTop: '14px !important',
+
+        "& div h6": {
+          display: 'none'
+        }
       }
     }
   }

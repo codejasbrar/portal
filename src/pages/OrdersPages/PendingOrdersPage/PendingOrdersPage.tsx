@@ -137,20 +137,10 @@ const PendingOrdersPage = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      const response = await LabSlipApiService.getOrdersByStatus('PENDING');
-      const orders = response.data;
-      if (orders && orders.length) {
-        setData(orders.map((item: any) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        }));
-      }
 
-      setData(orders);
+    onSaved().then(() => {
       setLoading(false);
-    })();
-
+    });
 
     const resizeListener = () => {
       setWidth(getWidth())

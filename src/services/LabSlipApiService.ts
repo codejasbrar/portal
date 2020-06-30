@@ -11,5 +11,5 @@ export default class LabSlipApiService {
 
   static getTestsByStatus = async (status: TestStatus) => await authorized.get(`/getResultsByStatus/${status}`).then(data => data);
 
-  static saveApprovedTests = async (hashes: string[]) => await authorized.post('/saveApprovedTests', {hashes})
+  static saveApprovedResults = async (hashes: string[]) => await authorized.post('/saveApprovedResults', {hashes})
 }
