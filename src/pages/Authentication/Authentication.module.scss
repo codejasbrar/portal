@@ -18,6 +18,7 @@
         @include breakpoint($mobile) {
             background-image: none !important;
             background-color: #fff;
+            padding-top:      60px;
         }
     }
 }

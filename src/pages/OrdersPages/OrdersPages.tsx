@@ -1,6 +1,6 @@
 import styles from "./OrdersPages.module.scss";
 import Navigation from "../../components/Navigation/Navigation";
-import {Route} from "react-router-dom";
+import {Route, Redirect} from "react-router-dom";
 import PendingOrdersPage from "./PendingOrdersPage/PendingOrdersPage";
 import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
 import React, {useEffect, useState} from "react";
@@ -8,7 +8,6 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
-import {loadTestsByStatus} from "../../actions/testsActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -38,6 +37,9 @@ const OrdersPage = () => {
         <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
         <div className={styles.containerFlex}>
           {width > 858 ? <Navigation /> : <Route path="/orders/navigation" component={MobileNavigation} />}
+          <Route path="/orders" exact>
+            <Redirect to="/orders/pending" />
+          </Route>
           <Route path="/orders/pending" component={PendingOrdersPage} />
           <Route path="/orders/approved" component={ApprovedOrdersPage} />
           <Route path="/orders/test" component={TestPendingOrdersPage} />
