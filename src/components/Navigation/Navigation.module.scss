@@ -84,7 +84,7 @@
 .navList {
     display:        flex;
     flex-direction: column;
-    width:          188px;
+    width:          198px;
     margin-bottom:  34px;
 
     @include breakpoint($tablet_horizontal) {

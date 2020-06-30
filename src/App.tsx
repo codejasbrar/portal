@@ -17,6 +17,7 @@ import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
 
+
 new LabSlipApiService();
 
 const App = () => {
