@@ -10,8 +10,6 @@ import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
 import {useDispatch} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
-import {useDispatch, useSelector} from "react-redux";
-import {ordersState, testsState} from "../../selectors/selectors";
 import {loadOrdersByStatus} from "../../actions/ordersActions";
 import {loadTestsByStatus} from "../../actions/testsActions";
 

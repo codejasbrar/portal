@@ -4,7 +4,7 @@ import React, {useEffect, useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 
 //Components
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -12,9 +12,8 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import {Order} from "../../../interfaces/Order";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ordersState} from "../../../selectors/selectors";
+import {ordersApprovedState} from "../../../selectors/selectors";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
-import LabSlipApiService from "../../../services/LabSlipApiService";
 
 
 const getWidth = () => window.innerWidth
@@ -114,25 +113,22 @@ const reformatDate = (order: Order) => {
 
 const TestDetailsPage = () => {
   let [width, setWidth] = useState(getWidth());
-  const orders = useSelector(ordersState);
-  // const dispatch = useDispatch();
+  const orders = useSelector(ordersApprovedState);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(orders);
 
   useEffect(() => {
-    (async () => {
-      const response = await LabSlipApiService.getTestsByStatus('PENDING');
-      const orders = response.data;
-      if (orders && orders.length) {
-        setData(orders.map((item: any) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        }));
-      }
 
-      setData(orders);
-      setLoading(false);
-    })();
+  }, [orders]);
+
+  useEffect(() => {
+    if (orders && orders.length) {
+      setData(orders.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+    setLoading(false);
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -161,7 +157,8 @@ const TestDetailsPage = () => {
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       <div className={styles.container}>
-        <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+        <Link to={'/orders/pending'}
+          className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
         </Link>
         <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
