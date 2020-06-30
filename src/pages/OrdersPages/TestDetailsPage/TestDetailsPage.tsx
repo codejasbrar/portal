@@ -144,7 +144,7 @@ const TestDetailsPage = () => {
   }, []);
 
 
-  const ordersToView = data
+  const testsToView = data
     .map(reformatDate)
     // .sort(((a: any, b: any) => {
     //   const aDate = new Date(a.result);
@@ -235,7 +235,7 @@ const TestDetailsPage = () => {
               :
               <div className={styles.mobileOrders}>
                 <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                {ordersToView
+                {testsToView
                   .map((item: any, i) => (
                     <div key={i} className={styles.mobileOrdersItem}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
@@ -249,7 +249,7 @@ const TestDetailsPage = () => {
                         <span className={styles.mobileOrdersText}>{item.unitsPerEm}</span></p>
                     </div>
                   ))}
-                {ordersToView.length === 0 && <NoMatches />}
+                {testsToView.length === 0 && <NoMatches />}
               </div>
             }
           </section>
