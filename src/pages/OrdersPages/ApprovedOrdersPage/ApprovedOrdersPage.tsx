@@ -112,8 +112,8 @@ export const reformatDate = (order: Order | Test) => {
   const dateApproved = order.approved ? new Date(order.approved) : ''
   return {
     ...order,
-    received: `${dateRecived.getMonth()}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
-    approved: dateApproved ? `${dateApproved.getMonth()}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
+    received: `${dateRecived.getMonth() + 1}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
+    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
   }
 };
 
