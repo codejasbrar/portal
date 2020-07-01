@@ -10,7 +10,7 @@ import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
 import {useDispatch} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
-import {loadOrdersByStatus} from "../../actions/ordersActions";
+import {loadAllData, loadOrdersByStatus} from "../../actions/ordersActions";
 import {loadTestsByStatus} from "../../actions/testsActions";
 
 const getWidth = () => window.innerWidth
@@ -24,12 +24,7 @@ const OrdersPage = () => {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([
-        dispatch(loadOrdersByStatus("PENDING")),
-        dispatch(loadOrdersByStatus("APPROVED")),
-        dispatch(loadTestsByStatus("PENDING")),
-        dispatch(loadTestsByStatus("APPROVED"))
-      ]);
+      await dispatch(loadAllData());
       setLoading(false);
     })();
   }, []);

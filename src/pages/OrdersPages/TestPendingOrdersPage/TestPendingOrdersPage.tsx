@@ -148,8 +148,8 @@ const TestsPage = () => {
   }, []);
 
   const onSaved = async () => {
-    await Promise.all([dispatch(loadTestsByStatus('PENDING')),
-      dispatch(loadTestsByStatus("APPROVED"))]);
+    dispatch(loadTestsByStatus("APPROVED"));
+    await dispatch(loadTestsByStatus('PENDING'));
   };
 
   const onLoad = () => {

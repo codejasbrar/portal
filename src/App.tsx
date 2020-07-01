@@ -52,7 +52,7 @@ const App = () => {
       </Route>
       <Route path="/authentication"
         render={() => (isLoggedIn ? <Redirect to="/orders/pending" /> : <Authentication />)} />
-      <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
+      <PrivateRoute loggedIn={isLoggedIn}>
         <Route path='/orders' component={OrdersPage} />
       </PrivateRoute>
     </Switch>

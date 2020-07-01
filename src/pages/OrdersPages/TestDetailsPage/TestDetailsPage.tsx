@@ -4,7 +4,7 @@ import React, {useEffect, useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 
 //Components
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -12,8 +12,9 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import {Order} from "../../../interfaces/Order";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ordersApprovedState} from "../../../selectors/selectors";
+import {ordersApprovedState, testsApprovedState} from "../../../selectors/selectors";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
+import {getResult} from "../../../actions/testsActions";
 
 
 const getWidth = () => window.innerWidth
@@ -113,17 +114,24 @@ const reformatDate = (order: Order) => {
 
 const TestDetailsPage = () => {
   let [width, setWidth] = useState(getWidth());
-  const orders = useSelector(ordersApprovedState);
+  const tests = useSelector(testsApprovedState);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(orders);
+  const [data, setData] = useState(tests as Order[]);
+  const dispatch = useDispatch();
+  const path = document.location.pathname;
+  const testId = parseInt(path.slice(path.lastIndexOf('/') + 1, path.length));
+  const test: any = tests.filter(test => test.id === testId)[0];
+
+  useEffect(() => {
+    (async () => {
+      if (test) console.log(await dispatch(getResult(test.hash)));
+    })();
+  }, [test]);
 
   useEffect(() => {
 
-  }, [orders]);
-
-  useEffect(() => {
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
+    if (tests && tests.length) {
+      setData(tests.map((item: any) => {
         item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
         return item;
       }));

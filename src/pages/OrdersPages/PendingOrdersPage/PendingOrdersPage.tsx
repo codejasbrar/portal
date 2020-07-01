@@ -121,8 +121,8 @@ const PendingOrdersPage = () => {
   const orders = useSelector(ordersPendingState);
 
   const onSaved = async () => {
-    await Promise.all([dispatch(loadOrdersByStatus('PENDING')),
-      dispatch(loadOrdersByStatus("APPROVED"))]);
+    dispatch(loadOrdersByStatus("APPROVED"));
+    await dispatch(loadOrdersByStatus('PENDING'));
   };
 
   useEffect(() => {

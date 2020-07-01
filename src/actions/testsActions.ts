@@ -1,8 +1,7 @@
 import LabSlipApiService, {TestStatus} from "../services/LabSlipApiService";
 import {Test} from "../interfaces/Test";
 import {Dispatch} from "react";
-import {logOut, refreshTokenAction} from "./authActions";
-import Token from "../helpers/localToken";
+import {catchBlock} from "./ordersActions";
 
 export const GET_TESTS_BY_STATUS = 'GET_TESTS_BY_STATUS';
 export const GET_TESTS_SUCCESS = 'GET_TESTS_SUCCESS';
@@ -22,15 +21,23 @@ export const loadTestsByStatus = (status: TestStatus) => async (dispatch: Dispat
     const response = await LabSlipApiService.getResultsByStatus(status);
     dispatch(loadTestsSuccess(response.data, status))
   } catch (exception) {
-    const errorData = exception.response;
-    if (errorData.status === 403 || errorData.message === "Unauthorized" || errorData.status === 401) {
-      try {
-        dispatch(refreshTokenAction(Token.get().refreshToken as string));
-      } catch (e) {
-        dispatch(logOut());
-      }
-    } else {
-      dispatch(loadTestsError())
-    }
+    await catchBlock(exception, dispatch);
+  }
+};
+
+export const saveResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
+  try {
+    await LabSlipApiService.saveApprovedResults(hashes);
+  } catch (exception) {
+    await catchBlock(exception, dispatch);
+  }
+};
+
+export const getResult = (hash: string) => async (dispatch: Dispatch<object>): Promise<any> => {
+  try {
+    const response = await LabSlipApiService.getResult(hash);
+    return response.data;
+  } catch (e) {
+    await catchBlock(e, dispatch)
   }
 };

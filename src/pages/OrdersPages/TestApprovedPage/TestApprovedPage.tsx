@@ -26,8 +26,7 @@ const columns = [
       sort: false,
       customBodyRender: (value: any, tableMeta: any, updateValue: any) => (
         <Link
-          // to={`${value}`}
-          to={'/orders/test-details/'} /*need page refresh*/
+          to={`/orders/test-details/${value}`} /*need page refresh*/
           color="secondary"
         >{value}</Link>
       )

@@ -8,6 +8,9 @@ import LabSlipApiService from "../../services/LabSlipApiService";
 //Styles
 import styles from "./ApproveButton.module.scss";
 import Spinner from "../Spinner/Spinner";
+import {saveResults} from "../../actions/testsActions";
+import {saveOrders} from "../../actions/ordersActions";
+import {useDispatch} from "react-redux";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -20,6 +23,7 @@ type ApproveButtonPropsTypes = {
 const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
@@ -37,8 +41,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const onApprove = async () => {
     setLoading(true);
     const hashes = props.selected.map((item: any) => item.hash);
-    props.mode === 'order' ? await LabSlipApiService.saveApprovedOrders(hashes) :
-      await LabSlipApiService.saveApprovedResults(hashes);
+    props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
+      await dispatch(saveResults(hashes));
     await props.onSaved();
     setShowPopup(false);
   };

@@ -28,5 +28,11 @@ export default class LabSlipApiService {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }
-  })
+  });
+
+  static getResult = async (hash: string) => await client.get(`/getResult/${hash}`, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  });
 }

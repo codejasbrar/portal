@@ -60,8 +60,8 @@ export default (state = initialState, action: AuthActionsTypes) => {
       Token.remove();
       return {
         ...state,
-        loggedIn: false
-      }
+        loggedIn: true
+      };
     case REFRESH_TOKEN_SUCCESS:
       Token.set(action.payload);
       return {
