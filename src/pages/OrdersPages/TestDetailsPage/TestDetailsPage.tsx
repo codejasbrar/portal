@@ -164,103 +164,104 @@ const TestDetailsPage = () => {
   return <>
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
-      <div className={styles.container}>
-        <Link to={'/orders/pending'}
-          className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
-          Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-        </Link>
-        <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
-          <section className={styles.adminSection}>
-            <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: 1234567890</h2>
+      {testsToView.map((item: any, i) => (
+        <div className={styles.container}>
+          <Link to={'/orders/pending'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+            Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
+          </Link>
+          <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
+            <section className={styles.adminSection}>
+              <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: 1234567890</h2>
 
-            <aside className={styles.testInfo}>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Received: </span>
-                4/23/2020 1:31PM
-              </p>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Order ID: </span>
-                34557445
-              </p>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Customer ID: </span>
-                33245
-              </p>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Gender: </span>
-                {/*{item.customerGender}*/}
-              </p>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Age: </span>
-                31
-              </p>
-              <button className={`${styles.btnPrimary} ${styles.testInfoBtn}`}>Approve results</button>
-            </aside>
-
-            <div className={styles.comment}>
-              <label >
-                <textarea className={styles.commentField} name="comment field" placeholder={'Add your comment here'}></textarea>
-              </label>
-              <div className={styles.commentBtnWrapper}>
-                <button className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
-              </div>
-            </div>
-
-            <div className={styles.commentList}>
-              <div className={styles.commentItem}>
-                <h4 className={styles.commentItemAuthor}>Dr Edward Armstrong</h4>
-                <span className={styles.commentItemDate}>4/23/2020 1:31PM</span>
-                <p className={styles.commentItemText}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                  aliquip ex ea consequat.
+              <aside className={styles.testInfo}>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Received: </span>
+                  {item.received} 1:31PM
                 </p>
-              </div>
-              <div className={styles.commentItem}>
-                <h4 className={styles.commentItemAuthor}>Vicky Zhao-Silvestro</h4>
-                <span className={styles.commentItemDate}>4/22/2020 9:12AM</span>
-                <p className={styles.commentItemText}>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur nostrud incididunt exercitation.
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Order ID: </span>
+                  34557445
                 </p>
-              </div>
-            </div>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Customer ID: </span>
+                  33245
+                </p>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Gender: </span>
+                  {/*{item.customerGender}*/}
+                </p>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Age: </span>
+                  31
+                </p>
+                <button className={`${styles.btnPrimary} ${styles.testInfoBtn}`}>Approve results</button>
+              </aside>
 
-          </section>
-
-          <section className={`${styles.orders} ${styles.resultsTable}`}>
-            {width > 700 ?
-              <MuiThemeProvider theme={CommonTableTheme()}>
-                <MUIDataTable
-                  title={''}
-                  data={data.map(reformatDate)}
-                  columns={columns}
-                  options={options}
-                />
-              </MuiThemeProvider>
-              :
-              <div className={styles.mobileOrders}>
-                <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                {testsToView
-                  .map((item: any, i) => (
-                    <div key={i} className={styles.mobileOrdersItem}>
-                      <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.panicValueBiomarkers}</span></p>
-                      <p className={styles.mobileOrdersTitle}>Result:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.result}</span>
-                      </p>
-                      <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-                      <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
-                        <span className={styles.mobileOrdersText}>{item.unitsPerEm}</span></p>
-                    </div>
-                  ))}
-                {testsToView.length === 0 && <NoMatches />}
+              <div className={styles.comment}>
+                <label >
+                  <textarea className={styles.commentField} name="comment field" placeholder={'Add your comment here'}></textarea>
+                </label>
+                <div className={styles.commentBtnWrapper}>
+                  <button className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
+                </div>
               </div>
-            }
-          </section>
+
+              <div className={styles.commentList}>
+                <div className={styles.commentItem}>
+                  <h4 className={styles.commentItemAuthor}>Dr Edward Armstrong</h4>
+                  <span className={styles.commentItemDate}>4/23/2020 1:31PM</span>
+                  <p className={styles.commentItemText}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea consequat.
+                  </p>
+                </div>
+                <div className={styles.commentItem}>
+                  <h4 className={styles.commentItemAuthor}>Vicky Zhao-Silvestro</h4>
+                  <span className={styles.commentItemDate}>4/22/2020 9:12AM</span>
+                  <p className={styles.commentItemText}>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur nostrud incididunt exercitation.
+                  </p>
+                </div>
+              </div>
+
+            </section>
+
+            <section className={`${styles.orders} ${styles.resultsTable}`}>
+              {width > 700 ?
+                <MuiThemeProvider theme={CommonTableTheme()}>
+                  <MUIDataTable
+                    title={''}
+                    data={data.map(reformatDate)}
+                    columns={columns}
+                    options={options}
+                  />
+                </MuiThemeProvider>
+                :
+                <div className={styles.mobileOrders}>
+                  <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
+
+                      <div key={i} className={styles.mobileOrdersItem}>
+                        <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
+                          <span className={styles.mobileOrdersText}>{item.panicValueBiomarkers}</span></p>
+                        <p className={styles.mobileOrdersTitle}>Result:&nbsp;
+                          <span className={styles.mobileOrdersText}>{item.result}</span>
+                        </p>
+                        <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
+                          <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
+                        <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
+                          <span className={styles.mobileOrdersText}>{item.unitsPerEm}</span></p>
+                      </div>
+
+                </div>
+              }
+            </section>
+
+          </div>
 
         </div>
-      </div>
+      ))}
+      {testsToView.length === 0 && <NoMatches />}
     </section>
 
   </>
