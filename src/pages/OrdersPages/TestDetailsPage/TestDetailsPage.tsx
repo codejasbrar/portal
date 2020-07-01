@@ -64,12 +64,13 @@ const columns = [
 const options: MUIDataTableOptions = {
   filter: false,
   download: false,
+  pagination: false,
   print: false,
   viewColumns: false,
   searchOpen: false,
   search: false,
   responsive: "scrollFullHeight",
-  rowsPerPage: 25,
+  rowsPerPage: 45,
   selectToolbarPlacement: 'none',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -92,7 +93,6 @@ const options: MUIDataTableOptions = {
     });
     return items;
   },
-  customFooter: CommonPagination,
 
 } as MUIDataTableOptions;
 
@@ -130,12 +130,12 @@ const TestDetailsPage = () => {
 
   useEffect(() => {
 
-    if (tests && tests.length) {
-      setData(tests.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
-    }
+    // if (tests && tests.length) {
+    //   setData(tests.map((item: any) => {
+    //     item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+    //     return item;
+    //   }));
+    // }
     setLoading(false);
 
     const resizeListener = () => {
@@ -166,7 +166,7 @@ const TestDetailsPage = () => {
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       {testsToView.map((item: any, i) => (
         <div className={styles.container}>
-          <Link to={'/orders/pending'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+          <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
           </Link>
           <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
@@ -176,7 +176,7 @@ const TestDetailsPage = () => {
               <aside className={styles.testInfo}>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Received: </span>
-                  {item.received} 1:31PM
+                  {item.received}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Order ID: </span>
@@ -188,13 +188,14 @@ const TestDetailsPage = () => {
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Gender: </span>
-                  {/*{item.customerGender}*/}
+                  {item.customerGender}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Age: </span>
                   31
                 </p>
                 <button className={`${styles.btnPrimary} ${styles.testInfoBtn}`}>Approve results</button>
+
               </aside>
 
               <div className={styles.comment}>

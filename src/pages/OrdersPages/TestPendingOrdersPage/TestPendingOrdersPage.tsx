@@ -30,7 +30,7 @@ const columns = [
       customBodyRender: (value: any, tableMeta: any, updateValue: any) => (
         <Link
           // to={`${value}`}
-          to={'/orders/test-details/'} /*need page refresh*/
+          to={'/orders/test-details/'} /*temp*/
           color="secondary"
         >{value}</Link>
       )
@@ -196,7 +196,9 @@ const TestsPage = () => {
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
-                  to={`/test/${item.id}`}>{item.id}</Link></span></p>
+                  // to={`/test/${item.id}`}
+                  to={'/orders/test-details/'}
+                >{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order

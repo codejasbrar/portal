@@ -404,6 +404,21 @@
             margin: 8px 0 17px;
         }
     }
+    textarea::-webkit-input-placeholder {
+        color: $gray6;
+    }
+
+    textarea:-moz-placeholder {
+        color: $gray6;
+    }
+
+    textarea::-moz-placeholder {
+        color: $gray6;
+    }
+
+    textarea:-ms-input-placeholder {
+        color: $gray6;
+    }
 }
 
 /*---Test Details Page styles END*/
