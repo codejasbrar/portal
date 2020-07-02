@@ -9,9 +9,12 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
-import LabSlipApiService from "../../../services/LabSlipApiService";
-import Spinner from "../../../components/Spinner/Spinner";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
+import {useDispatch, useSelector} from "react-redux";
+import {testsPendingState} from "../../../selectors/selectors";
+import {loadTestsByStatus} from "../../../actions/testsActions";
+import {Order} from "../../../interfaces/Order";
+import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -123,26 +126,18 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (test: Test) => {
-  const date = new Date(test.received);
-  return {
-    ...test,
-    received: `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
-  }
-};
-
 const TestsPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([] as Test[]);
   const [searchText, setSearchText] = useState('');
-  let [width, setWidth] = useState(getWidth());
+  const [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
+  const tests = useSelector(testsPendingState);
 
   useEffect(() => {
-    onSaved().then(() => {
-      setLoading(false);
-    });
+    onLoad();
+  }, [tests]);
 
-
+  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -153,16 +148,17 @@ const TestsPage = () => {
   }, []);
 
   const onSaved = async () => {
-    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
-    const orders = response.data;
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
+    dispatch(loadTestsByStatus("APPROVED"));
+    await dispatch(loadTestsByStatus('PENDING'));
+  };
+
+  const onLoad = () => {
+    if (tests && tests.length) {
+      setData(tests.map((item: any) => {
         item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
         return item;
       }));
     }
-
-    setData(orders);
   };
 
   const searchFilter = (item: any) =>
@@ -172,19 +168,9 @@ const TestsPage = () => {
 
   const testsToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-  // .sort(((a: any, b: any) => {
-  //   const aDate = new Date(a.received);
-  //   const bDate = new Date(b.received);
-  //
-  //   return aDate > bDate ? 1 : -1;
-  // }));
+    .filter(searchFilter);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
-
-  if (loading) {
-    return <Spinner />;
-  }
 
   return <section className={styles.tests}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
@@ -203,7 +189,7 @@ const TestsPage = () => {
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({testsToView.length} results)</p>
-        <ApproveButton mode="result" onSaved={onSaved} selected={data} text={"Approve all results"} />
+        <ApproveButton mode="result" onSaved={onSaved} selected={data as Order[]} text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (

@@ -16,6 +16,8 @@ import Spinner from "./components/Spinner/Spinner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 
 import LabSlipApiService from "./services/LabSlipApiService";
+import Token from "./helpers/localToken";
+import {refreshTokenAction} from "./actions/authActions";
 
 
 new LabSlipApiService();
@@ -27,12 +29,19 @@ const App = () => {
 
   useEffect(() => {
     (async () => {
-      if (localStorage.getItem('token')) {
-        await dispatch(loadUserByToken());
+      const tokenData = Token.get();
+      if (tokenData.token) {
+        if (Token.isTokenExpired()) {
+          await dispatch(refreshTokenAction(tokenData.refreshToken as string));
+          await dispatch(loadUserByToken());
+        } else {
+          await dispatch(loadUserByToken());
+        }
       }
       setLoading(false);
     })();
   }, [dispatch, isLoggedIn]);
+
 
   return <Router>
     <Header />
@@ -43,7 +52,7 @@ const App = () => {
       </Route>
       <Route path="/authentication"
         render={() => (isLoggedIn ? <Redirect to="/orders/pending" /> : <Authentication />)} />
-      <PrivateRoute loggedIn={isLoggedIn || !!sessionStorage.getItem('token')}>
+      <PrivateRoute loggedIn={isLoggedIn}>
         <Route path='/orders' component={OrdersPage} />
       </PrivateRoute>
     </Switch>

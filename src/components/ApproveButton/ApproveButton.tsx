@@ -7,6 +7,10 @@ import LabSlipApiService from "../../services/LabSlipApiService";
 
 //Styles
 import styles from "./ApproveButton.module.scss";
+import Spinner from "../Spinner/Spinner";
+import {saveResults} from "../../actions/testsActions";
+import {saveOrders} from "../../actions/ordersActions";
+import {useDispatch} from "react-redux";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -18,13 +22,15 @@ type ApproveButtonPropsTypes = {
 
 const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
       Are you sure you want to approve the following {props.mode}s?
     </p>
     <ul className={styles.modalContentList}>
-      {props.selected.map(item => <li key={item.id}
+      {props.selected.map((item: any) => <li key={item.id}
         className={styles.modalContentItem}>{props.mode === 'result' ? 'Test result' : 'Order'} ID: <span>{item.id}</span>
       </li>)}
     </ul>
@@ -33,17 +39,19 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   </div>;
 
   const onApprove = async () => {
-    const hashes = props.selected.map(item => item.hash);
-    props.mode === 'order' ? await LabSlipApiService.saveApprovedOrders(hashes) :
-      await LabSlipApiService.saveApprovedResults(hashes);
+    setLoading(true);
+    const hashes = props.selected.map((item: any) => item.hash);
+    props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
+      await dispatch(saveResults(hashes));
+    await props.onSaved();
     setShowPopup(false);
-    props.onSaved();
   };
 
   return <>
     <Button className={props.className ? props.className : ''}
       disabled={!props.selected.length}
       onClick={() => setShowPopup(true)}>{props.text}</Button>
+    {loading && <Spinner />}
     <Popup show={showPopup} classes={styles.modalApprove} onClose={() => setShowPopup(false)}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalContentTitle}>Submit for approval</h2>

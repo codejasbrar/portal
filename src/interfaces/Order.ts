@@ -1,8 +1,10 @@
-export interface Order {
+import {Test} from "./Test";
+
+export interface Order extends Test {
   id: number,
   received: string,
   approved: string,
   customerId: number,
-  criteriaMet: boolean,
+  criteriaMet: boolean | "Yes" | "No",
   hash: string
 }

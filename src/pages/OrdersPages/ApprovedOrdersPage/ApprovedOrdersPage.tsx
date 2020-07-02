@@ -9,8 +9,9 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import LabSlipApiService from "../../../services/LabSlipApiService";
-import Spinner from "../../../components/Spinner/Spinner";
+import {Test} from "../../../interfaces/Test";
+import {useSelector} from "react-redux";
+import {ordersApprovedState} from "../../../selectors/selectors";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -106,33 +107,31 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (order: Order) => {
-  const date = new Date(order.received);
+export const reformatDate = (order: Order | Test) => {
+  const dateRecived = new Date(order.received);
+  const dateApproved = order.approved ? new Date(order.approved) : ''
   return {
     ...order,
-    received: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
+    received: `${dateRecived.getMonth() + 1}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
+    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
   }
 };
 
 const ApprovedOrdersPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
-  let [width, setWidth] = useState(getWidth());
+  const [width, setWidth] = useState(getWidth());
+  const orders = useSelector(ordersApprovedState);
 
   useEffect(() => {
-    (async () => {
-      const response = await LabSlipApiService.getOrdersByStatus('APPROVED');
-      setData(response.data);
-      // setData(response.data.sort(((a: any, b: any) => {
-      //   const aDate = new Date(a.received);
-      //   const bDate = new Date(b.received);
-      //
-      //   return aDate > bDate ? -1 : 1;
-      // })));
-      setLoading(false);
-    })();
+    onLoad();
+  }, [orders]);
 
+  const onLoad = () => {
+    if (orders && orders.length) setData(orders);
+  };
+
+  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -149,17 +148,7 @@ const ApprovedOrdersPage = () => {
 
   const ordersToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.received);
-    //   const bDate = new Date(b.received);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
-
-  if (loading) {
-    return <Spinner />;
-  }
+    .filter(searchFilter);
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>

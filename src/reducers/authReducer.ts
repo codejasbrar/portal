@@ -1,5 +1,14 @@
-import {LOGIN_ERROR, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, CODE_REQUIRED, CODE_INCORRECT} from "../actions/authActions";
+import {
+  LOGIN_ERROR,
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS,
+  LOGOUT,
+  CODE_REQUIRED,
+  CODE_INCORRECT,
+  REFRESH_TOKEN_SUCCESS, REFRESH_TOKEN_ERROR, REFRESH_TOKEN_REQUEST
+} from "../actions/authActions";
 import {AuthActionsTypes, AuthState} from "../interfaces/AuthState";
+import Token from "../helpers/localToken";
 
 const initialState: AuthState = {
   loggedIn: !!localStorage.getItem('token'),
@@ -11,20 +20,20 @@ export default (state = initialState, action: AuthActionsTypes) => {
     case LOGIN_REQUEST:
       return {...state, loading: true};
     case LOGIN_SUCCESS:
-      localStorage.setItem('token', action.payload.token);
+      Token.set(action.payload);
       return {
         ...state,
         loggedIn: true,
         error: null,
         loading: false,
-        tempData: undefined
+        tempData: undefined,
       };
     case LOGOUT:
-      localStorage.removeItem('token');
+      Token.remove();
       return {
         ...state,
         loggedIn: false,
-        error: null
+        error: null,
       };
     case CODE_REQUIRED:
       return {
@@ -47,6 +56,23 @@ export default (state = initialState, action: AuthActionsTypes) => {
         loading: false,
         tempData: undefined
       };
+    case REFRESH_TOKEN_REQUEST:
+      Token.remove();
+      return {
+        ...state,
+        loggedIn: true
+      };
+    case REFRESH_TOKEN_SUCCESS:
+      Token.set(action.payload);
+      return {
+        ...state,
+        loggedIn: true,
+        error: null,
+        loading: false,
+      };
+    case REFRESH_TOKEN_ERROR:
+      Token.remove();
+      return state;
     default:
       return state;
   }

@@ -3,27 +3,38 @@ import React, {useEffect, useState} from "react";
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import LabSlipApiService from "../../services/LabSlipApiService";
+import {useSelector} from "react-redux";
+import {
+  ordersApprovedState,
+  ordersPendingState, ordersState,
+  testsApprovedState,
+  testsPendingState, testsState
+} from "../../selectors/selectors";
 
 type NavigationPropsTypes = {};
 
 const Navigation = (props: NavigationPropsTypes) => {
-  const [pendingOrdersCount, setPendingOrdersCount] = useState();
-  const [approvedOrdersCount, setApprovedOrdersCount] = useState();
-  const [pendingTestsCount, setPendingTestsCount] = useState();
+  const orders = useSelector(ordersState);
+  const tests = useSelector(testsState);
+  const ordersPending = useSelector(ordersPendingState);
+  const ordersApproved = useSelector(ordersApprovedState);
+  const testsPending = useSelector(testsPendingState);
+  const testsApproved = useSelector(testsApprovedState);
+  const [counts, setCounts] = useState({
+    op: ordersPending.length,
+    oa: ordersApproved.length,
+    tp: testsPending.length,
+    ta: testsApproved.length
+  });
 
   useEffect(() => {
-
-    (async () => {
-      const responseWithApproved = await LabSlipApiService.getOrdersByStatus('APPROVED');
-      const responseWithPending = await LabSlipApiService.getOrdersByStatus('PENDING');
-      const responseTestsWithPending = await LabSlipApiService.getTestsByStatus('PENDING');
-
-      setApprovedOrdersCount(responseWithApproved.data.length);
-      setPendingOrdersCount(responseWithPending.data.length);
-      setPendingTestsCount(responseTestsWithPending.data.length)
-    })();
-  }, []);
+    setCounts({
+      op: ordersPending.length,
+      oa: ordersApproved.length,
+      tp: testsPending.length,
+      ta: testsApproved.length
+    });
+  }, [orders, tests]);
 
   return <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
@@ -33,13 +44,13 @@ const Navigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        <span className={styles.navlinkNumber}>{pendingOrdersCount ? `(${pendingOrdersCount})` : ''}</span>
+        <span className={styles.navlinkNumber}>{counts.op ? `(${counts.op})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/approved'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Approved
-        <span className={styles.navlinkNumber}>{approvedOrdersCount ? `(${approvedOrdersCount})` : ''}</span>
+        <span className={styles.navlinkNumber}>{counts.oa ? `(${counts.oa})` : ''}</span>
       </NavLink>
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
@@ -48,12 +59,13 @@ const Navigation = (props: NavigationPropsTypes) => {
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        <span className={styles.navlinkNumber}>{pendingTestsCount ? `(${pendingTestsCount})` : ''}</span>
+        <span className={styles.navlinkNumber}>{counts.tp ? `(${counts.tp})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/test-approved'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Approved
+        <span className={styles.navlinkNumber}>{counts.ta ? `(${counts.ta})` : ''}</span>
       </NavLink>
     </nav>
   </div>

@@ -4,9 +4,9 @@ import {AxiosResponse} from 'axios';
 export interface IAuth {
   token: string,
   subject: string,
-  refresh_token: string,
-  issued_at: number,
-  expires_at: number
+  refreshToken: string,
+  issuedAt: number,
+  expiresIn: number
 }
 
 export interface AuthData {
@@ -25,4 +25,9 @@ export default class AuthApiService {
   static async authenticate(userData: AuthData): Promise<AxiosResponse> {
     return await client.post('/authenticate', userData)
   };
+
+  static async refreshToken(token: string): Promise<AxiosResponse> {
+    return await client.post('/authenticate/refresh', {"refreshToken": token})
+  }
 }
+

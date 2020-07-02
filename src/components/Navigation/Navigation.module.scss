@@ -32,6 +32,7 @@
     background:      transparent;
     color:           $text;
     padding:         8px 10px 8px 20px;
+    white-space:     nowrap;
 
     @include breakpoint($tablet_horizontal) {
         display:       block;

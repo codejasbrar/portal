@@ -11,9 +11,11 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import LabSlipApiService from "../../../services/LabSlipApiService";
-import Spinner from "../../../components/Spinner/Spinner";
+import {useDispatch, useSelector} from "react-redux";
+import {loadOrdersByStatus} from "../../../actions/ordersActions";
+import {ordersPendingState} from "../../../selectors/selectors";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
+import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -69,6 +71,7 @@ const options = (onSelect: any, onSaved: any) => ({
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
+  selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -109,39 +112,33 @@ const NoMatches = () => (
   </div>
 );
 
-const reformatDate = (order: Order) => {
-  const date = new Date(order.received);
-  return {
-    ...order,
-    received: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
-  }
-};
 
 const PendingOrdersPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
+  const orders = useSelector(ordersPendingState);
 
   const onSaved = async () => {
-    const response = await LabSlipApiService.getOrdersByStatus('PENDING');
-    const orders = response.data;
+    dispatch(loadOrdersByStatus("APPROVED"));
+    await dispatch(loadOrdersByStatus('PENDING'));
+  };
+
+  useEffect(() => {
+    onLoad();
+  }, [orders]);
+
+  const onLoad = () => {
     if (orders && orders.length) {
       setData(orders.map((item: any) => {
         item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
         return item;
       }));
     }
-
-    setData(orders);
   };
 
   useEffect(() => {
-
-    onSaved().then(() => {
-      setLoading(false);
-    });
-
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -158,19 +155,9 @@ const PendingOrdersPage = () => {
 
   const ordersToView = data
     .map(reformatDate)
-    .filter(searchFilter)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.received);
-    //   const bDate = new Date(b.received);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
+    .filter(searchFilter);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
-
-  if (loading) {
-    return <Spinner />;
-  }
 
   return <section className={styles.orders}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>

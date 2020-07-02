@@ -8,20 +8,28 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
+import {useDispatch} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
+import {loadAllData, loadOrdersByStatus} from "../../actions/ordersActions";
+import {loadTestsByStatus} from "../../actions/testsActions";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
 const OrdersPage = () => {
+  const [width, setWidth] = useState(getWidth());
   const [loading, setLoading] = useState(true);
-  let [width, setWidth] = useState(getWidth());
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
+      await dispatch(loadAllData());
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -30,6 +38,7 @@ const OrdersPage = () => {
       window.removeEventListener('resize', resizeListener);
     }
   }, []);
+
 
   return <>
     {loading && <Spinner />}

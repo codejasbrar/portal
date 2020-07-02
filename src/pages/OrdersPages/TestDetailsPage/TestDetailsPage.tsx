@@ -12,9 +12,9 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import {Order} from "../../../interfaces/Order";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ordersState} from "../../../selectors/selectors";
+import {ordersApprovedState, testsApprovedState} from "../../../selectors/selectors";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
-import LabSlipApiService from "../../../services/LabSlipApiService";
+import {getResult} from "../../../actions/testsActions";
 
 
 const getWidth = () => window.innerWidth
@@ -114,25 +114,29 @@ const reformatDate = (order: Order) => {
 
 const TestDetailsPage = () => {
   let [width, setWidth] = useState(getWidth());
-  const orders = useSelector(ordersState);
-  // const dispatch = useDispatch();
+  const tests = useSelector(testsApprovedState);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(orders);
+  const [data, setData] = useState(tests as Order[]);
+  const dispatch = useDispatch();
+  const path = document.location.pathname;
+  const testId = parseInt(path.slice(path.lastIndexOf('/') + 1, path.length));
+  const test: any = tests.filter(test => test.id === testId)[0];
 
   useEffect(() => {
     (async () => {
-      const response = await LabSlipApiService.getTestsByStatus('PENDING');
-      const orders = response.data;
-      if (orders && orders.length) {
-        setData(orders.map((item: any) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        }));
-      }
-
-      setData(orders);
-      setLoading(false);
+      if (test) console.log(await dispatch(getResult(test.hash)));
     })();
+  }, [test]);
+
+  useEffect(() => {
+
+    if (tests && tests.length) {
+      setData(tests.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+    setLoading(false);
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -161,7 +165,8 @@ const TestDetailsPage = () => {
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       <div className={styles.container}>
-        <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+        <Link to={'/orders/pending'}
+          className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
         </Link>
         <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
