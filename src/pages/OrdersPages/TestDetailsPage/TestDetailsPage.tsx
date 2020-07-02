@@ -6,15 +6,16 @@ import styles from "../OrdersPages.module.scss";
 //Components
 import {useDispatch, useSelector} from "react-redux";
 import Spinner from "../../../components/Spinner/Spinner";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
-import CommonTableTheme from "../../../themes/CommonTableTheme";
+import CommonTableTheme, {detailsTableTheme} from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
-import {Order} from "../../../interfaces/Order";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ordersApprovedState, testsApprovedState} from "../../../selectors/selectors";
-import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
+import {testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
+import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
+import {Biomarker, TestDetails} from "../../../interfaces/Test";
+import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 
 
 const getWidth = () => window.innerWidth
@@ -23,7 +24,7 @@ const getWidth = () => window.innerWidth
 
 const columns = [
   {
-    name: "panicValueBiomarkers",
+    name: "name",
     label: "Biomarker",
     options: {
       filter: true,
@@ -31,16 +32,21 @@ const columns = [
     }
   },
   {
-    name: "result",
+    name: "value",
     label: "Result",
     options: {
       filter: true,
       sort: true,
+      customBodyRender: (value: any, tableMeta: any) => {
+        const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
+        const panic = value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]);
+        return <span className={styles.dotWrapper}>{value}{panic && <span className={styles.dot} />}</span>;
+      },
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>),
     }
   },
   {
@@ -52,7 +58,7 @@ const columns = [
     }
   },
   {
-    name: "unitsPerEm",
+    name: "units",
     label: "Unit",
     options: {
       filter: true,
@@ -96,47 +102,28 @@ const options: MUIDataTableOptions = {
 
 } as MUIDataTableOptions;
 
-const NoMatches = () => (
-  <div className={styles.sorry}>
-    <p className={styles.sorryText}>
-      No results found
-    </p>
-  </div>
-);
-
-const reformatDate = (order: Order) => {
-  const date = new Date(order.received);
-  return {
-    ...order,
-    result: `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`
-  }
-};
-
 const TestDetailsPage = () => {
   let [width, setWidth] = useState(getWidth());
-  const tests = useSelector(testsApprovedState);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(tests as Order[]);
+  const {hash} = useParams();
+  const testSelected = useSelector(testDetails);
+  const [test, setTest] = useState({} as TestDetails);
   const dispatch = useDispatch();
-  const path = document.location.pathname;
-  const testId = parseInt(path.slice(path.lastIndexOf('/') + 1, path.length));
-  const test: any = tests.filter(test => test.id === testId)[0];
 
   useEffect(() => {
-    (async () => {
-      if (test) console.log(await dispatch(getResult(test.hash)));
-    })();
-  }, [test]);
+    if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
+  }, [testSelected]);
 
-  useEffect(() => {
 
-    // if (tests && tests.length) {
-    //   setData(tests.map((item: any) => {
-    //     item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-    //     return item;
-    //   }));
-    // }
+  const loadTest = async () => {
+    setLoading(true);
+    await dispatch(getResult(hash));
     setLoading(false);
+  };
+
+
+  useEffect(() => {
+    loadTest();
 
     const resizeListener = () => {
       setWidth(getWidth())
@@ -147,60 +134,64 @@ const TestDetailsPage = () => {
     }
   }, []);
 
+  //biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'
 
-  const testsToView = data
-    .map(reformatDate)
-    // .sort(((a: any, b: any) => {
-    //   const aDate = new Date(a.result);
-    //   const bDate = new Date(b.result);
-    //
-    //   return aDate > bDate ? 1 : -1;
-    // }));
-
-  if (loading) {
-    return <Spinner />;
-  }
+  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10 - 60'});
 
   return <>
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
-      {testsToView.map((item: any, i) => (
         <div className={styles.container}>
-          <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+          <Link to={'/orders/'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
           </Link>
+          {test &&
           <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
             <section className={styles.adminSection}>
-              <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: 1234567890</h2>
+              <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
 
               <aside className={styles.testInfo}>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Received: </span>
-                  {item.received}
+                  {test.received}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Order ID: </span>
-                  34557445
+                  {test.order?.id}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Customer ID: </span>
-                  33245
+                  {test.order?.customerId}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Gender: </span>
-                  {item.customerGender}
+                  {test.order?.customerGender === "F" ? 'Female' : 'Male'}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Age: </span>
                   31
                 </p>
-                <button className={`${styles.btnPrimary} ${styles.testInfoBtn}`}>Approve results</button>
-
+                {!test.approved && <ApproveButton className={`${styles.testInfoBtn}`}
+                  text={"Approve result"}
+                  selected={[{
+                    id: test.id,
+                    received: test.received,
+                    approved: '',
+                    customerId: test.order?.customerId,
+                    hash: hash,
+                    panicValueBiomarkers: [''],
+                    orderId: test.order?.id,
+                    criteriaMet: true
+                  }]}
+                  mode={"result"}
+                  onSaved={loadTest} />}
               </aside>
 
               <div className={styles.comment}>
-                <label >
-                  <textarea className={styles.commentField} name="comment field" placeholder={'Add your comment here'}></textarea>
+                <label>
+                  <textarea className={styles.commentField}
+                    name="comment field"
+                    placeholder={'Add your comment here'}></textarea>
                 </label>
                 <div className={styles.commentBtnWrapper}>
                   <button className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
@@ -212,7 +203,8 @@ const TestDetailsPage = () => {
                   <h4 className={styles.commentItemAuthor}>Dr Edward Armstrong</h4>
                   <span className={styles.commentItemDate}>4/23/2020 1:31PM</span>
                   <p className={styles.commentItemText}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                    et
                     dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
                     aliquip ex ea consequat.
                   </p>
@@ -221,7 +213,8 @@ const TestDetailsPage = () => {
                   <h4 className={styles.commentItemAuthor}>Vicky Zhao-Silvestro</h4>
                   <span className={styles.commentItemDate}>4/22/2020 9:12AM</span>
                   <p className={styles.commentItemText}>
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur nostrud incididunt exercitation.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                    pariatur nostrud incididunt exercitation.
                   </p>
                 </div>
               </div>
@@ -230,10 +223,10 @@ const TestDetailsPage = () => {
 
             <section className={`${styles.orders} ${styles.resultsTable}`}>
               {width > 700 ?
-                <MuiThemeProvider theme={CommonTableTheme()}>
+                <MuiThemeProvider theme={detailsTableTheme()}>
                   <MUIDataTable
                     title={''}
-                    data={data.map(reformatDate)}
+                    data={test.biomarkers?.map(biomarkerFormat)}
                     columns={columns}
                     options={options}
                   />
@@ -241,30 +234,29 @@ const TestDetailsPage = () => {
                 :
                 <div className={styles.mobileOrders}>
                   <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-
-                      <div key={i} className={styles.mobileOrdersItem}>
-                        <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
-                          <span className={styles.mobileOrdersText}>{item.panicValueBiomarkers}</span></p>
-                        <p className={styles.mobileOrdersTitle}>Result:&nbsp;
-                          <span className={styles.mobileOrdersText}>{item.result}</span>
-                        </p>
-                        <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
-                          <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-                        <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
-                          <span className={styles.mobileOrdersText}>{item.unitsPerEm}</span></p>
-                      </div>
-
+                  {test.biomarkers?.map(biomarkerFormat).map(biomarker =>
+                    <div key={biomarker.id} className={styles.mobileOrdersItem}>
+                      <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
+                        <span className={styles.mobileOrdersText}>{biomarker.name}</span></p>
+                      <p className={styles.mobileOrdersTitle}>Result:&nbsp;
+                        <span className={styles.mobileOrdersText}>{biomarker.value}</span>
+                      </p>
+                      <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
+                        <span className={styles.mobileOrdersText}>{biomarker.normalRange}</span>
+                      </p>
+                      <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
+                        <span className={styles.mobileOrdersText}>{biomarker.units}</span></p>
+                    </div>
+                  )}
                 </div>
               }
             </section>
 
           </div>
-
+          }
         </div>
-      ))}
-      {testsToView.length === 0 && <NoMatches />}
+      ))
     </section>
-
   </>
-}
+};
 export default TestDetailsPage;

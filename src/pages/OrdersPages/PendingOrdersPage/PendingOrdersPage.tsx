@@ -37,7 +37,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>

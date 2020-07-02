@@ -1,7 +1,7 @@
 import {User} from "../interfaces/User";
 import {AuthState} from "../interfaces/AuthState";
 import {Order} from "../interfaces/Order";
-import {Test} from "../interfaces/Test";
+import {Test, TestDetails} from "../interfaces/Test";
 
 
 export const authState = (store: Storage): AuthState => store.auth;
@@ -14,6 +14,8 @@ export const ordersApprovedState = (store: Storage): Order[] => (store.orders.ap
 
 export const testsPendingState = (store: Storage): Test[] => (store.tests.pending);
 export const testsApprovedState = (store: Storage): Test[] => (store.tests.approved);
+
+export const testDetails = (store: Storage): TestDetails => (store.tests.details);
 
 export const loggedIn = (store: Storage) => authState(store).loggedIn;
 export const loading = (store: Storage) => authState(store).loading;

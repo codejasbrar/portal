@@ -421,4 +421,22 @@
     }
 }
 
+.dot {
+    height:           6px;
+    width:            6px;
+    border-radius:    50%;
+    display:          inline-block;
+    background-color: #c80000;
+    position:         absolute;
+    top:              50%;
+    transform:        translateY(-50%);
+    right:            -16px;
+
+    &Wrapper {
+        position:     relative;
+        margin-right: 45px;
+    }
+}
+
+
 /*---Test Details Page styles END*/

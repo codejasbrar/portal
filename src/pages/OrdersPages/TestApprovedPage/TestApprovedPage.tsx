@@ -12,24 +12,27 @@ import {useSelector} from "react-redux";
 import {testsApprovedState} from "../../../selectors/selectors";
 import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 import {Test} from "../../../interfaces/Test";
+import {log} from "util";
+import {Order} from "../../../interfaces/Order";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-const columns = [
+const columns = (onClickLink: (id: number) => Test) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => (
-        <Link
-          to={`/orders/test-details/${value}`} /*need page refresh*/
+      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+        const link = onClickLink(value).hash;
+        return <Link
+          to={`/test/${link}`} /*need page refresh*/
           color="secondary"
         >{value}</Link>
-      )
+      }
     }
   },
   {
@@ -39,7 +42,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -68,7 +71,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -155,6 +158,8 @@ const TestApprovedPage = () => {
     .map(reformatDate)
     .filter(searchFilter);
 
+  const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
+
   return <section className={styles.tests}>
     <Link to={'/tests/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
@@ -165,7 +170,7 @@ const TestApprovedPage = () => {
         <MUIDataTable
           title={''}
           data={data.map(reformatDate)}
-          columns={columns}
+          columns={columns(onClickLink)}
           options={options}
         />
       </MuiThemeProvider>

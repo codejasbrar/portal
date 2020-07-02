@@ -1,6 +1,6 @@
 import {createMuiTheme} from "@material-ui/core/styles";
 
-export default () => (createMuiTheme as any)({
+const tableStylesObject = {
   palette: {
     primary: {
       main: '#00aaff',
@@ -107,4 +107,35 @@ export default () => (createMuiTheme as any)({
       }
     }
   }
-});
+};
+
+const detailsTableStylesObject = {
+  ...tableStylesObject,
+  overrides: {
+    ...tableStylesObject.overrides,
+    MuiTableCell: {
+      ...tableStylesObject.overrides.MuiTableCell,
+      root: {
+        textAlign: 'center !important',
+        maxWidth: '25%',
+        '&:nth-child(3)': {
+          textAlign: 'right !important'
+        },
+        '&:nth-child(2)': {
+          maxWidth: '10%'
+        },
+        '&:last-child': {
+          textAlign: 'right !important'
+        },
+        '&:first-child': {
+          maxWidth: '35%',
+          textAlign: 'left !important'
+        }
+      }
+    }
+  }
+  //SORRY!!!
+};
+
+export const detailsTableTheme = () => (createMuiTheme as any)(detailsTableStylesObject);
+export default () => (createMuiTheme as any)(tableStylesObject);
