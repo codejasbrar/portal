@@ -54,7 +54,7 @@ const OrdersPage = () => {
 
             <Route path="/orders/pending" component={PendingOrdersPage} />
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
-            <Route path="/orders/test/hash" component={TestPendingOrdersPage} />
+            <Route path="/orders/test" component={TestPendingOrdersPage} />
             <Route path="/orders/test-approved" component={TestApprovedPage} />
           </div>
         </div>

@@ -135,8 +135,8 @@ const TestDetailsPage = () => {
     }
   }, []);
 
-  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10-60'});
-  // const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
+  // const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10-60'});
+  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
 
   return <>
     {loading && <Spinner />}

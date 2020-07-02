@@ -49,7 +49,7 @@ const MobileNavigation = (props: NavigationPropsTypes) => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      <NavLink to={'/orders/test/hash'} className={styles.navlink}
+      <NavLink to={'/orders/test'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Pending approval
