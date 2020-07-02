@@ -118,23 +118,26 @@ const detailsTableStylesObject = {
       root: {
         textAlign: 'center !important',
         maxWidth: '25%',
+        '&:first-child': {
+          width: '35%',
+          textAlign: 'left !important'
+        },
+        '&:nth-child(2)': {
+          maxWidth: '10%',
+          textAlign: 'right !important'
+        },
         '&:nth-child(3)': {
           textAlign: 'right !important'
         },
-        '&:nth-child(2)': {
-          maxWidth: '10%'
-        },
         '&:last-child': {
-          textAlign: 'right !important'
+          textAlign: 'right !important',
+          width: '26%'
         },
-        '&:first-child': {
-          maxWidth: '35%',
-          textAlign: 'left !important'
-        }
       }
     }
   }
   //SORRY!!!
+  //THNX!_!
 };
 
 export const detailsTableTheme = () => (createMuiTheme as any)(detailsTableStylesObject);

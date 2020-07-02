@@ -39,7 +39,8 @@ const columns = [
       sort: true,
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-        const panic = value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]);
+        // const panic = value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]);
+        const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
         return <span className={styles.dotWrapper}>{value}{panic && <span className={styles.dot} />}</span>;
       },
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
@@ -134,9 +135,8 @@ const TestDetailsPage = () => {
     }
   }, []);
 
-  //biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'
-
-  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10 - 60'});
+  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10-60'});
+  // const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
 
   return <>
     {loading && <Spinner />}
@@ -171,8 +171,8 @@ const TestDetailsPage = () => {
                   <span className={styles.testInfoBold}>Age: </span>
                   31
                 </p>
-                {!test.approved && <ApproveButton className={`${styles.testInfoBtn}`}
-                  text={"Approve result"}
+                {!test.approved && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
+                  text={"Approve results"}
                   selected={[{
                     id: test.id,
                     received: test.received,
@@ -255,7 +255,6 @@ const TestDetailsPage = () => {
           </div>
           }
         </div>
-      ))
     </section>
   </>
 };
