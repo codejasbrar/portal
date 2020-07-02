@@ -22,8 +22,8 @@ import BodyScroll from "../../helpers/bodyScrollLock";
 
 const AuthPanel = () => {
   const dispatch = useDispatch();
-  const user = useSelector((store: Storage): User => ({...userState(store)}));
-  const isLoggedIn = useSelector((store: Storage) => (loggedIn(store)));
+  const user = useSelector(userState);
+  const isLoggedIn = useSelector(loggedIn);
   const history = useHistory();
 
   const [openedDropdown, setOpenedDropdown] = useState(false);
@@ -62,8 +62,8 @@ const AuthPanel = () => {
   };
 
   const UserLogo = () => <div className={styles.UserLogo}>
-    <span className={styles.UserLogoChar}>{user.first_name.slice(0, 1)}</span>
-    <span className={styles.UserLogoChar}>{user.last_name.slice(0, 1)}</span>
+    <span className={styles.UserLogoChar}>{user.physician ? user.physician.firstName.slice(0, 1) : user.email.slice(0, 1)}</span>
+    <span className={styles.UserLogoChar}>{user.physician ? user.physician.secondName.slice(0, 1) : ''}</span>
   </div>;
 
   return (
@@ -73,7 +73,8 @@ const AuthPanel = () => {
           <UserLogo />
           <ClickOutside onClickOutside={closeDropDownHandler}>
             <button type="button" onClick={toggleDropdownHandler} className={styles.UserName}>
-              <span>{user.first_name}</span><ArrowIcon className={`${styles.UserArrow} ${openedDropdown ? styles.UserArrowFlipped : ''}`} />
+              <span>{user.physician ? user.physician.firstName : user.email.slice(0, user.email.indexOf('@'))}</span><ArrowIcon
+              className={`${styles.UserArrow} ${openedDropdown ? styles.UserArrowFlipped : ''}`} />
             </button>
             <div className={`${styles.UserLogout} ${openedDropdown ? '' : styles.UserLogoutHided}`}>
               <button className={`${styles.UserLogoutBtn} ${openedDropdown ? '' : styles.UserLogoutBtnHided}`}
@@ -89,7 +90,8 @@ const AuthPanel = () => {
           <div className={styles.Aside}>
             <div className={styles.AsideTop}>
               {authed && <UserLogo />}
-              {authed && <p className={styles.UserName}>{user.first_name} {user.last_name}</p>}
+              {authed &&
+              <p className={styles.UserName}>{user.physician ? `${user.physician.prefix} ${user.physician.firstName} ${user.physician.secondName} ${user.physician.postfix}` : user.email}</p>}
             </div>
             <div className={styles.AsideBtnBlock}>
               {authed ? <Button onClick={handleLogOut} secondary>Log out</Button> :

@@ -1,8 +1,20 @@
 import {USER_ERROR, USER_REQUEST, USER_SUCCESS} from "../actions/userActions";
 
 export interface User {
-  first_name: string,
-  last_name: string,
+  id: number,
+  email: string,
+  active: boolean,
+  skip2fa: boolean,
+  physician: Physician
+}
+
+export interface Physician {
+  prefix: string,
+  firstName: string,
+  middleName: string,
+  secondName: string,
+  postfix: string,
+  phone: string
 }
 
 interface UserRequestAction {
