@@ -24,7 +24,7 @@ export default class LabSlipApiService {
     }
   });
 
-  static savePendingResults = async (hashes: string[]) => await client.post('/saveApprovedResults', {hashes}, {
+  static savePendingResults = async (hashes: string[]) => await client.post('/savePendingResults', {hashes}, {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }

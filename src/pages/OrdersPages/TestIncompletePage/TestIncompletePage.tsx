@@ -110,7 +110,7 @@ const options = (onSelect: any, onSaved: any) => ({
     return items;
   },
   customFooter: CommonPagination,
-  customToolbarSelect: (selected) => <ApproveButton mode="result"
+  customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
     text={"Approve results"}
     onSaved={onSaved}
     selected={onSelect(selected.data)} />,
@@ -148,7 +148,7 @@ const TestIncompletePage = () => {
   }, []);
 
   const onSaved = async () => {
-    dispatch(loadTestsByStatus("APPROVED"));
+    dispatch(loadTestsByStatus("PENDING"));
     await dispatch(loadTestsByStatus('INCOMPLETE'));
   };
 
@@ -176,7 +176,7 @@ const TestIncompletePage = () => {
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
-    <h2 className={styles.heading20}>Test results pending approval</h2>
+    <h2 className={styles.heading20}>Incomplete test results</h2>
     {width > 700 ?
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
@@ -189,7 +189,11 @@ const TestIncompletePage = () => {
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({testsToView.length} results)</p>
-        <ApproveButton mode="result" onSaved={onSaved} selected={data as Order[]} text={"Approve all results"} />
+        <ApproveButton type="pending"
+          mode="result"
+          onSaved={onSaved}
+          selected={data as Order[]}
+          text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -208,6 +212,7 @@ const TestIncompletePage = () => {
               </p>
               <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
+                type="pending"
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"} />

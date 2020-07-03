@@ -36,6 +36,21 @@ export const loadAllData = () => async (dispatch: Dispatch<object>): Promise<any
       LabSlipApiService.getOrdersByStatus('APPROVED').then(response => dispatch(loadOrdersSuccess(response.data, "APPROVED"))),
       LabSlipApiService.getResultsByStatus('PENDING').then(response => dispatch(loadTestsSuccess(response.data, "PENDING"))),
       LabSlipApiService.getResultsByStatus('APPROVED').then(response => dispatch(loadTestsSuccess(response.data, "APPROVED"))),
+    ]);
+  } catch (exception) {
+    await catchBlock(exception, dispatch)
+  }
+};
+
+export const loadAdminData = () => async (dispatch: Dispatch<object>): Promise<any> => {
+  dispatch(loadOrdersRequest());
+  dispatch(loadTestsRequest());
+  try {
+    await Promise.all([
+      LabSlipApiService.getOrdersByStatus('PENDING').then(response => dispatch(loadOrdersSuccess(response.data, 'PENDING'))),
+      LabSlipApiService.getOrdersByStatus('APPROVED').then(response => dispatch(loadOrdersSuccess(response.data, "APPROVED"))),
+      LabSlipApiService.getResultsByStatus('PENDING').then(response => dispatch(loadTestsSuccess(response.data, "PENDING"))),
+      LabSlipApiService.getResultsByStatus('APPROVED').then(response => dispatch(loadTestsSuccess(response.data, "APPROVED"))),
       LabSlipApiService.getResultsByStatus('INCOMPLETE').then(response => dispatch(loadTestsSuccess(response.data, "INCOMPLETE"))),
     ]);
   } catch (exception) {

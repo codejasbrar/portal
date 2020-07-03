@@ -8,27 +8,30 @@ import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
 import Spinner from "../../components/Spinner/Spinner";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
-import {loadAllData, loadOrdersByStatus} from "../../actions/ordersActions";
-import {loadTestsByStatus} from "../../actions/testsActions";
+import {loadAdminData, loadAllData} from "../../actions/ordersActions";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
+import {userState} from "../../selectors/selectors";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
 const OrdersPage = () => {
+  const user = useSelector(userState);
   const [width, setWidth] = useState(getWidth());
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
-      await dispatch(loadAllData());
-      setLoading(false);
+      if (user && Object.keys(user).length) {
+        user.physician ? await dispatch(loadAllData()) : await dispatch(loadAdminData());
+        setLoading(false);
+      }
     })();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const resizeListener = () => {

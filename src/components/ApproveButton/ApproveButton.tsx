@@ -28,14 +28,15 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
 
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
-      Are you sure you want to approve the following {props.mode}s?
+      Are you sure you want to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'} the
+      following {props.mode}s?
     </p>
     <ul className={styles.modalContentList}>
       {props.selected.map((item: any) => <li key={item.id}
         className={styles.modalContentItem}>{props.mode === 'result' ? 'Test result' : 'Order'} ID: <span>{item.id}</span>
       </li>)}
     </ul>
-    {props.mode === 'result' &&
+    {props.mode === 'result' && props.type !== 'pending' &&
     <p className={styles.modalContentText}>Results will be released to the customer as soon as they are approved.</p>}
   </div>;
 
@@ -55,7 +56,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     {loading && <Spinner />}
     <Popup show={showPopup} classes={styles.modalApprove} onClose={() => setShowPopup(false)}>
       <div className={styles.modalContent}>
-        <h2 className={styles.modalContentTitle}>Submit for approval</h2>
+        <h2 className={styles.modalContentTitle}>Submit
+          for {props.type && props.type === 'pending' ? 'set pending status' : 'approval'}</h2>
         {props.selected.length < 10 ? <ItemsList /> :
           <p className={styles.modalContentText}>You have selected
             <span className={styles.modalContentBold}> ({props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
