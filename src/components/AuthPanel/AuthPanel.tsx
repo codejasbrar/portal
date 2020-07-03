@@ -61,6 +61,8 @@ const AuthPanel = () => {
     closeAside();
   };
 
+  const physicainFullName = () => `${user.physician.prefix ? user.physician.prefix + ' ' : ''}${user.physician.firstName} ${user.physician.secondName}${user.physician.postfix ? ' ' + user.physician.postfix : ''}`;
+
   const UserLogo = () => <div className={styles.UserLogo}>
     <span className={styles.UserLogoChar}>{user.physician ? user.physician.firstName.slice(0, 1) : user.email.slice(0, 1)}</span>
     <span className={styles.UserLogoChar}>{user.physician ? user.physician.secondName.slice(0, 1) : ''}</span>
@@ -73,7 +75,7 @@ const AuthPanel = () => {
           <UserLogo />
           <ClickOutside onClickOutside={closeDropDownHandler}>
             <button type="button" onClick={toggleDropdownHandler} className={styles.UserName}>
-              <span>{user.physician ? `${user.physician.prefix} ${user.physician.firstName} ${user.physician.secondName} ${user.physician.postfix}` : user.email}</span><ArrowIcon
+              <span>{user.physician ? physicainFullName() : user.email}</span><ArrowIcon
               className={`${styles.UserArrow} ${openedDropdown ? styles.UserArrowFlipped : ''}`} />
             </button>
             <div className={`${styles.UserLogout} ${openedDropdown ? '' : styles.UserLogoutHided}`}>
@@ -91,7 +93,7 @@ const AuthPanel = () => {
             <div className={styles.AsideTop}>
               {authed && <UserLogo />}
               {authed &&
-              <p className={styles.UserName}>{user.physician ? `${user.physician.prefix} ${user.physician.firstName} ${user.physician.secondName} ${user.physician.postfix}` : user.email}</p>}
+              <p className={styles.UserName}>{user.physician ? physicainFullName() : user.email}</p>}
             </div>
             <div className={styles.AsideBtnBlock}>
               {authed ? <Button onClick={handleLogOut} secondary>Log out</Button> :
