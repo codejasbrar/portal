@@ -8,9 +8,7 @@ export default (state = initialState, action: UserActionsTypes) => {
     case USER_REQUEST:
       return state;
     case USER_SUCCESS:
-      return {
-        ...state, ...action.payload
-      };
+      return action.payload;
     case USER_ERROR:
       return new Error();
     case USER_LOGOUT:
