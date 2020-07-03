@@ -73,7 +73,7 @@ const AuthPanel = () => {
           <UserLogo />
           <ClickOutside onClickOutside={closeDropDownHandler}>
             <button type="button" onClick={toggleDropdownHandler} className={styles.UserName}>
-              <span>{user.physician ? user.physician.firstName : user.email.slice(0, user.email.indexOf('@'))}</span><ArrowIcon
+              <span>{user.physician ? `${user.physician.prefix} ${user.physician.firstName} ${user.physician.secondName} ${user.physician.postfix}` : user.email}</span><ArrowIcon
               className={`${styles.UserArrow} ${openedDropdown ? styles.UserArrowFlipped : ''}`} />
             </button>
             <div className={`${styles.UserLogout} ${openedDropdown ? '' : styles.UserLogoutHided}`}>
