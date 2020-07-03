@@ -20,20 +20,20 @@ const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-const columns = [
+const columns = (onClickLink: (id: number) => Test) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => (
-        <Link
-          // to={`${value}`}
-          to={'/orders/test-details/'} /*need page refresh*/
+      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+        const link = onClickLink(value).hash;
+        return <Link
+          to={`/test/${link}`} /*need page refresh*/
           color="secondary"
         >{value}</Link>
-      )
+      }
     }
   },
   {
@@ -43,7 +43,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -134,10 +134,6 @@ const TestsPage = () => {
   const tests = useSelector(testsPendingState);
 
   useEffect(() => {
-    onLoad();
-  }, [tests]);
-
-  useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -161,6 +157,10 @@ const TestsPage = () => {
     }
   };
 
+  useEffect(() => {
+    onLoad();
+  }, [tests]);
+
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
     || (String(item.customerId).indexOf(searchText) !== -1)
@@ -169,6 +169,8 @@ const TestsPage = () => {
   const testsToView = data
     .map(reformatDate)
     .filter(searchFilter);
+
+  const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
@@ -182,7 +184,7 @@ const TestsPage = () => {
         <MUIDataTable
           title={''}
           data={data.map(reformatDate)}
-          columns={columns}
+          columns={columns(onClickLink)}
           options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
@@ -196,7 +198,9 @@ const TestsPage = () => {
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
-                  to={`/test/${item.id}`}>{item.id}</Link></span></p>
+                  // to={`/test/${item.id}`}
+                  to={'/orders/test-details/'}
+                >{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order

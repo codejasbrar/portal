@@ -9,7 +9,7 @@ import CommonPagination from "../../../components/Table/Navigation/CommonPaginat
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order} from "../../../interfaces/Order";
-import {Test} from "../../../interfaces/Test";
+import {Test, TestDetails} from "../../../interfaces/Test";
 import {useSelector} from "react-redux";
 import {ordersApprovedState} from "../../../selectors/selectors";
 
@@ -33,7 +33,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -54,7 +54,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -107,7 +107,7 @@ const NoMatches = () => (
   </div>
 );
 
-export const reformatDate = (order: Order | Test) => {
+export const reformatDate = (order: Order | Test | TestDetails) => {
   const dateRecived = new Date(order.received);
   const dateApproved = order.approved ? new Date(order.approved) : ''
   return {

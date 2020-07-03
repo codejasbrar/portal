@@ -42,13 +42,6 @@ const OrdersPage = () => {
 
   return <>
     {loading && <Spinner />}
-    <Route path={[
-      "/orders/navigation",
-      "/orders/pending",
-      "/orders/approved",
-      "/orders/test",
-      "/orders/test-approved"
-    ]}>
       <section className={styles.wrapper}>
         <div className={styles.container}>
           <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
@@ -66,8 +59,6 @@ const OrdersPage = () => {
           </div>
         </div>
     </section>
-    </Route>
-    <Route path="/orders/test-details" component={TestDetailsPage} />
   </>
 }
 

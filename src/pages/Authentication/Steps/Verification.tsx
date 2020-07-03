@@ -11,7 +11,6 @@ import ValidateFields from "../../../helpers/validateFields";
 import {useDispatch, useSelector} from "react-redux";
 import {authState, loading} from "../../../selectors/selectors";
 import {logIn} from "../../../actions/authActions";
-import {AuthData} from "../../../services/AuthApiService";
 import Spinner from "../../../components/Spinner/Spinner";
 
 const Verification = () => {
@@ -19,7 +18,6 @@ const Verification = () => {
   const auth = useSelector(authState);
   const isLoading = useSelector(loading);
   const history = useHistory();
-  const [error, setError] = useState('');
   const [localError, setLocalError] = useState('');
   const [code, setCode] = useState('');
 
