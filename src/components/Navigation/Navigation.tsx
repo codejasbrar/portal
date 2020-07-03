@@ -7,24 +7,24 @@ import {useSelector} from "react-redux";
 import {
   ordersApprovedState,
   ordersPendingState, ordersState,
-  testsApprovedState,
+  testsApprovedState, testsIncompleteState,
   testsPendingState, testsState
 } from "../../selectors/selectors";
 
 type NavigationPropsTypes = {};
 
 const Navigation = (props: NavigationPropsTypes) => {
-  const orders = useSelector(ordersState);
-  const tests = useSelector(testsState);
   const ordersPending = useSelector(ordersPendingState);
   const ordersApproved = useSelector(ordersApprovedState);
   const testsPending = useSelector(testsPendingState);
   const testsApproved = useSelector(testsApprovedState);
+  const testsIncomplete = useSelector(testsIncompleteState);
   const [counts, setCounts] = useState({
     op: ordersPending.length,
     oa: ordersApproved.length,
     tp: testsPending.length,
-    ta: testsApproved.length
+    ta: testsApproved.length,
+    ti: testsIncomplete.length
   });
 
   useEffect(() => {
@@ -32,9 +32,10 @@ const Navigation = (props: NavigationPropsTypes) => {
       op: ordersPending.length,
       oa: ordersApproved.length,
       tp: testsPending.length,
-      ta: testsApproved.length
+      ta: testsApproved.length,
+      ti: testsIncomplete.length
     });
-  }, [orders, tests]);
+  }, [ordersPending.length, ordersApproved.length, testsPending.length, testsApproved.length, testsIncomplete.length]);
 
   return <div className={styles.navigation}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
@@ -66,6 +67,12 @@ const Navigation = (props: NavigationPropsTypes) => {
         activeClassName={styles.active}>
         Approved
         <span className={styles.navlinkNumber}>{counts.ta ? `(${counts.ta})` : ''}</span>
+      </NavLink>
+      <NavLink to={'/orders/test-incomplete'} className={styles.navlink}
+        exact={true}
+        activeClassName={styles.active}>
+        Incomplete
+        <span className={styles.navlinkNumber}>{counts.ti ? `(${counts.ti})` : ''}</span>
       </NavLink>
     </nav>
   </div>

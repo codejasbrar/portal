@@ -12,6 +12,7 @@ import {useDispatch} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import {loadAllData, loadOrdersByStatus} from "../../actions/ordersActions";
 import {loadTestsByStatus} from "../../actions/testsActions";
+import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -56,6 +57,7 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/test" component={TestPendingOrdersPage} />
             <Route path="/orders/test-approved" component={TestApprovedPage} />
+            <Route path="/orders/test-incomplete" component={TestIncompletePage} />
           </div>
         </div>
     </section>

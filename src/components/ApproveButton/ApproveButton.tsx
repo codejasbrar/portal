@@ -8,7 +8,7 @@ import LabSlipApiService from "../../services/LabSlipApiService";
 //Styles
 import styles from "./ApproveButton.module.scss";
 import Spinner from "../Spinner/Spinner";
-import {saveResults} from "../../actions/testsActions";
+import {saveApprovedResults, savePendingResults} from "../../actions/testsActions";
 import {saveOrders} from "../../actions/ordersActions";
 import {useDispatch} from "react-redux";
 
@@ -17,6 +17,7 @@ type ApproveButtonPropsTypes = {
   selected: Order[],
   onSaved: () => void,
   mode: "order" | "result",
+  type?: "approved" | "pending"
   className?: string
 };
 
@@ -42,7 +43,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     setLoading(true);
     const hashes = props.selected.map((item: any) => item.hash);
     props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
-      await dispatch(saveResults(hashes));
+      props.type && props.type === 'pending' ? await dispatch(savePendingResults(hashes)) : await dispatch(saveApprovedResults(hashes));
     await props.onSaved();
     setShowPopup(false);
   };
@@ -58,7 +59,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
         {props.selected.length < 10 ? <ItemsList /> :
           <p className={styles.modalContentText}>You have selected
             <span className={styles.modalContentBold}> ({props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
-            for approval. Are you sure you want to approve?</p>}
+            for {props.type && props.type === 'pending' ? 'set pending status' : 'approval'}. Are you sure you want
+            to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'}?</p>}
         <div className={styles.btnBlock}>
           <Button className={styles.btn} secondary onClick={() => setShowPopup(false)}>Cancel</Button>
           <Button className={styles.btn} onClick={onApprove}>Approve</Button>

@@ -36,6 +36,7 @@ export const loadAllData = () => async (dispatch: Dispatch<object>): Promise<any
       LabSlipApiService.getOrdersByStatus('APPROVED').then(response => dispatch(loadOrdersSuccess(response.data, "APPROVED"))),
       LabSlipApiService.getResultsByStatus('PENDING').then(response => dispatch(loadTestsSuccess(response.data, "PENDING"))),
       LabSlipApiService.getResultsByStatus('APPROVED').then(response => dispatch(loadTestsSuccess(response.data, "APPROVED"))),
+      LabSlipApiService.getResultsByStatus('INCOMPLETE').then(response => dispatch(loadTestsSuccess(response.data, "INCOMPLETE"))),
     ]);
   } catch (exception) {
     await catchBlock(exception, dispatch)

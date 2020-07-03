@@ -14,6 +14,7 @@ export const ordersApprovedState = (store: Storage): Order[] => (store.orders.ap
 
 export const testsPendingState = (store: Storage): Test[] => (store.tests.pending);
 export const testsApprovedState = (store: Storage): Test[] => (store.tests.approved);
+export const testsIncompleteState = (store: Storage): Test[] => (store.tests.incomplete);
 
 export const testDetails = (store: Storage): TestDetails => (store.tests.details);
 
