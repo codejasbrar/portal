@@ -135,14 +135,14 @@ const TestDetailsPage = () => {
     }
   }, []);
 
-  // const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: '10-60'});
   const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
 
   return <>
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
         <div className={styles.container}>
-          <Link to={'/orders/'} className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+          <Link to={'/orders/tests'}
+            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
           </Link>
           {test &&
@@ -171,6 +171,10 @@ const TestDetailsPage = () => {
                   <span className={styles.testInfoBold}>Age: </span>
                   31
                 </p>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Status: </span>
+                  {test.status}
+                </p>
                 {!test.approved && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
                   text={"Approve results"}
                   selected={[{
@@ -184,6 +188,7 @@ const TestDetailsPage = () => {
                     criteriaMet: true
                   }]}
                   mode={"result"}
+                  type={test.status === "INCOMPLETE" ? 'pending' : 'approved'}
                   onSaved={loadTest} />}
               </aside>
 

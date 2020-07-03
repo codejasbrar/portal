@@ -1,6 +1,5 @@
 import {GET_ORDERS_BY_STATUS, GET_ORDERS_ERROR, GET_ORDERS_SUCCESS} from "../actions/ordersActions";
 import {Order} from "../interfaces/Order";
-import {TestDetails} from "../interfaces/Test";
 
 export type OrdersState = {
   pending: Order[], approved: Order[]

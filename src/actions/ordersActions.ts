@@ -68,7 +68,7 @@ export const saveOrders = (hashes: string[]) => async (dispatch: Dispatch<object
 
 export const catchBlock = async (exception: any, dispatch: Dispatch<any>): Promise<any> => {
   const errorData = exception.response;
-  if (errorData.status === 403 || errorData.message === "Unauthorized" || errorData.status === 401) {
+  if (errorData && (errorData.status === 403 || errorData.message === "Unauthorized" || errorData.status === 401)) {
     try {
       await dispatch(refreshTokenAction(Token.get().refreshToken as string));
     } catch (e) {

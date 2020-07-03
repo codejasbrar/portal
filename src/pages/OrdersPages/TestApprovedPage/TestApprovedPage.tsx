@@ -29,7 +29,7 @@ const columns = (onClickLink: (id: number) => Test) => [
       customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
         const link = onClickLink(value).hash;
         return <Link
-          to={`/test/${link}`} /*need page refresh*/
+          to={`/orders/test/${link}`} /*need page refresh*/
           color="secondary"
         >{value}</Link>
       }
@@ -161,7 +161,7 @@ const TestApprovedPage = () => {
   const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
 
   return <section className={styles.tests}>
-    <Link to={'/tests/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
+    <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
     <h2 className={styles.heading20}>Approved</h2>

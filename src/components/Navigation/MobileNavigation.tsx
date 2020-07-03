@@ -54,19 +54,19 @@ const MobileNavigation = () => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {!user.physician && <NavLink to={'/orders/test-incomplete'} className={styles.navlink}
+      {!user.physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete
         <span className={styles.navlinkNumber}>{counts.ti ? `(${counts.ti})` : ''}</span>
       </NavLink>}
-      <NavLink to={'/orders/test'} className={styles.navlink}
+      <NavLink to={'/orders/tests'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Pending approval
         <span className={styles.navlinkNumber}>{counts.tp ? `(${counts.tp})` : ''}</span>
       </NavLink>
-      <NavLink to={'/orders/test-approved'} className={styles.navlink}
+      <NavLink to={'/orders/tests-approved'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Approved

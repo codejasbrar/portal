@@ -28,11 +28,8 @@ const columns = (onClickLink: (id: number) => Test) => [
       filter: true,
       sort: false,
       customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
-        const link = onClickLink(value).hash;
-        return <Link
-          to={`/test/${link}`} /*need page refresh*/
-          color="secondary"
-        >{value}</Link>
+        const link = onClickLink(value);
+        return link ? <Link to={`/orders/test/${link.hash}`} color="secondary">{value}</Link> : ''
       }
     }
   },
@@ -144,8 +141,7 @@ const TestsPage = () => {
   }, []);
 
   const onSaved = async () => {
-    dispatch(loadTestsByStatus("APPROVED"));
-    await dispatch(loadTestsByStatus('PENDING'));
+    await Promise.all([dispatch(loadTestsByStatus('PENDING')), dispatch(loadTestsByStatus("APPROVED"))]);
   };
 
   const onLoad = () => {
@@ -198,8 +194,7 @@ const TestsPage = () => {
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
-                  // to={`/test/${item.id}`}
-                  to={'/orders/test-details/'}
+                  to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>

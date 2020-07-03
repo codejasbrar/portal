@@ -1,4 +1,4 @@
-import {GET_TESTS_BY_STATUS, GET_TESTS_ERROR, GET_TESTS_SUCCESS} from "../actions/testsActions";
+import {GET_TEST_SUCCESS, GET_TESTS_BY_STATUS, GET_TESTS_ERROR, GET_TESTS_SUCCESS} from "../actions/testsActions";
 import {OrdersState} from "./ordersReducer";
 import {TestDetails} from "../interfaces/Test";
 import {Order} from "../interfaces/Order";
@@ -10,7 +10,7 @@ export interface TestsState extends OrdersState {
 
 const initialState: TestsState = {pending: [], approved: [], details: null, incomplete: []};
 
-export default (state: OrdersState = initialState, action: any) => {
+export default (state: TestsState = initialState, action: any) => {
   switch (action.type) {
     case GET_TESTS_SUCCESS:
       return {

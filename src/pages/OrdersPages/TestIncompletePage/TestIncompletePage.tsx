@@ -11,7 +11,7 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useDispatch, useSelector} from "react-redux";
-import {testsIncompleteState, testsPendingState} from "../../../selectors/selectors";
+import {testsIncompleteState} from "../../../selectors/selectors";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {Order} from "../../../interfaces/Order";
 import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
@@ -20,20 +20,20 @@ const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-const columns = [
+const columns = (onClickLink: (id: number) => Test) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => (
-        <Link
-          // to={`${value}`}
-          to={'/orders/test-details/'} /*need page refresh*/
+      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+        const link = onClickLink(value);
+        return link ? <Link
+          to={`/orders/test/${link.hash}`}
           color="secondary"
-        >{value}</Link>
-      )
+        >{value}</Link> : ''
+      }
     }
   },
   {
@@ -43,7 +43,7 @@ const columns = [
       filter: true,
       sort: true,
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td style={{borderBottom: "1px solid #C3C8CD"}}>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
@@ -148,8 +148,7 @@ const TestIncompletePage = () => {
   }, []);
 
   const onSaved = async () => {
-    dispatch(loadTestsByStatus("PENDING"));
-    await dispatch(loadTestsByStatus('INCOMPLETE'));
+    await Promise.all([dispatch(loadTestsByStatus("PENDING")), dispatch(loadTestsByStatus('INCOMPLETE'))]);
   };
 
   const onLoad = () => {
@@ -170,6 +169,8 @@ const TestIncompletePage = () => {
     .map(reformatDate)
     .filter(searchFilter);
 
+  const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
+
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
   return <section className={styles.tests}>
@@ -182,7 +183,7 @@ const TestIncompletePage = () => {
         <MUIDataTable
           title={''}
           data={data.map(reformatDate)}
-          columns={columns}
+          columns={columns(onClickLink)}
           options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
@@ -200,7 +201,7 @@ const TestIncompletePage = () => {
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
-                  to={`/test/${item.id}`}>{item.id}</Link></span></p>
+                  to={`/orders/test/${item.hash}`}>{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order

@@ -15,7 +15,7 @@ import {useDispatch} from "react-redux";
 type ApproveButtonPropsTypes = {
   text: string,
   selected: Order[],
-  onSaved: () => void,
+  onSaved: () => Promise<any>,
   mode: "order" | "result",
   type?: "approved" | "pending"
   className?: string
@@ -46,6 +46,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
       props.type && props.type === 'pending' ? await dispatch(savePendingResults(hashes)) : await dispatch(saveApprovedResults(hashes));
     await props.onSaved();
+    setLoading(false);
     setShowPopup(false);
   };
 

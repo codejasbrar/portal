@@ -54,10 +54,7 @@ const App = () => {
       <Route path="/authentication"
         render={() => (isLoggedIn ? <Redirect to="/orders/pending" /> : <Authentication />)} />
       <PrivateRoute loggedIn={isLoggedIn}>
-        <>
-          <Route path='/orders' component={OrdersPage} />
-          <Route path='/test/:hash' component={TestDetailsPage} />
-        </>
+        <Route path='/orders' component={OrdersPage} />
       </PrivateRoute>
     </Switch>
     <Footer />

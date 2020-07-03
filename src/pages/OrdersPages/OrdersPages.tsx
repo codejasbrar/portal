@@ -12,7 +12,8 @@ import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import {loadAdminData, loadAllData} from "../../actions/ordersActions";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
-import {userState} from "../../selectors/selectors";
+import {loadingDataState, ordersState, testsState, userState} from "../../selectors/selectors";
+import {log} from "util";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -33,6 +34,7 @@ const OrdersPage = () => {
     })();
   }, [user]);
 
+
   useEffect(() => {
     const resizeListener = () => {
       setWidth(getWidth())
@@ -46,6 +48,14 @@ const OrdersPage = () => {
 
   return <>
     {loading && <Spinner />}
+    <Route path={[
+      "/orders/navigation",
+      "/orders/pending",
+      "/orders/approved",
+      "/orders/tests",
+      "/orders/tests-approved",
+      "/orders/tests-incomplete"
+    ]}>
       <section className={styles.wrapper}>
         <div className={styles.container}>
           <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
@@ -58,12 +68,14 @@ const OrdersPage = () => {
 
             <Route path="/orders/pending" component={PendingOrdersPage} />
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
-            <Route path="/orders/test" component={TestPendingOrdersPage} />
-            <Route path="/orders/test-approved" component={TestApprovedPage} />
-            <Route path="/orders/test-incomplete" component={TestIncompletePage} />
+            <Route path="/orders/tests" component={TestPendingOrdersPage} />
+            <Route path="/orders/tests-approved" component={TestApprovedPage} />
+            <Route path="/orders/tests-incomplete" component={TestIncompletePage} />
           </div>
         </div>
-    </section>
+      </section>
+    </Route>
+    <Route path="/orders/test/:hash" component={TestDetailsPage} />
   </>
 }
 
