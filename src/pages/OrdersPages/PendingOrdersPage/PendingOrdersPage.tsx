@@ -61,7 +61,7 @@ const columns = [
   },
 ];
 
-const options = (onSelect: any, onSaved: any) => ({
+const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -73,13 +73,15 @@ const options = (onSelect: any, onSaved: any) => ({
   rowsPerPage: 25,
   selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [],
+  rowsPerPageOptions: [25],
   rowHover: true,
   textLabels: {
     body: {
       noMatch: "No results found",
     }
   },
+  onChangePage: (currentPage) => setPage(currentPage),
+  isRowSelectable: (dataIndex: number) => dataIndex >= page*25 && dataIndex < page*25+25 ? true : false,
   customSort(items: any, index: number, isDesc: string) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
@@ -93,7 +95,6 @@ const options = (onSelect: any, onSaved: any) => ({
     });
     return items;
   },
-  selectableRowsOnClick: true,
   customFooter: CommonPagination,
   customToolbar: () => '',
   customToolbarSelect: (selected) => <ApproveButton mode="order"
@@ -116,6 +117,7 @@ const NoMatches = () => (
 const PendingOrdersPage = () => {
   const [data, setData] = useState([] as Order[]);
   const [searchText, setSearchText] = useState('');
+  const [page, setPage] = useState(0);
   const [width, setWidth] = useState(getWidth());
   const dispatch = useDispatch();
   const orders = useSelector(ordersPendingState);
@@ -169,7 +171,7 @@ const PendingOrdersPage = () => {
           title={''}
           data={data.map(reformatDate)}
           columns={columns}
-          options={options(onSelect, onSaved)}
+          options={options(onSelect, onSaved, setPage, page)}
         />
       </MuiThemeProvider>
       :

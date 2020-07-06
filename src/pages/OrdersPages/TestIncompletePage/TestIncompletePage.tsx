@@ -78,7 +78,7 @@ const columns = (onClickLink: (id: number) => Test) => [
   },
 ];
 
-const options = (onSelect: any, onSaved: any) => ({
+const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -89,7 +89,7 @@ const options = (onSelect: any, onSaved: any) => ({
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
   selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [],
+  rowsPerPageOptions: [25],
   rowHover: true,
   textLabels: {
     body: {
@@ -110,6 +110,8 @@ const options = (onSelect: any, onSaved: any) => ({
     return items;
   },
   customFooter: CommonPagination,
+  onChangePage: (currentPage) => setPage(currentPage),
+  isRowSelectable: (dataIndex: number) => dataIndex >= page*25 && dataIndex < page*25+25 ? true : false,
   customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
     text={"Approve results"}
     onSaved={onSaved}
@@ -129,6 +131,7 @@ const NoMatches = () => (
 const TestIncompletePage = () => {
   const [data, setData] = useState([] as Test[]);
   const [searchText, setSearchText] = useState('');
+  const [page, setPage] = useState(0);
   const [width, setWidth] = useState(getWidth());
   const dispatch = useDispatch();
   const tests = useSelector(testsIncompleteState);
@@ -184,7 +187,7 @@ const TestIncompletePage = () => {
           title={''}
           data={data.map(reformatDate)}
           columns={columns(onClickLink)}
-          options={options(onSelect, onSaved)}
+          options={options(onSelect, onSaved, setPage, page)}
         />
       </MuiThemeProvider>
       :
