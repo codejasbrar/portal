@@ -64,7 +64,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
             <span className={styles.modalContentBold}> ({props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
             for {props.type && props.type === 'pending' ? 'set pending status' : 'approval'}. Are you sure you want
             to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'}?</p>}
-        <div className={styles.btnBlock}>
+        <div className={`${styles.btnBlock} ${styles.btnBlockPopup}`}>
           <Button className={styles.btn} secondary onClick={() => setShowPopup(false)}>Cancel</Button>
           <Button className={styles.btn} onClick={onApprove}>Approve</Button>
         </div>
