@@ -30,9 +30,17 @@ export const loadTestsByStatus = (status: TestStatus) => async (dispatch: Dispat
   }
 };
 
-export const saveResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
+export const saveApprovedResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.saveApprovedResults(hashes);
+  } catch (exception) {
+    await catchBlock(exception, dispatch);
+  }
+};
+
+export const savePendingResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
+  try {
+    await LabSlipApiService.savePendingResults(hashes);
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }

@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
-
 import styles from "../OrdersPages.module.scss";
-
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
@@ -10,24 +8,32 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {Order} from "../../../interfaces/Order";
-import {useDispatch, useSelector} from "react-redux";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
-import {ordersPendingState} from "../../../selectors/selectors";
+import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
+import {useDispatch, useSelector} from "react-redux";
+import {testsIncompleteState} from "../../../selectors/selectors";
+import {loadTestsByStatus} from "../../../actions/testsActions";
+import {Order} from "../../../interfaces/Order";
 import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-const columns = [
+const columns = (onClickLink: (id: number) => Test) => [
   {
     name: "id",
-    label: "Order ID",
+    label: "Test result ID",
     options: {
       filter: true,
       sort: false,
+      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+        const link = onClickLink(value);
+        return link ? <Link
+          to={`/orders/test/${link.hash}`}
+          color="secondary"
+        >{value}</Link> : ''
+      }
     }
   },
   {
@@ -44,6 +50,14 @@ const columns = [
     }
   },
   {
+    name: "orderId",
+    label: "Order ID",
+    options: {
+      filter: true,
+      sort: false,
+    }
+  },
+  {
     name: "customerId",
     label: "Customer ID",
     options: {
@@ -52,11 +66,14 @@ const columns = [
     }
   },
   {
-    name: "criteriaMet",
-    label: "Criteria met",
+    name: "panicValueBiomarkers",
+    label: "Biomarkers out of range",
     options: {
       filter: true,
       sort: false,
+    },
+    customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+      return value.join(", ");
     }
   },
 ];
@@ -71,7 +88,6 @@ const options = (onSelect: any, onSaved: any) => ({
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [],
   rowHover: true,
@@ -80,7 +96,7 @@ const options = (onSelect: any, onSaved: any) => ({
       noMatch: "No results found",
     }
   },
-  customSort(items: any, index: number, isDesc: string) {
+  customSort(items, index, isDesc) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
       const bDate = new Date(b.data[index]);
@@ -93,16 +109,14 @@ const options = (onSelect: any, onSaved: any) => ({
     });
     return items;
   },
-  selectableRowsOnClick: true,
   customFooter: CommonPagination,
-  customToolbar: () => '',
-  customToolbarSelect: (selected) => <ApproveButton mode="order"
-    text={"Approve orders"}
+  customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
+    text={"Approve results"}
     onSaved={onSaved}
     selected={onSelect(selected.data)} />,
   customSearchRender: SearchBar,
+  customToolbar: () => ''
 } as MUIDataTableOptions);
-
 
 const NoMatches = () => (
   <div className={styles.sorry}>
@@ -112,30 +126,16 @@ const NoMatches = () => (
   </div>
 );
 
-
-const PendingOrdersPage = () => {
-  const [data, setData] = useState([] as Order[]);
+const TestIncompletePage = () => {
+  const [data, setData] = useState([] as Test[]);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
   const dispatch = useDispatch();
-  const orders = useSelector(ordersPendingState);
-
-  const onSaved = async () => {
-    await Promise.all([dispatch(loadOrdersByStatus("APPROVED")), dispatch(loadOrdersByStatus('PENDING'))]);
-  };
+  const tests = useSelector(testsIncompleteState);
 
   useEffect(() => {
     onLoad();
-  }, [orders]);
-
-  const onLoad = () => {
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
-    }
-  };
+  }, [tests]);
 
   useEffect(() => {
     const resizeListener = () => {
@@ -147,58 +147,82 @@ const PendingOrdersPage = () => {
     }
   }, []);
 
+  const onSaved = async () => {
+    await Promise.all([dispatch(loadTestsByStatus("PENDING")), dispatch(loadTestsByStatus('INCOMPLETE'))]);
+  };
+
+  const onLoad = () => {
+    if (tests && tests.length) {
+      setData(tests.map((item: any) => {
+        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+        return item;
+      }));
+    }
+  };
+
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
     || (String(item.customerId).indexOf(searchText) !== -1)
       ? 1 : 0;
 
-  const ordersToView = data
+  const testsToView = data
     .map(reformatDate)
     .filter(searchFilter);
 
+  const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
+
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
 
-  return <section className={styles.orders}>
+  return <section className={styles.tests}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
-    <h2 className={styles.heading20}>Orders pending approval</h2>
+    <h2 className={styles.heading20}>Incomplete test results</h2>
     {width > 700 ?
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
           data={data.map(reformatDate)}
-          columns={columns}
+          columns={columns(onClickLink)}
           options={options(onSelect, onSaved)}
         />
       </MuiThemeProvider>
       :
-      <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
-        <ApproveButton mode="order" onSaved={onSaved} selected={data} text={"Approve all orders"} />
+      <div className={styles.mobileTests}>
+        <p className={styles.testsResultsInfo}>({testsToView.length} results)</p>
+        <ApproveButton type="pending"
+          mode="result"
+          onSaved={onSaved}
+          selected={data as Order[]}
+          text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
-        {ordersToView
-          .map((item: any, i: any) => (
-            <div key={i} className={styles.mobileOrdersItem}>
-              <p className={styles.mobileOrdersTitle}>Order
-                ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
-              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
+        {testsToView
+          .map((item: any, i) => (
+            <div key={i} className={styles.mobileTestsItem}>
+              <p className={styles.mobileTestsTitle}>Test result
+                ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
+                  to={`/orders/test/${item.hash}`}>{item.id}</Link></span></p>
+              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
               </p>
-              <p className={styles.mobileOrdersTitle}>Customer
-                ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-              <p className={styles.mobileOrdersTitle}>Criteria
-                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+              <p className={styles.mobileTestsTitle}>Order
+                ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>
+              <p className={styles.mobileTestsTitle}>Customer
+                ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
+              <p className={styles.mobileTestsTitle}>Biomarkers out of
+                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
+              </p>
               <ApproveButton className={styles.btnApproveMobile}
-                mode="order"
+                mode="result"
+                type="pending"
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"} />
             </div>
           ))}
-        {ordersToView.length === 0 && <NoMatches />}
+        {testsToView.length === 0 && <NoMatches />}
       </div>
     }
   </section>
 }
 
-export default PendingOrdersPage;
+export default TestIncompletePage;

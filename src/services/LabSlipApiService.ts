@@ -3,7 +3,7 @@ import Token from "../helpers/localToken";
 
 export type OrderStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED";
 
-export type TestStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED";
+export type TestStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED" | "INCOMPLETE";
 
 export default class LabSlipApiService {
   static getOrdersByStatus = async (status: OrderStatus) => await client.get(`/getOrdersByStatus/${status}`, {
@@ -16,7 +16,19 @@ export default class LabSlipApiService {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }
-  })
+  });
+
+  static saveApprovedResults = async (hashes: string[]) => await client.post('/saveApprovedResults', {hashes}, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  });
+
+  static savePendingResults = async (hashes: string[]) => await client.post('/savePendingResults', {hashes}, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  });
 
   static getResultsByStatus = async (status: TestStatus) => await client.get(`/getResultsByStatus/${status}`, {
     headers: {
@@ -24,11 +36,6 @@ export default class LabSlipApiService {
     }
   }).then(data => data);
 
-  static saveApprovedResults = async (hashes: string[]) => await client.post('/saveApprovedResults', {hashes}, {
-    headers: {
-      'Authorization': `Bearer ${Token.get().token}`
-    }
-  });
 
   static getResult = async (hash: string) => await client.get(`/getResult/${hash}`, {
     headers: {
