@@ -127,7 +127,10 @@ const detailsTableStylesObject = {
           textAlign: 'right !important'
         },
         '&:nth-child(3)': {
-          textAlign: 'right !important'
+          textAlign: 'right !important',
+
+          // delete if Normal Range column is needed
+          display: 'none'
         },
         '&:last-child': {
           textAlign: 'right !important',
