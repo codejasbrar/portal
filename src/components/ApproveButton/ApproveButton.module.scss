@@ -4,7 +4,7 @@
 .modalContent {
 
     &Title {
-        font-family:    "Open Sans Semibold", sans-serif;
+        font-family:    "Open Sans", sans-serif;
         margin:         0;
         letter-spacing: 0.4px;
         color:          $text;
@@ -23,7 +23,7 @@
     }
 
     &Bold {
-        font-family: "Open Sans Semibold", sans-serif;
+        font-family: "Open Sans", sans-serif;
         font-weight: 600;
     }
 
@@ -37,6 +37,7 @@
 
     &Item {
         font-family: "Open Sans", sans-serif;
+        color:       $text;
         font-weight: 600;
 
         span {
@@ -52,12 +53,25 @@
     margin-top:      24px;
 
     .btn {
-        font-weight: 600;
         max-width:   87px;
         margin-left: 20px;
     }
 }
+.btnBlockPopup {
+    .btn {
+        margin-left: 0;
+        &+.btn {
+            margin-left: 20px;
+        }
+    }
+    @include breakpoint($big_mobile) {
+        justify-content: center;
 
+        .btn {
+            max-width: 50%;
+        }
+    }
+}
 .modalApprove {
     max-width: 400px;
 
