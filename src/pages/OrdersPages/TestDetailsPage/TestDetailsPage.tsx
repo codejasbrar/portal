@@ -37,12 +37,34 @@ const columns = [
     options: {
       filter: true,
       sort: true,
+
+/*original*/
+      // customBodyRender: (value: any, tableMeta: any) => {
+      //   const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
+      //   const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
+      //   return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
+      // },
+
+/*new option*/
       customBodyRender: (value: any, tableMeta: any) => {
-        const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-        // const panic = value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]);
+        const markersRange = tableMeta.rowData[2] === 'N/A' ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{panic && <span className={styles.dot} />}</span>;
+        const dotItem = markersRange == null ? value : value && <span className={styles.dot} />;
+
+        return (
+          <span className={styles.dotWrapper}>
+              {dotItem && panic ? (
+                <>
+                  {value}
+                  <span className={styles.dot} />
+                </>
+              ) : (
+                <>{value}</>
+              )}
+            </span>
+        );
       },
+
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
@@ -51,6 +73,7 @@ const columns = [
     }
   },
   {
+    //check the CommonTableTheme.ts str:132
     name: "normalRange",
     label: "Normal range",
     options: {
@@ -246,7 +269,8 @@ const TestDetailsPage = () => {
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.value}</span>
                       </p>
-                      <p className={styles.mobileOrdersTitle}>Normal range:&nbsp;
+                       {/*delete hide-class if Normal Range string is needed*/}
+                      <p className={`${styles.mobileOrdersTitle} ${styles.hide}`}>Normal range:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.normalRange}</span>
                       </p>
                       <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
