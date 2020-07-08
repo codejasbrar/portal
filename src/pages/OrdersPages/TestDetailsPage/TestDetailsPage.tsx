@@ -41,12 +41,11 @@ const columns = [
 /*original*/
       // customBodyRender: (value: any, tableMeta: any) => {
       //   const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-      //   // const panic = value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]);
       //   const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
-      //   return <span className={styles.dotWrapper}>{value}{panic && <span className={styles.dot} />}</span>;
+      //   return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
       // },
 
-/*test option*/
+/*new option*/
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === 'N/A' ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
