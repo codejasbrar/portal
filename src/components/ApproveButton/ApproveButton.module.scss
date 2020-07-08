@@ -1,0 +1,84 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.modalContent {
+
+    &Title {
+        font-family:    "Open Sans", sans-serif;
+        margin:         0;
+        letter-spacing: 0.4px;
+        color:          $text;
+        font-size:      20px;
+        line-height:    30px;
+        font-weight:    600;
+    }
+
+    &Text {
+        font-family:    "Open Sans", sans-serif;
+        color:          $text;
+        font-size:      14px;
+        letter-spacing: 0.3px;
+        line-height:    20px;
+        padding-top:    15px;
+    }
+
+    &Bold {
+        font-family: "Open Sans", sans-serif;
+        font-weight: 600;
+    }
+
+    &List {
+        font-family:     "Open Sans Semibold", sans-serif;
+        padding:         15px 0 0 0;
+        list-style-type: none;
+        font-weight:     400;
+        margin:          0;
+    }
+
+    &Item {
+        font-family: "Open Sans", sans-serif;
+        color:       $text;
+        font-weight: 600;
+
+        span {
+            font-weight:    400;
+            letter-spacing: -0.3px;
+        }
+    }
+}
+
+.btnBlock {
+    justify-content: flex-end;
+    display:         flex;
+    margin-top:      24px;
+
+    .btn {
+        max-width:   87px;
+        margin-left: 20px;
+    }
+}
+.btnBlockPopup {
+    .btn {
+        margin-left: 0;
+        &+.btn {
+            margin-left: 20px;
+        }
+    }
+    @include breakpoint($big_mobile) {
+        justify-content: center;
+
+        .btn {
+            max-width: 50%;
+        }
+    }
+}
+.modalApprove {
+    max-width: 400px;
+
+    @include breakpoint($mobile) {
+        margin:    0 16px;
+        width:     100%;
+        max-width: none;
+        min-width: auto;
+    }
+}

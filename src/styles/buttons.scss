@@ -1,0 +1,139 @@
+@import "variables";
+@import "mixins";
+
+.btn {
+    padding:          0 20px;
+    box-sizing:       border-box;
+    border-radius:    3px;
+    border-style:     hidden;
+    background-color: transparent;
+    cursor:           pointer;
+    display:          inline-block;
+    height:           36px;
+    color:            #ffffff;
+    font-size:        14px;
+    font-weight:      600;
+    line-height:      36px;
+    letter-spacing:   0.23px;
+    text-decoration:  none;
+    text-align:       center;
+    transition:       all 0.2s ease-out;
+    outline:          none;
+    @include appearance;
+
+    &Disabled,
+    &:disabled {
+        cursor:         default;
+        opacity:        0.3;
+        pointer-events: none;
+    }
+
+    /*  btn-primary */
+
+    &Primary {
+        @extend .btn;
+        background-color: $primary;
+
+        /*  btn-primary-glass   */
+
+        &Glass {
+            @extend .btn;
+            color:  $primary;
+            border: 1px solid $primary;
+            flex:   none;
+
+            &Check {
+                @extend .btn;
+                border: 1px solid $gray6;
+                color:  $gray1;
+                cursor: default;
+                flex:   none;
+
+                &:hover,
+                &:focus,
+                &:active,
+                &:visited {
+                    border-color: $gray6;
+                }
+            }
+        }
+
+        /*  hover, focus, active, disabled  */
+
+        &, &Glass {
+            &:hover,
+            &:focus {
+                color:            #ffffff;
+                border-color:     $primary--hover;
+                background-color: $primary--hover;
+            }
+
+            &:active {
+                color:            $primary--active-text;
+                border-color:     $primary--active;
+                background-color: $primary--active;
+            }
+
+            &Disabled,
+            &:disabled {
+                @extend .btn:disabled;
+            }
+        }
+    }
+
+    /*  btn-secondary   */
+
+    &Secondary {
+        @extend .btn;
+        color:            $gray3;
+        background-color: $gray7;
+
+        &:active {
+            color:            $gray4;
+            background-color: $gray6;
+        }
+
+        /*  btn-secondary-glass */
+
+        &Glass {
+            @extend .btn;
+            color:  $gray5;
+            border: 1px solid $gray6;
+            flex:   none;
+
+            &:active {
+                border-color:     $gray6;
+                background-color: $gray6;
+            }
+        }
+
+        &, &Glass {
+            &:hover,
+            &:focus {
+                border-color:     $gray8;
+                background-color: $gray8;
+            }
+
+            &Disabled,
+            &:disabled {
+                @extend .btn:disabled;
+            }
+        }
+
+        &Dark {
+            @extend .btn;
+            background-color: $gray4;
+
+            &:hover,
+            &:focus {
+                color:            #ffffff;
+                background-color: $gray5;
+            }
+
+            &:active {
+                color:            $gray2;
+                background-color: $gray3;
+            }
+        }
+    }
+}

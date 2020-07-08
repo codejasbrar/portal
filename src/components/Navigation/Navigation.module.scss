@@ -1,0 +1,94 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.navigation {
+    margin-right: 80px;
+
+    &Title {
+        margin-bottom: 17px;
+    }
+
+    @include breakpoint($tablet_horizontal) {
+        display: none;
+    }
+}
+
+.mobileNavigation {
+    padding:    5px 0 30px 0;
+    background: #ffffff;
+}
+
+.navlink {
+    display:         inline-block;
+    vertical-align:  top;
+    font-size:       14px;
+    letter-spacing:  0.3px;
+    transition:      all 0.2s ease-in-out;
+    cursor:          pointer;
+    box-sizing:      border-box;
+    position:        relative;
+    text-decoration: none;
+    background:      transparent;
+    color:           $text;
+    padding:         8px 10px 8px 20px;
+    white-space:     nowrap;
+
+    @include breakpoint($tablet_horizontal) {
+        display:       block;
+        width:         100%;
+        border-bottom: 1px solid $gray7;
+        padding:       14px 10px 14px 0;
+    }
+
+    &:after {
+        @include breakpoint($tablet_horizontal) {
+            content:          '';
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14' viewBox='0 0 9 14'%3E%3Cg%3E%3Cg transform='rotate(-90 4.5 7)'%3E%3Cpath fill='%230af' d='M9.472 3L4.501 7.944-.472 3-2 4.522 4.5 11 11 4.522z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            width:            9px;
+            height:           14px;
+            right:            16px;
+            top:              50%;
+            transform:        translateY(-50%);
+            position:         absolute;
+        }
+    }
+
+    &.active {
+
+        &:before {
+            content:    '';
+            position:   absolute;
+            background: $primary;
+            width:      3px;
+            height:     100%;
+            bottom:     0;
+            left:       0;
+
+            @include breakpoint($tablet_horizontal) {
+                content: none;
+            }
+        }
+    }
+
+    &:hover,
+    &:focus {
+        background-color: $gray8;
+    }
+
+    &Number {
+        color:        $gray5;
+        padding-left: 5px;
+    }
+}
+
+.navList {
+    display:        flex;
+    flex-direction: column;
+    width:          198px;
+    margin-bottom:  34px;
+
+    @include breakpoint($tablet_horizontal) {
+        width: 100%;
+    }
+}

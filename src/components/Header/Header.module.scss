@@ -1,0 +1,27 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.Header {
+    height:           70px;
+    width:            100%;
+    background-color: $dark_bg;
+    position:         fixed;
+    z-index:          999;
+
+    @include breakpoint($tablet) {
+        height: 60px;
+    }
+
+    &Container {
+        display:         flex;
+        align-items:     center;
+        justify-content: space-between;
+        height:          100%;
+
+        @include breakpoint($tablet) {
+            justify-content: center;
+        }
+    }
+}
+

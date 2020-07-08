@@ -1,0 +1,25 @@
+@import "variables";
+@import "mixins";
+@import "heading";
+@import "hide-show";
+@import "buttons";
+
+.container {
+    max-width: 1170px;
+    margin:    0 auto;
+
+    @include breakpoint($desktop) {
+        max-width:     none;
+        width:         100%;
+        padding-left:  16px;
+        padding-right: 16px;
+    }
+}
+
+.wrapper {
+    padding-top: 70px;
+
+    @include breakpoint($tablet_horizontal) {
+        padding-top: 60px;
+    }
+}

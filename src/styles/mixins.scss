@@ -1,0 +1,19 @@
+@import "variables";
+
+@mixin breakpoint($breakpoint) {
+    @media screen and (max-width: $breakpoint) {
+        @content;
+    }
+}
+
+@mixin breakpointMin($breakpoint) {
+    @media screen and (min-width: $breakpoint) {
+        @content;
+    }
+}
+
+@mixin appearance {
+    appearance:   none;
+    user-select:  none;
+    touch-action: manipulation;
+}

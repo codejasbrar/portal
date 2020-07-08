@@ -1,0 +1,170 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+
+.User {
+    &PanelDesktop {
+        display:     flex;
+        align-items: center;
+        position:    relative;
+
+        @include breakpoint($tablet) {
+            display: none;
+        }
+    }
+
+    &PanelMobile {
+        display: none;
+
+        @include breakpoint($tablet) {
+            display:          block;
+            position:         fixed;
+            left:             0;
+            width:            270px;
+            top:              0;
+            bottom:           0;
+            background-color: $gray2;
+            transition:       transform 0.3s linear;
+            z-index:          1;
+        }
+
+        &Hided {
+            transform: translateX(-100%);
+        }
+    }
+
+    &Logo {
+        height:           40px;
+        width:            40px;
+        background-color: $gray4;
+        border-radius:    50%;
+        display:          flex;
+        justify-content:  center;
+        align-items:      center;
+        user-select:      none;
+
+        @include breakpoint($tablet) {
+            height: 60px;
+            width:  60px;
+        }
+
+        &Char {
+            color:          $gray6;
+            font-family:    "Open Sans Condensed", sans-serif;
+            font-size:      1.4em;
+            line-height:    26px;
+            text-transform: uppercase;
+
+            @include breakpoint($tablet) {
+                font-size: 2em;
+            }
+        }
+    }
+
+    &Name {
+        color:       #fff;
+        font-family: "Open Sans", sans-serif;
+        font-weight: 600;
+
+        @include breakpoint($tablet) {
+            display:    block;
+            font-size:  1.25em;
+            margin-top: 12px;
+        }
+    }
+
+    &Arrow {
+        margin-left: 9px;
+
+        &Flipped {
+            transform: rotate(180deg);
+        }
+    }
+
+    &Logout {
+        position:         absolute;
+        border-radius:    6px;
+        background-color: #fff;
+        right:            0;
+        top:              120%;
+        display:          flex;
+        height:           56px;
+        width:            170px;
+        box-shadow:       0 0 10px 2px rgba(0, 0, 0, 0.06);
+        visibility:       visible;
+        transition:       height 0.2s linear;
+
+        &Hided {
+            visibility: hidden;
+            height:     0;
+            transition: visibility 0s 0.2s, height 0.2s linear;
+        }
+
+        &Btn {
+            letter-spacing: 0.3px;
+            padding-left:   20px;
+            transition:     opacity 0.18s linear;
+            opacity:        1;
+
+            &Hided {
+                opacity: 0;
+            }
+        }
+    }
+}
+
+.Aside {
+    &Opener {
+        display: none;
+        @include breakpoint($tablet) {
+            position:        fixed;
+            height:          60px;
+            width:           60px;
+            display:         flex;
+            justify-content: center;
+            align-items:     center;
+            left:            0;
+            top:             0;
+        }
+    }
+
+    &Top {
+        background-color: $dark_bg;
+        display:          flex;
+        align-items:      center;
+        justify-content:  center;
+        flex-direction:   column;
+        padding-top:      24px;
+        padding-bottom:   20px;
+        min-height:       136px;
+    }
+
+    &BtnBlock {
+        padding:       16px 16px 24px;
+        border-bottom: 1px solid $gray3;
+    }
+
+    &Bottom {
+        padding: 24px 16px;
+    }
+
+    &Link {
+        font-size:      0.86em;
+        color:          $gray6;
+        font-family:    "Open Sans", sans-serif;
+        letter-spacing: 0.3px;
+        line-height:    30px;
+        display:        block;
+
+        &:visited {
+            color: $gray6;
+        }
+    }
+}
+
+.loginBtn {
+    @include breakpoint($tablet) {
+        display: none;
+    }
+}
+
