@@ -81,7 +81,7 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
     }
   },
   onChangePage: (currentPage) => setPage(currentPage),
-  isRowSelectable: (dataIndex: number) => dataIndex >= page*25 && dataIndex < page*25+25 ? true : false,
+  onSearchChange: () => setPage(0),
   customSort(items: any, index: number, isDesc: string) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
@@ -97,13 +97,22 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   },
   customFooter: CommonPagination,
   customToolbar: () => '',
-  customToolbarSelect: (selected) => <ApproveButton mode="order"
+  customToolbarSelect: (selected, displayData, setSelectedRows) => {
+    const displayedRows = displayData.slice(page*25, page*25+25);
+    const displayedSelectedRows = selected.data
+      .filter((item: any) => displayedRows.find((currentItem) => currentItem.dataIndex === item.dataIndex));
+
+    if (displayedSelectedRows.length == 0) {
+      setSelectedRows([]);
+    }
+
+    return <ApproveButton mode="order"
     text={"Approve orders"}
     onSaved={onSaved}
-    selected={onSelect(selected.data)} />,
+    selected={onSelect(displayedSelectedRows)} />;
+    },
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
-
 
 const NoMatches = () => (
   <div className={styles.sorry}>

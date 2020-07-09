@@ -108,11 +108,20 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   },
   customFooter: CommonPagination,
   onChangePage: (currentPage) => setPage(currentPage),
-  isRowSelectable: (dataIndex: number) => dataIndex >= page*25 && dataIndex < page*25+25 ? true : false,
-  customToolbarSelect: (selected) => <ApproveButton mode="result"
-    text={"Approve results"}
-    onSaved={onSaved}
-    selected={onSelect(selected.data)} />,
+  onSearchChange: () => setPage(0),
+  customToolbarSelect: (selected, displayData, setSelectedRows) => {
+    const displayedRows = displayData.slice(page * 25, page * 25 + 25);
+    const displayedSelectedRows = selected.data
+      .filter((item: any) => displayedRows.find((currentItem) => currentItem.dataIndex === item.dataIndex));
+
+    if (displayedSelectedRows.length == 0) {
+      setSelectedRows([]);
+    }
+    return <ApproveButton mode="result"
+      text={"Approve results"}
+      onSaved={onSaved}
+      selected={onSelect(displayedSelectedRows)} />
+  },
   customSearchRender: SearchBar,
   customToolbar: () => ''
 } as MUIDataTableOptions);
