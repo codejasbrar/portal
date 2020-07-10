@@ -85,6 +85,7 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
+  selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [25],
   rowHover: true,
@@ -93,6 +94,8 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
       noMatch: "No results found",
     }
   },
+  onChangePage: (currentPage) => setPage(currentPage),
+  onSearchChange: () => setPage(0),
   customSort(items, index, isDesc) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
@@ -107,10 +110,9 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
     return items;
   },
   customFooter: CommonPagination,
-  onChangePage: (currentPage) => setPage(currentPage),
-  onSearchChange: () => setPage(0),
+  customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
-    const displayedRows = displayData.slice(page * 25, page * 25 + 25);
+    const displayedRows = displayData.slice(page*25, page*25+25);
     const displayedSelectedRows = selected.data
       .filter((item: any) => displayedRows.find((currentItem) => currentItem.dataIndex === item.dataIndex));
 
@@ -123,7 +125,6 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
       selected={onSelect(displayedSelectedRows)} />
   },
   customSearchRender: SearchBar,
-  customToolbar: () => ''
 } as MUIDataTableOptions);
 
 const NoMatches = () => (
@@ -156,6 +157,10 @@ const TestsPage = () => {
     await Promise.all([dispatch(loadTestsByStatus('PENDING')), dispatch(loadTestsByStatus("APPROVED"))]);
   };
 
+  useEffect(() => {
+    onLoad();
+  }, [tests]);
+
   const onLoad = () => {
     if (tests && tests.length) {
       setData(tests.map((item: any) => {
@@ -164,10 +169,6 @@ const TestsPage = () => {
       }));
     }
   };
-
-  useEffect(() => {
-    onLoad();
-  }, [tests]);
 
   const searchFilter = (item: any) =>
     (String(item.id).indexOf(searchText) !== -1)
