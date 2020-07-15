@@ -5,23 +5,23 @@ import {Order} from "../interfaces/Order";
 
 export interface TestsState extends OrdersState {
   details: TestDetails | null,
-  incomplete: { content: Order[] }
+  incomplete: OrdersState | {}
 }
 
 const initialState: TestsState = {
-  pending: {content: []},
-  approved: {content: []},
+  pending: {},
+  approved: {},
   details: null,
-  incomplete: {content: []}
+  incomplete: {}
 };
 
 export default (state: TestsState = initialState, action: any) => {
   switch (action.type) {
     case GET_TESTS_SUCCESS:
       return {
-        pending: action.status === "PENDING" ? action.payload : state.pending.content,
-        approved: action.status === "APPROVED" ? action.payload : state.approved.content,
-        incomplete: action.status === "INCOMPLETE" ? action.payload : state.incomplete.content
+        pending: action.status === "PENDING" ? action.payload : state.pending,
+        approved: action.status === "APPROVED" ? action.payload : state.approved,
+        incomplete: action.status === "INCOMPLETE" ? action.payload : state.incomplete
       };
     case GET_TEST_SUCCESS:
       return {

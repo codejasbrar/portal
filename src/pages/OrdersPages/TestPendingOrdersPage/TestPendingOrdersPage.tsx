@@ -154,7 +154,7 @@ const TestsPage = () => {
   }, []);
 
   const onSaved = async () => {
-    await Promise.all([dispatch(loadTestsByStatus('PENDING')), dispatch(loadTestsByStatus("APPROVED"))]);
+    await Promise.all([dispatch(loadTestsByStatus('PENDING', 0)), dispatch(loadTestsByStatus("APPROVED", 0))]);
   };
 
   useEffect(() => {

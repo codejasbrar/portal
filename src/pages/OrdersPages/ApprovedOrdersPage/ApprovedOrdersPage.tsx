@@ -5,13 +5,15 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
-import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {Order} from "../../../interfaces/Order";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import {Test, TestDetails} from "../../../interfaces/Test";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {ordersApprovedState} from "../../../selectors/selectors";
+import {loadOrdersByStatus} from "../../../actions/ordersActions";
+import Pagination from "../../../components/Table/Pagination/Pagination";
+import Spinner from "../../../components/Spinner/Spinner";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -62,7 +64,7 @@ const columns = [
   },
 ];
 
-const options: MUIDataTableOptions = {
+const options = (onSearch: (count: number) => void) => ({
   filter: false,
   download: false,
   print: false,
@@ -72,8 +74,10 @@ const options: MUIDataTableOptions = {
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
   selectToolbarPlacement: 'none',
-  rowsPerPageOptions: [],
+  rowsPerPageOptions: [25],
   rowHover: true,
+  pagination: false,
+  customFooter: (rowCount) => onSearch(rowCount),
   selectableRows: 'none',
   textLabels: {
     body: {
@@ -93,11 +97,10 @@ const options: MUIDataTableOptions = {
     });
     return items;
   },
-  customFooter: CommonPagination,
   customToolbarSelect: () => <></>,
   customSearchRender: SearchBar,
   customToolbar: () => <></>,
-} as MUIDataTableOptions;
+}) as MUIDataTableOptions;
 
 const NoMatches = () => (
   <div className={styles.sorry}>
@@ -118,20 +121,42 @@ export const reformatDate = (order: Order | Test | TestDetails) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const [data, setData] = useState([] as Order[]);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const [searchItemsCount, setCount] = useState(0);
+  const [data, setData] = useState({} as OrdersResponse);
   const [searchText, setSearchText] = useState('');
   const [width, setWidth] = useState(getWidth());
+  const [page, setPage] = useState(0);
   const orders = useSelector(ordersApprovedState);
+
+  const onLoad = () => {
+    if (orders.content && orders.content.length) {
+      setData({
+        ...orders, content: orders.content.map((item: Order) => {
+          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+          return item;
+        })
+      });
+    }
+  };
 
   useEffect(() => {
     onLoad();
   }, [orders]);
 
-  const onLoad = () => {
-    if (orders && orders.length) setData(orders);
+  useEffect(() => {
+    if (orders.content && orders.content.length) onSaved();
+  }, [page]);
+
+  const onSaved = async () => {
+    setLoading(true);
+    await dispatch(loadOrdersByStatus('APPROVED', page));
+    setLoading(false);
   };
 
   useEffect(() => {
+    onSaved();
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -146,11 +171,12 @@ const ApprovedOrdersPage = () => {
     || (String(item.customerId).indexOf(searchText) !== -1)
       ? 1 : 0;
 
-  const ordersToView = data
+  const ordersToView = orders.content ? orders.content
     .map(reformatDate)
-    .filter(searchFilter);
+    .filter(searchFilter) : [];
 
   return <section className={styles.orders}>
+    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -159,10 +185,16 @@ const ApprovedOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.map(reformatDate)}
+          data={data.content ? data.content.map(reformatDate) : []}
           columns={columns}
-          options={options}
+          options={options(setCount)}
         />
+        <Pagination page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          searchItems={searchItemsCount}
+          totalItems={data.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
@@ -181,6 +213,13 @@ const ApprovedOrdersPage = () => {
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
             </div>
           ))}
+        <Pagination mobile
+          page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          searchItems={ordersToView.length}
+          totalItems={data.totalElements} />
         {ordersToView.length === 0 && <NoMatches />}
       </div>
     }

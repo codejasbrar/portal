@@ -151,7 +151,7 @@ const TestIncompletePage = () => {
   }, []);
 
   const onSaved = async () => {
-    await Promise.all([dispatch(loadTestsByStatus("PENDING")), dispatch(loadTestsByStatus('INCOMPLETE'))]);
+    await Promise.all([dispatch(loadTestsByStatus("PENDING", 0)), dispatch(loadTestsByStatus('INCOMPLETE', 0))]);
   };
 
   const onLoad = () => {

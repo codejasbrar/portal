@@ -7,13 +7,10 @@ import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
-import Spinner from "../../components/Spinner/Spinner";
 import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
-import {loadAdminData, loadAllData} from "../../actions/ordersActions";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
-import {loadingDataState, ordersState, testsState, userState} from "../../selectors/selectors";
-import {log} from "util";
+import {userState} from "../../selectors/selectors";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -29,7 +26,6 @@ const OrdersPage = () => {
     (async () => {
       if (user && Object.keys(user).length) {
        // user.physician ? await dispatch(loadAllData()) : await dispatch(loadAdminData());
-        setLoading(false);
       }
     })();
   }, [user]);
@@ -47,7 +43,6 @@ const OrdersPage = () => {
 
 
   return <>
-    {loading && <Spinner />}
     <Route path={[
       "/orders/navigation",
       "/orders/pending",
@@ -70,7 +65,7 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            <Route path="/orders/tests-incomplete" component={TestIncompletePage} />
+            {user && user.physician && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
           </div>
         </div>
       </section>

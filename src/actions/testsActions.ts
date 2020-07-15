@@ -20,10 +20,10 @@ export const loadTestsSuccess = (tests: Test[], status: TestStatus) => ({
 export const getTestRequest = () => ({type: GET_TEST_REQUEST});
 export const getTestSuccess = (test: TestDetails) => ({type: GET_TEST_SUCCESS, payload: test});
 
-export const loadTestsByStatus = (status: TestStatus) => async (dispatch: Dispatch<object>): Promise<any> => {
+export const loadTestsByStatus = (status: TestStatus, page: number) => async (dispatch: Dispatch<object>): Promise<any> => {
   dispatch(loadTestsRequest());
   try {
-    const response = await LabSlipApiService.getResultsByStatus(status);
+    const response = await LabSlipApiService.getResultsByStatus(status, page);
     dispatch(loadTestsSuccess(response.data, status))
   } catch (exception) {
     await catchBlock(exception, dispatch);

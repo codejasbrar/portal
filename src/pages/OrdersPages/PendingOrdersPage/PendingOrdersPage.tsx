@@ -7,15 +7,16 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
-import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
-import LabSlipApiService from "../../../services/LabSlipApiService";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
+import {loadOrdersByStatus} from "../../../actions/ordersActions";
+import {useDispatch, useSelector} from "react-redux";
+import {ordersPendingState} from "../../../selectors/selectors";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -61,7 +62,7 @@ const columns = [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, page: number, setPage: (page: number) => void, totalElements: number, totalPages: number, size: number) => ({
+const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -70,12 +71,12 @@ const options = (onSelect: any, onSaved: any, page: number, setPage: (page: numb
   searchOpen: true,
   search: false,
   responsive: "scrollFullHeight",
-  customFooter: CommonPagination,
-  rowsPerPage: 250,
+  customFooter: (rowCount) => onSearch(rowCount),
+  rowsPerPage: 25,
   pagination: false,
   selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [250],
+  rowsPerPageOptions: [25],
   rowHover: true,
   textLabels: {
     body: {
@@ -97,17 +98,10 @@ const options = (onSelect: any, onSaved: any, page: number, setPage: (page: numb
   },
   customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
-    const displayedSelectedRows = selected.data
-      .filter((item: any) => displayData.find((currentItem) => currentItem.dataIndex === item.dataIndex));
-
-    if (displayedSelectedRows.length == 0) {
-      setSelectedRows([]);
-    }
-
     return <ApproveButton mode="order"
-    text={"Approve orders"}
-    onSaved={onSaved}
-    selected={onSelect(displayedSelectedRows)} />;
+      text={"Approve orders"}
+      onSaved={onSaved}
+      selected={onSelect(selected.data)} />;
     },
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
@@ -122,17 +116,20 @@ const NoMatches = () => (
 
 
 const PendingOrdersPage = () => {
+  const dispatch = useDispatch();
+  const orders = useSelector(ordersPendingState);
   const [data, setData] = useState({} as OrdersResponse);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [width, setWidth] = useState(getWidth());
+  const [searchItemsCount, setCount] = useState(0);
 
 
-  const onLoad = (data: OrdersResponse) => {
-    if (data.content && data.content.length) {
+  const onLoad = () => {
+    if (orders.content && orders.content.length) {
       setData({
-        ...data, content: data.content.map((item: Order) => {
+        ...orders, content: orders.content.map((item: Order) => {
           item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
           return item;
         })
@@ -141,13 +138,16 @@ const PendingOrdersPage = () => {
   };
 
   useEffect(() => {
-    onSaved();
+    onLoad();
+  }, [orders]);
+
+  useEffect(() => {
+    if (orders.content && orders.content.length) onSaved();
   }, [page]);
 
   const onSaved = async () => {
     setLoading(true);
-    const resp = await LabSlipApiService.getOrdersByStatus('PENDING', page);
-    onLoad(resp);
+    await dispatch(loadOrdersByStatus('PENDING', page));
     setLoading(false);
   };
 
@@ -167,7 +167,7 @@ const PendingOrdersPage = () => {
     || (String(item.customerId).indexOf(searchText) !== -1)
       ? 1 : 0;
 
-  const ordersToView = data.content ? data.content
+  const ordersToView = orders.content ? orders.content
     .map(reformatDate)
     .filter(searchFilter) : [];
 
@@ -185,18 +185,19 @@ const PendingOrdersPage = () => {
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
           columns={columns}
-          options={options(onSelect, onSaved, page, setPage, data.totalElements, data.totalPages, data.size)}
+          options={options(onSelect, onSaved, setCount)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={data.totalPages}
           itemsPerPage={data.size}
+          searchItems={searchItemsCount}
           totalItems={data.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
-        <ApproveButton mode="order" onSaved={onSaved} selected={data.content} text={"Approve all orders"} />
+        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -216,6 +217,13 @@ const PendingOrdersPage = () => {
                 text={"Approve"} />
             </div>
           ))}
+        <Pagination mobile
+          page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          searchItems={ordersToView.length}
+          totalItems={data.totalElements} />
         {ordersToView.length === 0 && <NoMatches />}
       </div>
     }

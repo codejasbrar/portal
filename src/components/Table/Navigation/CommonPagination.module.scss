@@ -45,9 +45,14 @@
 
     &Arrows {
         margin-left: auto;
+
+        &Mobile {
+            margin-top: 32px;
+        }
     }
 
-    &Nav {
-        margin-top: -50px;
+    &Mobile {
+        display:    block;
+        text-align: center;
     }
 }

@@ -7,24 +7,28 @@ type CommonPaginationPropsTypes = {
   totalPages: number,
   setPage: (page: number) => void,
   totalItems: number,
-  itemsPerPage: number
+  itemsPerPage: number,
+  searchItems: number,
+  mobile?: boolean,
 }
 
 const Pagination = (props: CommonPaginationPropsTypes) => {
-  return <div className={styles.pagination}>
+  return <div className={`${styles.pagination} ${props.mobile ? styles.paginationMobile : ''}`}>
     <div className={styles.paginationWrap}>
-      <span className={styles.text}>Showing results </span>
-      <strong>{props.page * props.itemsPerPage + 1}-{props.page * props.itemsPerPage + props.itemsPerPage > props.totalItems ? props.totalItems : props.page * props.itemsPerPage + props.itemsPerPage} </strong>
-      of <strong> {props.totalItems} </strong>
+      {props.totalItems && <><span className={styles.text}>Showing results </span>
+        {props.searchItems && props.searchItems === 25 && props.page !== props.totalPages ?
+          <strong>{props.page * props.itemsPerPage + 1}-{props.page * props.itemsPerPage + props.itemsPerPage > props.totalItems ? props.totalItems : props.page * props.itemsPerPage + props.itemsPerPage} </strong> :
+          <strong>{props.searchItems} </strong>}
+        of <strong>{props.totalItems} </strong></>}
     </div>
     {props.totalPages > 1 &&
-    <div className={styles.paginationArrows}>
+    <div className={`${styles.paginationArrows} ${props.mobile ? styles.paginationArrowsMobile : ''}`}>
       <button className={styles.arrowLeft} disabled={props.page === 0} onClick={() => props.setPage(props.page - 1)}>
         <ArrowIcon />
       </button>
       <span className={styles.text}>Page <strong>{props.page + 1}</strong> of <strong>{props.totalPages}</strong></span>
       <button className={styles.arrowRight}
-        disabled={props.page === props.totalPages}
+        disabled={props.page === props.totalPages - 1}
         onClick={() => props.setPage(props.page + 1)}>
         <ArrowIcon />
       </button>
