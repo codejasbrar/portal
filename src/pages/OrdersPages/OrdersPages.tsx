@@ -28,7 +28,7 @@ const OrdersPage = () => {
   useEffect(() => {
     (async () => {
       if (user && Object.keys(user).length) {
-        user.physician ? await dispatch(loadAllData()) : await dispatch(loadAdminData());
+       // user.physician ? await dispatch(loadAllData()) : await dispatch(loadAdminData());
         setLoading(false);
       }
     })();

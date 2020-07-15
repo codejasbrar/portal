@@ -10,12 +10,12 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {Order} from "../../../interfaces/Order";
-import {useDispatch, useSelector} from "react-redux";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
-import {ordersPendingState} from "../../../selectors/selectors";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
+import LabSlipApiService from "../../../services/LabSlipApiService";
+import Spinner from "../../../components/Spinner/Spinner";
+import Pagination from "../../../components/Table/Pagination/Pagination";
 
 const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -61,7 +61,7 @@ const columns = [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
+const options = (onSelect: any, onSaved: any, page: number, setPage: (page: number) => void, totalElements: number, totalPages: number, size: number) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -70,18 +70,18 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
   searchOpen: true,
   search: false,
   responsive: "scrollFullHeight",
-  rowsPerPage: 25,
+  customFooter: CommonPagination,
+  rowsPerPage: 250,
+  pagination: false,
   selectableRows: 'multiple',
   selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [25],
+  rowsPerPageOptions: [250],
   rowHover: true,
   textLabels: {
     body: {
       noMatch: "No results found",
     }
   },
-  onChangePage: (currentPage) => setPage(currentPage),
-  onSearchChange: () => setPage(0),
   customSort(items: any, index: number, isDesc: string) {
     items.sort((a: any, b: any) => {
       const aDate = new Date(a.data[index]);
@@ -95,12 +95,10 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
     });
     return items;
   },
-  customFooter: CommonPagination,
   customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
-    const displayedRows = displayData.slice(page*25, page*25+25);
     const displayedSelectedRows = selected.data
-      .filter((item: any) => displayedRows.find((currentItem) => currentItem.dataIndex === item.dataIndex));
+      .filter((item: any) => displayData.find((currentItem) => currentItem.dataIndex === item.dataIndex));
 
     if (displayedSelectedRows.length == 0) {
       setSelectedRows([]);
@@ -124,31 +122,37 @@ const NoMatches = () => (
 
 
 const PendingOrdersPage = () => {
-  const [data, setData] = useState([] as Order[]);
+  const [data, setData] = useState({} as OrdersResponse);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [width, setWidth] = useState(getWidth());
-  const dispatch = useDispatch();
-  const orders = useSelector(ordersPendingState);
 
-  const onSaved = async () => {
-    await Promise.all([dispatch(loadOrdersByStatus("APPROVED")), dispatch(loadOrdersByStatus('PENDING'))]);
-  };
 
-  useEffect(() => {
-    onLoad();
-  }, [orders]);
-
-  const onLoad = () => {
-    if (orders && orders.length) {
-      setData(orders.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
+  const onLoad = (data: OrdersResponse) => {
+    if (data.content && data.content.length) {
+      setData({
+        ...data, content: data.content.map((item: Order) => {
+          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+          return item;
+        })
+      });
     }
   };
 
   useEffect(() => {
+    onSaved();
+  }, [page]);
+
+  const onSaved = async () => {
+    setLoading(true);
+    const resp = await LabSlipApiService.getOrdersByStatus('PENDING', page);
+    onLoad(resp);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    onSaved();
     const resizeListener = () => {
       setWidth(getWidth())
     };
@@ -163,13 +167,14 @@ const PendingOrdersPage = () => {
     || (String(item.customerId).indexOf(searchText) !== -1)
       ? 1 : 0;
 
-  const ordersToView = data
+  const ordersToView = data.content ? data.content
     .map(reformatDate)
-    .filter(searchFilter);
+    .filter(searchFilter) : [];
 
-  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
 
   return <section className={styles.orders}>
+    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -178,15 +183,20 @@ const PendingOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.map(reformatDate)}
+          data={data.content ? data.content.map(reformatDate) : []}
           columns={columns}
-          options={options(onSelect, onSaved, setPage, page)}
+          options={options(onSelect, onSaved, page, setPage, data.totalElements, data.totalPages, data.size)}
         />
+        <Pagination page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          totalItems={data.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
-        <ApproveButton mode="order" onSaved={onSaved} selected={data} text={"Approve all orders"} />
+        <ApproveButton mode="order" onSaved={onSaved} selected={data.content} text={"Approve all orders"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: any) => (
