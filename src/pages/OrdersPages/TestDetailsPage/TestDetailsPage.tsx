@@ -141,14 +141,18 @@ const TestDetailsPage = () => {
     await dispatch(getResult(hash));
     setLoading(false);
   };
-  console.log(history.action);
 
 
   useEffect(() => {
     loadTest();
   }, []);
 
-  const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
+  const customerAge = (dateOfBirth: string) => new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
+
+  const biomarkerFormat = (biomarker: Biomarker) => ({
+    ...biomarker,
+    normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'
+  });
 
   return <>
     {loading && <Spinner />}
@@ -161,17 +165,17 @@ const TestDetailsPage = () => {
             onClick={() => history.goBack()}
             className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
-          {test &&
+          {test.order &&
           <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
             <section className={styles.adminSection}>
               <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
 
-              <aside className={styles.testInfo}>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Received: </span>
-                  {test.received}
-                </p>
-                <p className={styles.testInfoString}>
+            <aside className={styles.testInfo}>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Received: </span>
+                {test.received}
+              </p>
+              <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Order ID: </span>
                   {test.order?.id}
                 </p>
@@ -185,7 +189,7 @@ const TestDetailsPage = () => {
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Age: </span>
-                  31
+                  {customerAge(test.order?.customerDateOfBirth)}
                 </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Status: </span>
