@@ -52,16 +52,16 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
 
   return <>
     <Button className={props.className ? props.className : ''}
-      disabled={!props.selected.length}
+      disabled={!props.selected || !props.selected.length}
       onClick={() => setShowPopup(true)}>{props.text}</Button>
     {loading && <Spinner />}
     <Popup show={showPopup} classes={styles.modalApprove} onClose={() => setShowPopup(false)}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalContentTitle}>Submit
           for {props.type && props.type === 'pending' ? 'set pending status' : 'approval'}</h2>
-        {props.selected.length < 10 ? <ItemsList /> :
+        {props.selected && props.selected.length < 10 ? <ItemsList /> :
           <p className={styles.modalContentText}>You have selected
-            <span className={styles.modalContentBold}> ({props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
+            <span className={styles.modalContentBold}> ({props.selected && props.selected.length}) {props.mode === "result" ? 'test results' : 'orders'} </span>
             for {props.type && props.type === 'pending' ? 'set pending status' : 'approval'}. Are you sure you want
             to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'}?</p>}
         <div className={`${styles.btnBlock} ${styles.btnBlockPopup}`}>

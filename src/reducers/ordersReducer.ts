@@ -1,11 +1,11 @@
 import {GET_ORDERS_BY_STATUS, GET_ORDERS_ERROR, GET_ORDERS_SUCCESS} from "../actions/ordersActions";
-import {Order} from "../interfaces/Order";
+import {OrdersResponse} from "../interfaces/Order";
 
 export type OrdersState = {
-  pending: Order[], approved: Order[]
+  pending: OrdersResponse | {}, approved: OrdersResponse | {}
 }
 
-const initialState: OrdersState = {pending: [], approved: []};
+const initialState: OrdersState = {pending: {}, approved: {}};
 
 export default (state = initialState, action: any) => {
   switch (action.type) {
