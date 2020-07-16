@@ -1,6 +1,6 @@
 import {User} from "../interfaces/User";
 import {AuthState} from "../interfaces/AuthState";
-import {Order, OrdersResponse} from "../interfaces/Order";
+import {Order, OrdersQuantity, OrdersResponse} from "../interfaces/Order";
 import {Test, TestDetails} from "../interfaces/Test";
 import {OrdersState} from "../reducers/ordersReducer";
 import {TestsState} from "../reducers/testsReducer";
@@ -17,6 +17,8 @@ export const ordersApprovedState = (store: Storage): OrdersResponse => (store.or
 export const testsPendingState = (store: Storage): OrdersResponse => (store.tests.pending);
 export const testsApprovedState = (store: Storage): OrdersResponse => (store.tests.approved);
 export const testsIncompleteState = (store: Storage): OrdersResponse => (store.tests.incomplete);
+
+export const resultsQuantity = (store: Storage): OrdersQuantity => (store.counters);
 
 export const testDetails = (store: Storage): TestDetails => (store.tests.details);
 

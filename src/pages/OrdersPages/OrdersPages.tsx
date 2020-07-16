@@ -40,7 +40,7 @@ const OrdersPage = () => {
         <div className={styles.container}>
           <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>Physician portal</h1>
           <div className={styles.containerFlex}>
-            {width > 858 ? <Navigation /> : <Route path="/orders/navigation" component={MobileNavigation} />}
+            {width > 858 ? <Navigation desktop /> : <Route path="/orders/navigation" component={MobileNavigation} />}
 
             <Route path="/orders" exact>
               <Redirect to="/orders/pending" />

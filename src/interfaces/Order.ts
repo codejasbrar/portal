@@ -57,3 +57,11 @@ export interface OrdersResponse {
   totalElements: number,
   totalPages: number
 }
+
+export interface OrdersQuantity {
+  pendingOrders: number,
+  approvedOrders: number,
+  incompleteResults: number,
+  pendingResults: number,
+  approvedResults: number
+}

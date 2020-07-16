@@ -2,6 +2,7 @@ import LabSlipApiService, {TestStatus} from "../services/LabSlipApiService";
 import {Test, TestDetails} from "../interfaces/Test";
 import {Dispatch} from "react";
 import {catchBlock} from "./ordersActions";
+import {loadCounters} from "./countersActions";
 
 export const GET_TESTS_BY_STATUS = 'GET_TESTS_BY_STATUS';
 export const GET_TESTS_SUCCESS = 'GET_TESTS_SUCCESS';
@@ -33,6 +34,7 @@ export const loadTestsByStatus = (status: TestStatus, page: number) => async (di
 export const saveApprovedResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.saveApprovedResults(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }
@@ -41,6 +43,7 @@ export const saveApprovedResults = (hashes: string[]) => async (dispatch: Dispat
 export const savePendingResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.savePendingResults(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }
