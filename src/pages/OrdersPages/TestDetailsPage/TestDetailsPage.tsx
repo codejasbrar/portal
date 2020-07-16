@@ -8,19 +8,15 @@ import {useDispatch, useSelector} from "react-redux";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Link, useParams} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
-import CommonTableTheme, {detailsTableTheme} from "../../../themes/CommonTableTheme";
+import {detailsTableTheme} from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
-import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
+import {reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-
-
-const getWidth = () => window.innerWidth
-  || document.documentElement.clientWidth
-  || document.body.clientWidth;
+import {useHistory} from "react-router-dom";
 
 const columns = [
   {
@@ -127,12 +123,13 @@ const options: MUIDataTableOptions = {
 } as MUIDataTableOptions;
 
 const TestDetailsPage = () => {
-  let [width, setWidth] = useState(getWidth());
+  const width = useResizeListener();
   const [loading, setLoading] = useState(true);
   const {hash} = useParams();
   const testSelected = useSelector(testDetails);
   const [test, setTest] = useState({} as TestDetails);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
@@ -144,18 +141,11 @@ const TestDetailsPage = () => {
     await dispatch(getResult(hash));
     setLoading(false);
   };
+  console.log(history.action);
 
 
   useEffect(() => {
     loadTest();
-
-    const resizeListener = () => {
-      setWidth(getWidth())
-    };
-    window.addEventListener('resize', resizeListener);
-    return () => {
-      window.removeEventListener('resize', resizeListener);
-    }
   }, []);
 
   const biomarkerFormat = (biomarker: Biomarker) => ({...biomarker, normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'});
@@ -164,10 +154,13 @@ const TestDetailsPage = () => {
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
         <div className={styles.container}>
-          <Link to={'/orders/tests'}
+          {history.action === 'POP' ? <Link to={'/orders/tests'}
             className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-          </Link>
+          </Link> : <button type="button"
+            onClick={() => history.goBack()}
+            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+            Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
           {test &&
           <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
             <section className={styles.adminSection}>

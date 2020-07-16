@@ -24,7 +24,7 @@ export const loadTestsByStatus = (status: TestStatus, page: number) => async (di
   dispatch(loadTestsRequest());
   try {
     const response = await LabSlipApiService.getResultsByStatus(status, page);
-    dispatch(loadTestsSuccess(response.data, status))
+    dispatch(loadTestsSuccess(response, status))
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }

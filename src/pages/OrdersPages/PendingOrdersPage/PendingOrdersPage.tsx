@@ -11,14 +11,14 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
 import {ordersPendingState} from "../../../selectors/selectors";
+import {Test, TestDetails} from "../../../interfaces/Test";
 
-const getWidth = () => window.innerWidth
+export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
@@ -106,7 +106,7 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void)
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
 
-const NoMatches = () => (
+export const NoMatches = () => (
   <div className={styles.sorry}>
     <p className={styles.sorryText}>
       No results found
@@ -114,6 +114,33 @@ const NoMatches = () => (
   </div>
 );
 
+export const reformatDate = (order: Order | Test | TestDetails) => {
+  const dateRecived = new Date(order.received);
+  const dateApproved = order.approved ? new Date(order.approved) : ''
+  return {
+    ...order,
+    received: `${dateRecived.getMonth() + 1}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
+    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
+  }
+};
+
+export const useResizeListener = () => {
+  const [width, setWidth] = useState(getWidth());
+  useEffect(() => {
+    const resizeListener = () => {
+      setWidth(getWidth())
+    };
+    window.addEventListener('resize', resizeListener);
+    return () => {
+      window.removeEventListener('resize', resizeListener);
+    }
+  });
+  return width;
+};
+
+export const itemsToView = (data: OrdersResponse, searchText: string) => data.content ? data.content
+  .map(reformatDate)
+  .filter((item: any) => (String(item.id).indexOf(searchText) !== -1) || (String(item.customerId).indexOf(searchText) !== -1) ? 1 : 0) : [];
 
 const PendingOrdersPage = () => {
   const dispatch = useDispatch();
@@ -122,9 +149,8 @@ const PendingOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
-  const [width, setWidth] = useState(getWidth());
   const [searchItemsCount, setCount] = useState(0);
-
+  const width = useResizeListener();
 
   const onLoad = () => {
     if (orders.content && orders.content.length) {
@@ -153,23 +179,9 @@ const PendingOrdersPage = () => {
 
   useEffect(() => {
     onSaved();
-    const resizeListener = () => {
-      setWidth(getWidth())
-    };
-    window.addEventListener('resize', resizeListener);
-    return () => {
-      window.removeEventListener('resize', resizeListener);
-    }
   }, []);
 
-  const searchFilter = (item: any) =>
-    (String(item.id).indexOf(searchText) !== -1)
-    || (String(item.customerId).indexOf(searchText) !== -1)
-      ? 1 : 0;
-
-  const ordersToView = orders.content ? orders.content
-    .map(reformatDate)
-    .filter(searchFilter) : [];
+  const ordersToView = itemsToView(data, searchText);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
 
@@ -178,7 +190,7 @@ const PendingOrdersPage = () => {
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
-    <h2 className={styles.heading20}>Orders pending approval</h2>
+    <h2 className={styles.heading20}>Pending approval orders</h2>
     {width > 700 ?
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
@@ -196,7 +208,7 @@ const PendingOrdersPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({ordersToView.length} results)</p>
+        <p className={styles.ordersResultsInfo}>({data.totalElements || 0} results)</p>
         <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView

@@ -1,7 +1,7 @@
 import styles from "./OrdersPages.module.scss";
 import Navigation from "../../components/Navigation/Navigation";
 import {Route, Redirect} from "react-router-dom";
-import PendingOrdersPage from "./PendingOrdersPage/PendingOrdersPage";
+import PendingOrdersPage, {getWidth} from "./PendingOrdersPage/PendingOrdersPage";
 import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
 import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
@@ -12,24 +12,9 @@ import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
 import {userState} from "../../selectors/selectors";
 
-const getWidth = () => window.innerWidth
-  || document.documentElement.clientWidth
-  || document.body.clientWidth;
-
 const OrdersPage = () => {
   const user = useSelector(userState);
   const [width, setWidth] = useState(getWidth());
-  const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    (async () => {
-      if (user && Object.keys(user).length) {
-       // user.physician ? await dispatch(loadAllData()) : await dispatch(loadAdminData());
-      }
-    })();
-  }, [user]);
-
 
   useEffect(() => {
     const resizeListener = () => {
@@ -65,7 +50,7 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            {user && user.physician && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
+            {user && !user.physician && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
           </div>
         </div>
       </section>

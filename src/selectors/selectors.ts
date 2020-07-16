@@ -14,13 +14,11 @@ export const testsState = (store: Storage): TestsState => store.tests;
 export const ordersPendingState = (store: Storage): OrdersResponse => (store.orders.pending);
 export const ordersApprovedState = (store: Storage): OrdersResponse => (store.orders.approved);
 
-export const testsPendingState = (store: Storage): Test[] => (store.tests.pending);
-export const testsApprovedState = (store: Storage): Test[] => (store.tests.approved);
-export const testsIncompleteState = (store: Storage): Test[] => (store.tests.incomplete);
+export const testsPendingState = (store: Storage): OrdersResponse => (store.tests.pending);
+export const testsApprovedState = (store: Storage): OrdersResponse => (store.tests.approved);
+export const testsIncompleteState = (store: Storage): OrdersResponse => (store.tests.incomplete);
 
 export const testDetails = (store: Storage): TestDetails => (store.tests.details);
-
-export const loadingDataState = (store: Storage): boolean => (store.tests.loading || store.orders.loading);
 
 export const loggedIn = (store: Storage) => authState(store).loggedIn;
 export const loading = (store: Storage) => authState(store).loading;
