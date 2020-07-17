@@ -3,53 +3,41 @@ import React, {useEffect, useState} from "react";
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {
-  ordersApprovedState,
-  ordersPendingState, testsApprovedState, testsIncompleteState,
-  testsPendingState, userState
-} from "../../selectors/selectors";
+import {useDispatch, useSelector} from "react-redux";
+import {resultsQuantity, userState} from "../../selectors/selectors";
+import {loadCounters} from "../../actions/countersActions";
+import {OrdersQuantity} from "../../interfaces/Order";
 
 const MobileNavigation = () => {
   const user = useSelector(userState);
-  // const ordersPending = useSelector(ordersPendingState);
-  // const ordersApproved = useSelector(ordersApprovedState);
-  // const testsPending = useSelector(testsPendingState);
-  // const testsApproved = useSelector(testsApprovedState);
-  // const testsIncomplete = useSelector(testsIncompleteState);
-  // const [counts, setCounts] = useState({
-  //   op: ordersPending.length,
-  //   oa: ordersApproved.length,
-  //   tp: testsPending.length,
-  //   ta: testsApproved.length,
-  //   ti: testsIncomplete.length
-  // });
+  const quantity = useSelector(resultsQuantity);
+  const [counters, setCounters] = useState({} as OrdersQuantity);
+  const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   setCounts({
-  //     op: ordersPending.length,
-  //     oa: ordersApproved.length,
-  //     tp: testsPending.length,
-  //     ta: testsApproved.length,
-  //     ti: testsIncomplete.length
-  //   });
-  // }, [ordersPending.length, ordersApproved.length, testsPending.length, testsApproved.length, testsIncomplete.length]);
+  useEffect(() => {
+    if (quantity) setCounters(quantity);
+  }, [quantity]);
+
+  useEffect(() => {
+    (async () => {
+      await dispatch(loadCounters());
+    })();
+  }, []);
 
   return <div className={styles.mobileNavigation}>
     <h1 className={styles.heading30}>Physician portal</h1>
-    <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Orders</h2>
     <nav className={styles.navList}>
       <NavLink to={'/orders/pending'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        {/*// <span className={styles.navlinkNumber}>{counts.op ? `(${counts.op})` : ''}</span>*/}
+        <span className={styles.navlinkNumber}>{counters.pendingOrders ? `(${counters.pendingOrders})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/approved'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Approved
-        {/*<span className={styles.navlinkNumber}>{counts.oa ? `(${counts.oa})` : ''}</span>*/}
+        <span className={styles.navlinkNumber}>{counters.approvedOrders ? `(${counters.approvedOrders})` : ''}</span>
       </NavLink>
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
@@ -58,19 +46,19 @@ const MobileNavigation = () => {
         exact={true}
         activeClassName={styles.active}>
         Incomplete
-        {/*<span className={styles.navlinkNumber}>{counts.ti ? `(${counts.ti})` : ''}</span>*/}
+        <span className={styles.navlinkNumber}>{counters.incompleteResults ? `(${counters.incompleteResults})` : ''}</span>
       </NavLink>}
       <NavLink to={'/orders/tests'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Pending approval
-        {/*<span className={styles.navlinkNumber}>{counts.tp ? `(${counts.tp})` : ''}</span>*/}
+        <span className={styles.navlinkNumber}>{counters.pendingResults ? `(${counters.pendingResults})` : ''}</span>
       </NavLink>
       <NavLink to={'/orders/tests-approved'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Approved
-        {/*<span className={styles.navlinkNumber}>{counts.ta ? `(${counts.ta})` : ''}</span>*/}
+        <span className={styles.navlinkNumber}>{counters.approvedResults ? `(${counters.approvedResults})` : ''}</span>
       </NavLink>
     </nav>
   </div>

@@ -1,8 +1,9 @@
 import LabSlipApiService, {OrderStatus} from "../services/LabSlipApiService";
-import {Order} from "../interfaces/Order";
+import {Order, OrdersQuantity} from "../interfaces/Order";
 import {Dispatch} from "react";
 import {logOut, refreshTokenAction} from "./authActions";
 import Token from "../helpers/localToken";
+import {loadCounters} from "./countersActions";
 
 export const GET_ORDERS_BY_STATUS = 'GET_ORDERS_BY_STATUS';
 export const GET_ORDERS_SUCCESS = 'GET_ORDERS_SUCCESS';
@@ -29,6 +30,7 @@ export const loadOrdersByStatus = (status: OrderStatus, page: number) => async (
 export const saveOrders = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.saveApprovedOrders(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }
