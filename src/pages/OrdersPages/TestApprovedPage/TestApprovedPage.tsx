@@ -175,16 +175,16 @@ const TestApprovedPage = () => {
         {testsToView
           .map((item: any, i) => (
             <div key={i} className={styles.mobileOrdersItem}>
-              <p className={styles.mobileOrdersTitle}>Order
-                ID: <span className={styles.mobileOrdersText}><Link className={styles.mobileTestsLink}
+              <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
               <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
               </p>
+              <p className={styles.mobileOrdersTitle}>Order ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
+              </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-              <p className={styles.mobileOrdersTitle}>Criteria
-                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+              <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved}</span></p>
             </div>
           ))}
         <Pagination mobile
