@@ -11,7 +11,7 @@ export const CODE_INCORRECT = 'CODE_INCORRECT';
 export const REFRESH_TOKEN_REQUEST = 'REFRESH_TOKEN_REQUEST';
 export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCEESS';
 export const REFRESH_TOKEN_ERROR = 'REFRESH_TOKEN_ERROR';
-export const CLEAR_TEMP_DATA = Symbol();
+export const CLEAR_TEMP_DATA = 'CLEAR_TEMP_DATA';
 
 export const requestLoginAction = () => ({type: LOGIN_REQUEST});
 export const successLoginAction = (data: IAuth) => ({type: LOGIN_SUCCESS, payload: data});
