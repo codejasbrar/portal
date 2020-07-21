@@ -13,7 +13,12 @@ import {useDispatch, useSelector} from "react-redux";
 import {testsPendingState} from "../../../selectors/selectors";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
-import {NoMatches, reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {
+  customDateColumnRender,
+  NoMatches,
+  reformatDate,
+  useResizeListener
+} from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
@@ -41,7 +46,8 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test) => [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
   {
@@ -191,7 +197,7 @@ const TestsPage = () => {
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
-              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
+              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>

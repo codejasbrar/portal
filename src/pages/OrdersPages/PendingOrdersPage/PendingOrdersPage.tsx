@@ -22,6 +22,15 @@ export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
+export const customDateColumnRender = (value: string, tableMeta?: any, updateValue?: any) => {
+  const date = value.slice(0, value.indexOf('T'));
+  const time = value.slice(value.indexOf('T') + 1, value.length);
+  return <>
+    <div>{date}</div>
+    <div>{time}</div>
+  </>
+};
+
 const columns = [
   {
     name: "id",
@@ -41,7 +50,8 @@ const columns = [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
   {
@@ -115,12 +125,15 @@ export const NoMatches = () => (
 );
 
 export const reformatDate = (order: Order | Test | TestDetails) => {
-  const dateRecived = new Date(order.received);
-  const dateApproved = order.approved ? new Date(order.approved) : ''
+  const offsetHours = new Date().getTimezoneOffset() / 60;
+  const dateReceived = new Date(order.received);
+  const dateApproved = order.approved ? new Date(order.approved) : '';
+  dateReceived.setHours(dateReceived.getHours() - offsetHours);
+  if (dateApproved) dateApproved.setHours(dateApproved.getHours() - offsetHours);
   return {
     ...order,
-    received: `${dateRecived.getMonth() + 1}/${dateRecived.getDate()}/${dateRecived.getFullYear()}`,
-    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}` : ''
+    received: `${dateReceived.getMonth() + 1}/${dateReceived.getDate()}/${dateReceived.getFullYear()}T${dateReceived.toLocaleTimeString('en-US')}`,
+    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}T${dateApproved.toLocaleTimeString('en-US')}` : ''
   }
 };
 
@@ -216,7 +229,7 @@ const PendingOrdersPage = () => {
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Order
                 ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
-              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
+              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>

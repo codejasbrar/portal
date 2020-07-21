@@ -134,7 +134,7 @@ const TestIncompletePage = () => {
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}>{item.id}</Link></span></p>
-              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
+              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>

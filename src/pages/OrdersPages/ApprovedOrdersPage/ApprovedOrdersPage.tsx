@@ -14,6 +14,7 @@ import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
+  customDateColumnRender,
   getWidth,
   itemsToView,
   NoMatches,
@@ -40,7 +41,8 @@ const columns = [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
   {
@@ -61,7 +63,8 @@ const columns = [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
 ];
@@ -172,11 +175,14 @@ const ApprovedOrdersPage = () => {
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Order
                 ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
-              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
+              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-              <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved}</span></p>
+              <p className={styles.mobileOrdersTitle}>Criteria
+                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+              <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
+              </p>
             </div>
           ))}
         <Pagination mobile
