@@ -10,7 +10,7 @@ import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
 import {useDispatch, useSelector} from "react-redux";
 import {authState, loading} from "../../../selectors/selectors";
-import {logIn} from "../../../actions/authActions";
+import {clearTempDataAction, logIn} from "../../../actions/authActions";
 import Spinner from "../../../components/Spinner/Spinner";
 
 const Verification = () => {
@@ -30,6 +30,10 @@ const Verification = () => {
     if (!auth.tempData) {
       history.replace("/authentication")
     }
+
+    return () => {
+      dispatch(clearTempDataAction());
+    };
   }, []);
 
   useEffect(() => {

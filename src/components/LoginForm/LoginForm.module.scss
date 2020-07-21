@@ -85,6 +85,10 @@
             &:hover {
                 text-decoration: underline;
             }
+
+            &:visited {
+                color: $primary;
+            }
         }
     }
 }

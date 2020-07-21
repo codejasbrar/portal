@@ -11,6 +11,7 @@ export const CODE_INCORRECT = 'CODE_INCORRECT';
 export const REFRESH_TOKEN_REQUEST = 'REFRESH_TOKEN_REQUEST';
 export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCEESS';
 export const REFRESH_TOKEN_ERROR = 'REFRESH_TOKEN_ERROR';
+export const CLEAR_TEMP_DATA = Symbol();
 
 export const requestLoginAction = () => ({type: LOGIN_REQUEST});
 export const successLoginAction = (data: IAuth) => ({type: LOGIN_SUCCESS, payload: data});
@@ -20,6 +21,8 @@ export const codeRequiredAction = (data: IAuth) => ({type: CODE_REQUIRED, payloa
 export const codeIncorrectAction = (error: Error) => ({type: CODE_INCORRECT, payload: error});
 
 export const logoutAction = () => ({type: LOGOUT});
+
+export const clearTempDataAction = () => ({type: CLEAR_TEMP_DATA});
 
 export const refreshTokenRequest = () => ({type: REFRESH_TOKEN_REQUEST});
 export const refreshTokenSuccess = (data: IAuth) => ({type: REFRESH_TOKEN_SUCCESS, payload: data});
