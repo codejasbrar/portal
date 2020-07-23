@@ -141,6 +141,7 @@ const TestDetailsPage = () => {
     await dispatch(getResult(hash));
     setLoading(false);
   };
+  console.log(history.action);
 
 
   useEffect(() => {
@@ -170,12 +171,12 @@ const TestDetailsPage = () => {
             <section className={styles.adminSection}>
               <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
 
-            <aside className={styles.testInfo}>
-              <p className={styles.testInfoString}>
-                <span className={styles.testInfoBold}>Received: </span>
-                {test.received}
-              </p>
-              <p className={styles.testInfoString}>
+              <aside className={styles.testInfo}>
+                <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Received: </span>
+                  {test.received?.replace('T', ' ')}
+                </p>
+                <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Order ID: </span>
                   {test.order?.id}
                 </p>
@@ -195,6 +196,10 @@ const TestDetailsPage = () => {
                   <span className={styles.testInfoBold}>Status: </span>
                   {test.status}
                 </p>
+                {test.approved && <p className={styles.testInfoString}>
+                  <span className={styles.testInfoBold}>Approved: </span>
+                  {test.approved?.replace('T', ' ')}
+                </p>}
                 {!test.approved && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
                   text={"Approve results"}
                   selected={[{

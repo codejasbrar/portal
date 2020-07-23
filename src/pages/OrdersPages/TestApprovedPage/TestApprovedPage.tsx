@@ -9,7 +9,12 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {useDispatch, useSelector} from "react-redux";
 import {testsApprovedState} from "../../../selectors/selectors";
-import {NoMatches, reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {
+  customDateColumnRender,
+  NoMatches,
+  reformatDate,
+  useResizeListener
+} from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import {OrdersResponse} from "../../../interfaces/Order";
 import {loadTestsByStatus} from "../../../actions/testsActions";
@@ -44,7 +49,8 @@ const columns = (onClickLink: (id: number) => Test) => [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
   {
@@ -73,7 +79,8 @@ const columns = (onClickLink: (id: number) => Test) => [
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
             onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
 ];
@@ -178,13 +185,16 @@ const TestApprovedPage = () => {
               <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
-              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received}</span>
+              <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Order ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-              <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved}</span></p>
+              <p className={styles.mobileOrdersTitle}>Criteria
+                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
+              <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
+              </p>
             </div>
           ))}
         <Pagination mobile
