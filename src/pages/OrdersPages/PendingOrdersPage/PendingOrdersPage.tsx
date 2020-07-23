@@ -132,8 +132,8 @@ export const reformatDate = (order: Order | Test | TestDetails) => {
   if (dateApproved) dateApproved.setHours(dateApproved.getHours() - offsetHours);
   return {
     ...order,
-    received: `${dateReceived.getMonth() + 1}/${dateReceived.getDate()}/${dateReceived.getFullYear()}T${dateReceived.toLocaleTimeString('en-US')}`,
-    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}T${dateApproved.toLocaleTimeString('en-US')}` : ''
+    received: `${dateReceived.getMonth() + 1}/${dateReceived.getDate()}/${dateReceived.getFullYear()}T${dateReceived.toLocaleTimeString()}`,
+    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}T${dateApproved.toLocaleTimeString()}` : ''
   }
 };
 
