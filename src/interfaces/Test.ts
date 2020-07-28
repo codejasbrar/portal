@@ -16,7 +16,7 @@ export interface Biomarker {
   value: number,
   minPanicValue: number,
   maxPanicValue: number,
-  units: string
+  units: string,
 }
 
 export interface TestDetails {

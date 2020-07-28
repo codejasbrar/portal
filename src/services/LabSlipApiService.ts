@@ -5,8 +5,10 @@ export type OrderStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECT
 
 export type TestStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED" | "INCOMPLETE";
 
+export type SortDirection = 'asc' | 'desc';
+
 export default class LabSlipApiService {
-  static getOrdersByStatus = async (status: OrderStatus, page: number) => await client.get(`/getOrdersByStatus/${status}?page=${page}&size=25`, {
+  static getOrdersByStatus = async (status: OrderStatus, page: number, sortParam?: string, sortDirection?: SortDirection) => await client.get(`/getOrdersByStatus/${status}?page=${page}&size=25&sort=${sortParam || 'received'},${sortDirection || 'desc'}`, {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }
@@ -30,7 +32,7 @@ export default class LabSlipApiService {
     }
   });
 
-  static getResultsByStatus = async (status: TestStatus, page: number) => await client.get(`/getResultsByStatus/${status}?page=${page}&size=25`, {
+  static getResultsByStatus = async (status: TestStatus, page: number, sortParam?: string, sortDirection?: SortDirection) => await client.get(`/getResultsByStatus/${status}?page=${page}&size=25&sort=${sortParam || 'received'},${sortDirection || 'desc'}`, {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }
