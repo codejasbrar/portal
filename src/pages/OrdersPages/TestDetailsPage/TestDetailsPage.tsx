@@ -117,20 +117,22 @@ const TestDetailsPage = () => {
   const [test, setTest] = useState({} as TestDetails);
   const dispatch = useDispatch();
   const history = useHistory();
-  const [commentLength, setCommentLength] = useState(0);
-  const commentArea = useRef() as RefObject<HTMLTextAreaElement>;
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
   }, [testSelected]);
 
   const addComment = async () => {
-    if (commentArea.current && commentArea.current.value.length) {
-      await LabSlipApiService.saveMessage(hash, commentArea.current.value);
-      commentArea.current.value = '';
-      setCommentLength(0);
+    if (comment.length && comment.trim().length > 0) {
+      await LabSlipApiService.saveMessage(hash, comment);
+      setComment('');
       await loadTest();
     }
+  };
+
+  const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
   };
 
   const loadTest = async () => {
@@ -216,13 +218,14 @@ const TestDetailsPage = () => {
 
               <div className={styles.comment}>
                 <label className={styles.commentLabel}>
-                  <textarea maxLength={255}
-                    onChange={(e) => setCommentLength(e.target.value.length)}
-                    ref={commentArea}
+                  <textarea
+                    value={comment}
+                    maxLength={255}
+                    onChange={onChangeComment}
                     className={styles.commentField}
                     name="comment field"
-                    placeholder={'Add your comment here'}></textarea>
-                  <span className={styles.commentCounter}>{commentLength}/255</span>
+                    placeholder={'Add your comment here'} />
+                  <span className={styles.commentCounter}>{comment.length}/255</span>
                 </label>
                 <div className={styles.commentBtnWrapper}>
                   <button onClick={addComment} className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
