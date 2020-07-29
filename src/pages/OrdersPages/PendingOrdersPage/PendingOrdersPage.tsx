@@ -17,6 +17,7 @@ import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
 import {ordersPendingState} from "../../../selectors/selectors";
 import {Test, TestDetails} from "../../../interfaces/Test";
+import {SortDirection} from "../../../services/LabSlipApiService";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -31,7 +32,7 @@ export const customDateColumnRender = (value: string, tableMeta?: any, updateVal
   </>
 };
 
-const columns = [
+const columns = (onSort: () => void) => [
   {
     name: "id",
     label: "Order ID",
@@ -46,11 +47,12 @@ const columns = [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
+        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+            onClick={() => onSort()}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>
+      },
       customBodyRender: customDateColumnRender
     }
   },
@@ -92,19 +94,6 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void)
     body: {
       noMatch: "No results found",
     }
-  },
-  customSort(items: any, index: number, isDesc: string) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
   },
   customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
@@ -163,6 +152,7 @@ const PendingOrdersPage = () => {
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [searchItemsCount, setCount] = useState(0);
+  const [receivedSortDirection, setReceivedSortDirection] = useState('desc' as SortDirection);
   const width = useResizeListener();
 
   const onLoad = () => {
@@ -182,12 +172,18 @@ const PendingOrdersPage = () => {
 
   useEffect(() => {
     if (orders.content && orders.content.length) onSaved();
-  }, [page]);
+  }, [page, receivedSortDirection]);
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadOrdersByStatus('PENDING', page));
+    console.log(receivedSortDirection);
+    await dispatch(loadOrdersByStatus('PENDING', page, 'received', receivedSortDirection));
     setLoading(false);
+  };
+
+  const onSort = () => {
+    setReceivedSortDirection(receivedSortDirection === 'desc' ? 'asc' : 'desc');
+    setPage(0);
   };
 
   useEffect(() => {
@@ -209,7 +205,7 @@ const PendingOrdersPage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={columns}
+          columns={columns(onSort)}
           options={options(onSelect, onSaved, setCount)}
         />
         <Pagination page={page}

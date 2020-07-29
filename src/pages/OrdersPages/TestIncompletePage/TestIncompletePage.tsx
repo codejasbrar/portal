@@ -16,6 +16,7 @@ import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {itemsToView, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
+import {SortDirection} from "../../../services/LabSlipApiService";
 
 const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
   filterType: 'checkbox',
@@ -35,19 +36,6 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
       noMatch: "No results found",
     }
   },
-  customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
-  },
   customFooter: (rowCount) => setCount(rowCount),
   customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
     text={"Approve results"}
@@ -65,6 +53,7 @@ const TestIncompletePage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
+  const [sortDirection, setSortDirection] = useState('desc' as SortDirection);
   const tests = useSelector(testsIncompleteState);
 
   useEffect(() => {
@@ -80,7 +69,7 @@ const TestIncompletePage = () => {
 
   useEffect(() => {
     if (tests.content && tests.content.length) onSaved();
-  }, [page]);
+  }, [page, sortDirection]);
 
   useEffect(() => {
     onSaved();
@@ -88,9 +77,15 @@ const TestIncompletePage = () => {
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadTestsByStatus('INCOMPLETE', page));
+    await dispatch(loadTestsByStatus('INCOMPLETE', page, 'received', sortDirection));
     setLoading(false);
   };
+
+  const onSort = () => {
+    setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    setPage(0);
+  };
+
 
   const testsToView = itemsToView(data, searchText);
 
@@ -109,7 +104,7 @@ const TestIncompletePage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={testsNotApprovedColumns(onClickLink)}
+          columns={testsNotApprovedColumns(onClickLink, onSort)}
           options={options(onSelect, onSaved, setCount)}
         />
         <Pagination page={page}

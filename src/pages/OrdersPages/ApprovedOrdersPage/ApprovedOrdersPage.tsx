@@ -22,7 +22,7 @@ import {
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
-const columns = [
+const columns = (onSort: (sortParam: 'received' | 'approved') => void) => [
   {
     name: "id",
     label: "Order ID",
@@ -37,10 +37,10 @@ const columns = [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>,
       customBodyRender: customDateColumnRender
     }
@@ -59,10 +59,10 @@ const columns = [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort('approved')}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>,
       customBodyRender: customDateColumnRender
     }
@@ -89,19 +89,6 @@ const options = (onSearch: (count: number) => void) => ({
       noMatch: "No results found",
     }
   },
-  customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
-  },
   customToolbarSelect: () => <></>,
   customSearchRender: SearchBar,
   customToolbar: () => <></>,
@@ -115,6 +102,8 @@ const ApprovedOrdersPage = () => {
   const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
   const [page, setPage] = useState(0);
+  const [sortDirections, setSortDirections] = useState({'received': 'desc', 'approved': 'asc'} as any);
+  const [currentSortParam, setSortParam] = useState('received');
   const orders = useSelector(ordersApprovedState);
 
   useEffect(() => {
@@ -130,12 +119,22 @@ const ApprovedOrdersPage = () => {
 
   useEffect(() => {
     if (orders.content && orders.content.length) onSaved();
-  }, [page]);
+  }, [page, sortDirections.received, sortDirections.approved]);
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadOrdersByStatus('APPROVED', page));
+    await dispatch(loadOrdersByStatus('APPROVED', page, currentSortParam, sortDirections[currentSortParam]));
     setLoading(false);
+  };
+
+  const onSort = (sortParam: 'received' | 'approved') => {
+    if (sortParam !== currentSortParam) setSortParam(sortParam);
+    if (sortParam === 'received') {
+      setSortDirections({...sortDirections, received: sortDirections.received === 'desc' ? 'asc' : 'desc'})
+    } else if (sortParam === 'approved') {
+      setSortDirections({...sortDirections, approved: sortDirections.approved === 'desc' ? 'asc' : 'desc'})
+    }
+    setPage(0);
   };
 
   useEffect(() => {
@@ -156,7 +155,7 @@ const ApprovedOrdersPage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={columns}
+          columns={columns(onSort)}
           options={options(setCount)}
         />
         <Pagination page={page}

@@ -18,6 +18,11 @@ import {Biomarker, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
 
+interface BiomarkerDetails extends Biomarker {
+  normalRange: string,
+  panic: boolean | 0
+}
+
 const columns = [
   {
     name: "name",
@@ -34,31 +39,10 @@ const columns = [
       filter: true,
       sort: true,
 
-/*original*/
-      // customBodyRender: (value: any, tableMeta: any) => {
-      //   const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-      //   const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
-      //   return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
-      // },
-
-/*new option*/
       customBodyRender: (value: any, tableMeta: any) => {
-        const markersRange = tableMeta.rowData[2] === 'N/A' ? null : tableMeta.rowData[2].split(' - ');
-        const panic = markersRange ? value < parseInt(markersRange[0]) || value > parseInt(markersRange[1]) : false;
-        const dotItem = markersRange == null ? value : value && <span className={styles.dot} />;
-
-        return (
-          <span className={styles.dotWrapper}>
-              {dotItem && panic ? (
-                <>
-                  {value}
-                  <span className={styles.dot} />
-                </>
-              ) : (
-                <>{value}</>
-              )}
-            </span>
-        );
+        const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
+        const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
+        return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
       },
 
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
@@ -107,20 +91,13 @@ const options: MUIDataTableOptions = {
     }
   },
   customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
+    return items.sort(sortByName).sort(sortByPanic)
   },
 
 } as MUIDataTableOptions;
+
+const sortByName = (a: BiomarkerDetails, b: BiomarkerDetails) => a.name > b.name ? 1 : -1;
+const sortByPanic = (a: BiomarkerDetails, b: BiomarkerDetails) => a.panic ? -1 : 0;
 
 const TestDetailsPage = () => {
   const width = useResizeListener();
@@ -141,7 +118,6 @@ const TestDetailsPage = () => {
     await dispatch(getResult(hash));
     setLoading(false);
   };
-  console.log(history.action);
 
 
   useEffect(() => {
@@ -152,18 +128,21 @@ const TestDetailsPage = () => {
 
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
-    normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A'
+    normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
+  // @ts-ignore
+  window.testArr = test.biomarkers;
 
   return <>
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
-        <div className={styles.container}>
-          {history.action === 'POP' ? <Link to={'/orders/tests'}
-            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
-            Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-          </Link> : <button type="button"
-            onClick={() => history.goBack()}
+      <div className={styles.container}>
+        {history.action === 'POP' ? <Link to={'/orders/tests'}
+          className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+          Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
+        </Link> : <button type="button"
+          onClick={() => history.goBack()}
             className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
           {test.order &&
@@ -256,7 +235,7 @@ const TestDetailsPage = () => {
                 <MuiThemeProvider theme={detailsTableTheme()}>
                   <MUIDataTable
                     title={''}
-                    data={test.biomarkers?.map(biomarkerFormat)}
+                    data={test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic)}
                     columns={columns}
                     options={options}
                   />
@@ -264,14 +243,17 @@ const TestDetailsPage = () => {
                 :
                 <div className={styles.mobileOrders}>
                   <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                  {test.biomarkers?.map(biomarkerFormat).map(biomarker =>
+                  {test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic).map(biomarker =>
                     <div key={biomarker.id} className={styles.mobileOrdersItem}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.name}</span></p>
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
-                        <span className={styles.mobileOrdersText}>{biomarker.value}</span>
+                        <span className={styles.dotWrapper}>
+                          <span className={styles.mobileOrdersText}>{biomarker.value}</span>
+                          {biomarker.panic && <span className={styles.dot} />}
+                        </span>
                       </p>
-                       {/*delete hide-class if Normal Range string is needed*/}
+                      {/*delete hide-class if Normal Range string is needed*/}
                       <p className={`${styles.mobileOrdersTitle} ${styles.hide}`}>Normal range:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.normalRange}</span>
                       </p>
