@@ -22,8 +22,9 @@ import {
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
+import {SortDirection} from "../../../services/LabSlipApiService";
 
-export const testsNotApprovedColumns = (onClickLink: (id: number) => Test) => [
+export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSort: () => void) => [
   {
     name: "id",
     label: "Test result ID",
@@ -42,10 +43,10 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort()}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>,
       customBodyRender: customDateColumnRender
     }
@@ -98,19 +99,6 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
       noMatch: "No results found",
     }
   },
-  customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
-  },
   customFooter: (rowCount) => setCount(rowCount),
   customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
@@ -129,6 +117,7 @@ const TestsPage = () => {
   const width = useResizeListener();
   const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
+  const [sortDirection, setSortDirection] = useState('desc' as SortDirection);
   const dispatch = useDispatch();
   const tests = useSelector(testsPendingState);
 
@@ -138,7 +127,7 @@ const TestsPage = () => {
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadTestsByStatus('PENDING', page));
+    await dispatch(loadTestsByStatus('PENDING', page, 'received', sortDirection));
     setLoading(false);
   };
 
@@ -155,8 +144,12 @@ const TestsPage = () => {
 
   useEffect(() => {
     if (tests.content && tests.content.length) onSaved();
-  }, [page]);
+  }, [page, sortDirection]);
 
+  const onSort = () => {
+    setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    setPage(0);
+  };
 
   const testsToView = itemsToView(data, searchText);
 
@@ -175,7 +168,7 @@ const TestsPage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={testsNotApprovedColumns(onClickLink)}
+          columns={testsNotApprovedColumns(onClickLink, onSort)}
           options={options(onSelect, onSaved, setCount)}
         />
         <Pagination page={page}

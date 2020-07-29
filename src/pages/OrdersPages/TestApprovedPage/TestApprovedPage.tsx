@@ -21,9 +21,10 @@ import {loadTestsByStatus} from "../../../actions/testsActions";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
+import {SortDirection} from "../../../services/LabSlipApiService";
 
 
-const columns = (onClickLink: (id: number) => Test) => [
+const columns = (onClickLink: (id: number) => Test, onSort: (sortParam: 'received' | 'approved') => void) => [
   {
     name: "id",
     label: "Test result ID",
@@ -45,10 +46,10 @@ const columns = (onClickLink: (id: number) => Test) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>,
       customBodyRender: customDateColumnRender
     }
@@ -75,10 +76,10 @@ const columns = (onClickLink: (id: number) => Test) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort('approved')}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>,
       customBodyRender: customDateColumnRender
     }
@@ -103,19 +104,6 @@ const options = (onSearch: (count: number) => void) => ({
       noMatch: "No results found",
     }
   },
-  customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
-  },
   customFooter: (rowCount) => onSearch(rowCount),
   customToolbarSelect: () => <></>,
   customSearchRender: SearchBar,
@@ -130,6 +118,8 @@ const TestApprovedPage = () => {
   const width = useResizeListener();
   const tests = useSelector(testsApprovedState);
   const [searchItemsCount, setCount] = useState(0);
+  const [sortDirections, setSortDirections] = useState({'received': 'desc', 'approved': 'asc'} as any);
+  const [currentSortParam, setSortParam] = useState('received');
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -138,17 +128,28 @@ const TestApprovedPage = () => {
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadTestsByStatus('APPROVED', page));
+    await dispatch(loadTestsByStatus('APPROVED', page, currentSortParam, sortDirections[currentSortParam]));
     setLoading(false);
   };
 
   useEffect(() => {
     if (tests && tests.content && tests.content.length) onSaved();
-  }, [page]);
+  }, [page, sortDirections.received, sortDirections.approved]);
 
   useEffect(() => {
     onSaved();
   }, []);
+
+  const onSort = (sortParam: 'received' | 'approved') => {
+    console.log('1');
+    if (sortParam !== currentSortParam) setSortParam(sortParam);
+    if (sortParam === 'received') {
+      setSortDirections({...sortDirections, received: sortDirections.received === 'desc' ? 'asc' : 'desc'})
+    } else if (sortParam === 'approved') {
+      setSortDirections({...sortDirections, approved: sortDirections.approved === 'desc' ? 'asc' : 'desc'})
+    }
+    setPage(0);
+  };
 
   const testsToView = itemsToView(data, searchText);
 
@@ -165,7 +166,7 @@ const TestApprovedPage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={columns(onClickLink)}
+          columns={columns(onClickLink, onSort)}
           options={options(setCount)}
         />
         <Pagination page={page}
