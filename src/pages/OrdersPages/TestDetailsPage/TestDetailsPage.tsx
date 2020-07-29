@@ -128,6 +128,7 @@ const TestDetailsPage = () => {
     if (commentArea.current && commentArea.current.value.length) {
       await LabSlipApiService.saveMessage(hash, commentArea.current.value);
       commentArea.current.value = '';
+      setCommentLength(0);
       await loadTest();
     }
   };
