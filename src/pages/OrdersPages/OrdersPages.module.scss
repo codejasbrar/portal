@@ -429,6 +429,18 @@
     textarea:-ms-input-placeholder {
         color: $gray6;
     }
+
+    &Label {
+        position: relative;
+    }
+
+    &Counter {
+        position:  absolute;
+        right:     0;
+        bottom:    0;
+        font-size: 12px;
+        color:     $gray4;
+    }
 }
 
 .dot {

@@ -14,9 +14,10 @@ import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from 
 import {testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
 import {reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
-import {Biomarker, TestDetails} from "../../../interfaces/Test";
+import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
+import LabSlipApiService from "../../../services/LabSlipApiService";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -99,6 +100,15 @@ const options: MUIDataTableOptions = {
 const sortByName = (a: BiomarkerDetails, b: BiomarkerDetails) => a.name > b.name ? 1 : -1;
 const sortByPanic = (a: BiomarkerDetails, b: BiomarkerDetails) => a.panic ? -1 : 0;
 
+const commentSentDateFormat = (dateString: string) => {
+  const offsetHours = new Date().getTimezoneOffset() / 60;
+  const sentDate = new Date(dateString);
+  sentDate.setHours(sentDate.getHours() - offsetHours);
+  return `${sentDate.getMonth() + 1}/${sentDate.getDate()}/${sentDate.getFullYear()} ${sentDate.toLocaleTimeString()}`
+};
+
+const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) > new Date(b.sent) ? -1 : 1;
+
 const TestDetailsPage = () => {
   const width = useResizeListener();
   const [loading, setLoading] = useState(true);
@@ -107,11 +117,20 @@ const TestDetailsPage = () => {
   const [test, setTest] = useState({} as TestDetails);
   const dispatch = useDispatch();
   const history = useHistory();
+  const [commentLength, setCommentLength] = useState(0);
+  const commentArea = useRef() as RefObject<HTMLTextAreaElement>;
 
   useEffect(() => {
     if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
   }, [testSelected]);
 
+  const addComment = async () => {
+    if (commentArea.current && commentArea.current.value.length) {
+      await LabSlipApiService.saveMessage(hash, commentArea.current.value);
+      commentArea.current.value = '';
+      await loadTest();
+    }
+  };
 
   const loadTest = async () => {
     setLoading(true);
@@ -131,8 +150,6 @@ const TestDetailsPage = () => {
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
     panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
-  // @ts-ignore
-  window.testArr = test.biomarkers;
 
   return <>
     {loading && <Spinner />}
@@ -197,35 +214,29 @@ const TestDetailsPage = () => {
               </aside>
 
               <div className={styles.comment}>
-                <label>
-                  <textarea className={styles.commentField}
+                <label className={styles.commentLabel}>
+                  <textarea maxLength={255}
+                    onChange={(e) => setCommentLength(e.target.value.length)}
+                    ref={commentArea}
+                    className={styles.commentField}
                     name="comment field"
                     placeholder={'Add your comment here'}></textarea>
+                  <span className={styles.commentCounter}>{commentLength}/255</span>
                 </label>
                 <div className={styles.commentBtnWrapper}>
-                  <button className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
+                  <button onClick={addComment} className={`${styles.btnPrimary} ${styles.commentBtn} `}>Add</button>
                 </div>
               </div>
 
               <div className={styles.commentList}>
-                <div className={styles.commentItem}>
-                  <h4 className={styles.commentItemAuthor}>Dr Edward Armstrong</h4>
-                  <span className={styles.commentItemDate}>4/23/2020 1:31PM</span>
+                {test.testResultComments.sort(sortCommentsByDate).map((comment) => <div key={comment.id + comment.sent}
+                  className={styles.commentItem}>
+                  <h4 className={styles.commentItemAuthor}>{comment.user.physician ? `${comment.user.physician.prefix} ${comment.user.physician.firstName} ${comment.user.physician.secondName}` : comment.user.email}</h4>
+                  <span className={styles.commentItemDate}>{commentSentDateFormat(comment.sent)}</span>
                   <p className={styles.commentItemText}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                    et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea consequat.
+                    {comment.message}
                   </p>
-                </div>
-                <div className={styles.commentItem}>
-                  <h4 className={styles.commentItemAuthor}>Vicky Zhao-Silvestro</h4>
-                  <span className={styles.commentItemDate}>4/22/2020 9:12AM</span>
-                  <p className={styles.commentItemText}>
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                    pariatur nostrud incididunt exercitation.
-                  </p>
-                </div>
+                </div>)}
               </div>
 
             </section>
