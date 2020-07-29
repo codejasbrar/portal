@@ -49,5 +49,11 @@ export default class LabSlipApiService {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
     }
-  })
+  });
+
+  static saveMessage = async (hash: string, message: string) => await client.post(`/saveComment/${hash}`, {message}, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  });
 }
