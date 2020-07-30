@@ -192,8 +192,6 @@ const TestApprovedPage = () => {
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
-              <p className={styles.mobileOrdersTitle}>Criteria
-                met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
               <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
               </p>
             </div>
