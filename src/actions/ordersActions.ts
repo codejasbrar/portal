@@ -1,9 +1,9 @@
 import LabSlipApiService, {OrderStatus} from "../services/LabSlipApiService";
-import {Order} from "../interfaces/Order";
+import {Order, OrdersQuantity} from "../interfaces/Order";
 import {Dispatch} from "react";
 import {logOut, refreshTokenAction} from "./authActions";
 import Token from "../helpers/localToken";
-import {loadTestsRequest, loadTestsSuccess} from "./testsActions";
+import {loadCounters} from "./countersActions";
 
 export const GET_ORDERS_BY_STATUS = 'GET_ORDERS_BY_STATUS';
 export const GET_ORDERS_SUCCESS = 'GET_ORDERS_SUCCESS';
@@ -17,50 +17,20 @@ export const loadOrdersSuccess = (orders: Order[], status: OrderStatus) => ({
 });
 export const loadOrdersError = () => ({type: GET_ORDERS_ERROR});
 
-export const loadOrdersByStatus = (status: OrderStatus) => async (dispatch: Dispatch<object>): Promise<any> => {
+export const loadOrdersByStatus = (status: OrderStatus, page: number, sortParam?: string, sortDirection?: 'asc' | 'desc') => async (dispatch: Dispatch<object>): Promise<any> => {
   dispatch(loadOrdersRequest());
   try {
-    const response = await LabSlipApiService.getOrdersByStatus(status);
-    dispatch(loadOrdersSuccess(response.data, status))
+    const response = await LabSlipApiService.getOrdersByStatus(status, page, sortParam || '', sortDirection || 'desc');
+    dispatch(loadOrdersSuccess(response, status))
   } catch (exception) {
     await catchBlock(exception, dispatch);
-  }
-};
-
-export const loadAllData = () => async (dispatch: Dispatch<object>): Promise<any> => {
-  dispatch(loadOrdersRequest());
-  dispatch(loadTestsRequest());
-  try {
-    await Promise.all([
-      LabSlipApiService.getOrdersByStatus('PENDING').then(response => dispatch(loadOrdersSuccess(response.data, 'PENDING'))),
-      LabSlipApiService.getOrdersByStatus('APPROVED').then(response => dispatch(loadOrdersSuccess(response.data, "APPROVED"))),
-      LabSlipApiService.getResultsByStatus('PENDING').then(response => dispatch(loadTestsSuccess(response.data, "PENDING"))),
-      LabSlipApiService.getResultsByStatus('APPROVED').then(response => dispatch(loadTestsSuccess(response.data, "APPROVED"))),
-    ]);
-  } catch (exception) {
-    await catchBlock(exception, dispatch)
-  }
-};
-
-export const loadAdminData = () => async (dispatch: Dispatch<object>): Promise<any> => {
-  dispatch(loadOrdersRequest());
-  dispatch(loadTestsRequest());
-  try {
-    await Promise.all([
-      LabSlipApiService.getOrdersByStatus('PENDING').then(response => dispatch(loadOrdersSuccess(response.data, 'PENDING'))),
-      LabSlipApiService.getOrdersByStatus('APPROVED').then(response => dispatch(loadOrdersSuccess(response.data, "APPROVED"))),
-      LabSlipApiService.getResultsByStatus('PENDING').then(response => dispatch(loadTestsSuccess(response.data, "PENDING"))),
-      LabSlipApiService.getResultsByStatus('APPROVED').then(response => dispatch(loadTestsSuccess(response.data, "APPROVED"))),
-      LabSlipApiService.getResultsByStatus('INCOMPLETE').then(response => dispatch(loadTestsSuccess(response.data, "INCOMPLETE"))),
-    ]);
-  } catch (exception) {
-    await catchBlock(exception, dispatch)
   }
 };
 
 export const saveOrders = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.saveApprovedOrders(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }

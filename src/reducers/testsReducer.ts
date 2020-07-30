@@ -5,10 +5,15 @@ import {Order} from "../interfaces/Order";
 
 export interface TestsState extends OrdersState {
   details: TestDetails | null,
-  incomplete: Order[]
+  incomplete: OrdersState | {}
 }
 
-const initialState: TestsState = {pending: [], approved: [], details: null, incomplete: []};
+const initialState: TestsState = {
+  pending: {},
+  approved: {},
+  details: null,
+  incomplete: {}
+};
 
 export default (state: TestsState = initialState, action: any) => {
   switch (action.type) {

@@ -2,6 +2,7 @@ import LabSlipApiService, {TestStatus} from "../services/LabSlipApiService";
 import {Test, TestDetails} from "../interfaces/Test";
 import {Dispatch} from "react";
 import {catchBlock} from "./ordersActions";
+import {loadCounters} from "./countersActions";
 
 export const GET_TESTS_BY_STATUS = 'GET_TESTS_BY_STATUS';
 export const GET_TESTS_SUCCESS = 'GET_TESTS_SUCCESS';
@@ -20,11 +21,11 @@ export const loadTestsSuccess = (tests: Test[], status: TestStatus) => ({
 export const getTestRequest = () => ({type: GET_TEST_REQUEST});
 export const getTestSuccess = (test: TestDetails) => ({type: GET_TEST_SUCCESS, payload: test});
 
-export const loadTestsByStatus = (status: TestStatus) => async (dispatch: Dispatch<object>): Promise<any> => {
+export const loadTestsByStatus = (status: TestStatus, page: number, sortParam?: string, sortDirection?: 'asc' | 'desc') => async (dispatch: Dispatch<object>): Promise<any> => {
   dispatch(loadTestsRequest());
   try {
-    const response = await LabSlipApiService.getResultsByStatus(status);
-    dispatch(loadTestsSuccess(response.data, status))
+    const response = await LabSlipApiService.getResultsByStatus(status, page, sortParam || '', sortDirection || 'desc');
+    dispatch(loadTestsSuccess(response, status))
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }
@@ -33,6 +34,7 @@ export const loadTestsByStatus = (status: TestStatus) => async (dispatch: Dispat
 export const saveApprovedResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.saveApprovedResults(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }
@@ -41,6 +43,7 @@ export const saveApprovedResults = (hashes: string[]) => async (dispatch: Dispat
 export const savePendingResults = (hashes: string[]) => async (dispatch: Dispatch<object>): Promise<any> => {
   try {
     await LabSlipApiService.savePendingResults(hashes);
+    await dispatch(loadCounters());
   } catch (exception) {
     await catchBlock(exception, dispatch);
   }

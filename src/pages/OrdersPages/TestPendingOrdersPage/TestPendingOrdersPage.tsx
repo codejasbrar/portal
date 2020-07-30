@@ -5,7 +5,6 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
-import CommonPagination from "../../../components/Table/Navigation/CommonPagination";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
@@ -13,14 +12,19 @@ import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useDispatch, useSelector} from "react-redux";
 import {testsPendingState} from "../../../selectors/selectors";
 import {loadTestsByStatus} from "../../../actions/testsActions";
-import {Order} from "../../../interfaces/Order";
-import {reformatDate} from "../ApprovedOrdersPage/ApprovedOrdersPage";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
+import {
+  customDateColumnRender,
+  NoMatches,
+  reformatDate,
+  useResizeListener
+} from "../PendingOrdersPage/PendingOrdersPage";
+import Pagination from "../../../components/Table/Pagination/Pagination";
+import Spinner from "../../../components/Spinner/Spinner";
+import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
+import {SortDirection} from "../../../services/LabSlipApiService";
 
-const getWidth = () => window.innerWidth
-  || document.documentElement.clientWidth
-  || document.body.clientWidth;
-
-const columns = (onClickLink: (id: number) => Test) => [
+export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSort: () => void) => [
   {
     name: "id",
     label: "Test result ID",
@@ -39,11 +43,12 @@ const columns = (onClickLink: (id: number) => Test) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
         <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
+            onClick={() => onSort()}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
+      customBodyRender: customDateColumnRender
     }
   },
   {
@@ -75,7 +80,7 @@ const columns = (onClickLink: (id: number) => Test) => [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
+const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -94,113 +99,89 @@ const options = (onSelect: any, onSaved: any, setPage: any, page: any) => ({
       noMatch: "No results found",
     }
   },
-  onChangePage: (currentPage) => setPage(currentPage),
-  onSearchChange: () => setPage(0),
-  customSort(items, index, isDesc) {
-    items.sort((a: any, b: any) => {
-      const aDate = new Date(a.data[index]);
-      const bDate = new Date(b.data[index]);
-
-      if (isDesc === 'asc') {
-        return aDate > bDate ? -1 : 1;
-      }
-
-      return aDate > bDate ? 1 : -1;
-    });
-    return items;
-  },
-  customFooter: CommonPagination,
+  customFooter: (rowCount) => setCount(rowCount),
   customToolbar: () => '',
   customToolbarSelect: (selected, displayData, setSelectedRows) => {
-    const displayedRows = displayData.slice(page*25, page*25+25);
-    const displayedSelectedRows = selected.data
-      .filter((item: any) => displayedRows.find((currentItem) => currentItem.dataIndex === item.dataIndex));
-
-    if (displayedSelectedRows.length == 0) {
-      setSelectedRows([]);
-    }
     return <ApproveButton mode="result"
       text={"Approve results"}
       onSaved={onSaved}
-      selected={onSelect(displayedSelectedRows)} />
+      selected={onSelect(selected.data)} />
   },
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
 
-const NoMatches = () => (
-  <div className={styles.sorry}>
-    <p className={styles.sorryText}>
-      No results found
-    </p>
-  </div>
-);
-
 const TestsPage = () => {
-  const [data, setData] = useState([] as Test[]);
+  const [data, setData] = useState({} as OrdersResponse);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
-  const [width, setWidth] = useState(getWidth());
+  const width = useResizeListener();
+  const [loading, setLoading] = useState(true);
+  const [searchItemsCount, setCount] = useState(0);
+  const [sortDirection, setSortDirection] = useState('desc' as SortDirection);
   const dispatch = useDispatch();
   const tests = useSelector(testsPendingState);
 
   useEffect(() => {
-    const resizeListener = () => {
-      setWidth(getWidth())
-    };
-    window.addEventListener('resize', resizeListener);
-    return () => {
-      window.removeEventListener('resize', resizeListener);
-    }
+    onSaved();
   }, []);
 
   const onSaved = async () => {
-    await Promise.all([dispatch(loadTestsByStatus('PENDING')), dispatch(loadTestsByStatus("APPROVED"))]);
+    setLoading(true);
+    await dispatch(loadTestsByStatus('PENDING', page, 'received', sortDirection));
+    setLoading(false);
   };
 
   useEffect(() => {
-    onLoad();
+    if (tests && tests.content && tests.content.length) {
+      setData({
+        ...tests, content: tests.content.map((item: Order) => {
+          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+          return item;
+        })
+      })
+    }
   }, [tests]);
 
-  const onLoad = () => {
-    if (tests && tests.length) {
-      setData(tests.map((item: any) => {
-        item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-        return item;
-      }));
-    }
+  useEffect(() => {
+    if (tests.content && tests.content.length) onSaved();
+  }, [page, sortDirection]);
+
+  const onSort = () => {
+    setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    setPage(0);
   };
 
-  const searchFilter = (item: any) =>
-    (String(item.id).indexOf(searchText) !== -1)
-    || (String(item.customerId).indexOf(searchText) !== -1)
-      ? 1 : 0;
+  const testsToView = itemsToView(data, searchText);
 
-  const testsToView = data
-    .map(reformatDate)
-    .filter(searchFilter);
+  const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
 
-  const onClickLink = (id: number) => tests.filter(test => test.id === id)[0];
-
-  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data[row.index]);
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
 
   return <section className={styles.tests}>
+    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
-    <h2 className={styles.heading20}>Test results pending approval</h2>
+    <h2 className={styles.heading20}>Pending approval test results</h2>
     {width > 700 ?
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.map(reformatDate)}
-          columns={columns(onClickLink)}
-          options={options(onSelect, onSaved, setPage, page)}
+          data={data.content ? data.content.map(reformatDate) : []}
+          columns={testsNotApprovedColumns(onClickLink, onSort)}
+          options={options(onSelect, onSaved, setCount)}
         />
+        <Pagination page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          searchItems={searchItemsCount}
+          totalItems={data.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
-        <p className={styles.testsResultsInfo}>({testsToView.length} results)</p>
-        <ApproveButton mode="result" onSaved={onSaved} selected={data as Order[]} text={"Approve all results"} />
+        <p className={styles.testsResultsInfo}>({data.totalElements || 0} results)</p>
+        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -209,7 +190,7 @@ const TestsPage = () => {
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
-              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received}</span>
+              <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>
@@ -225,6 +206,13 @@ const TestsPage = () => {
                 text={"Approve"} />
             </div>
           ))}
+        <Pagination mobile
+          page={page}
+          setPage={setPage}
+          totalPages={data.totalPages}
+          itemsPerPage={data.size}
+          searchItems={testsToView.length}
+          totalItems={data.totalElements} />
         {testsToView.length === 0 && <NoMatches />}
       </div>
     }

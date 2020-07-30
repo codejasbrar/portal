@@ -1,4 +1,5 @@
 import {OrderDetails} from "./Order";
+import {User} from "./User";
 
 export interface Test {
   id: number,
@@ -16,7 +17,14 @@ export interface Biomarker {
   value: number,
   minPanicValue: number,
   maxPanicValue: number,
-  units: string
+  units: string,
+}
+
+export interface TestComment {
+  message: string,
+  id: number,
+  user: User,
+  sent: string
 }
 
 export interface TestDetails {
@@ -25,5 +33,6 @@ export interface TestDetails {
   approved: string | null,
   status: string,
   order: OrderDetails,
-  biomarkers: Biomarker[]
+  biomarkers: Biomarker[],
+  testResultComments: TestComment[]
 }

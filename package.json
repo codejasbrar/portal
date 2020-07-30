@@ -37,6 +37,7 @@
     "build": "react-scripts build",
     "build:production": "cp ./configs/.env.prod ./.env && npm run build",
     "build:test": "cp ./configs/.env.test ./.env && npm run build",
+    "build:test2": "cp ./configs/.env.test2 ./.env && npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
