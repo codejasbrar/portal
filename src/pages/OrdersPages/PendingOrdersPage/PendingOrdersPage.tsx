@@ -15,7 +15,7 @@ import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
-import {ordersPendingState} from "../../../selectors/selectors";
+import {isAdmin, ordersPendingState, userState} from "../../../selectors/selectors";
 import {Test, TestDetails} from "../../../interfaces/Test";
 import {SortDirection} from "../../../services/LabSlipApiService";
 
@@ -74,7 +74,7 @@ const columns = (onSort: () => void) => [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void) => ({
+const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void, isAdmin: boolean) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -86,7 +86,7 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void)
   customFooter: (rowCount) => onSearch(rowCount),
   rowsPerPage: 25,
   pagination: false,
-  selectableRows: 'multiple',
+  selectableRows: isAdmin ? 'none' : 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [25],
   rowHover: true,
@@ -146,6 +146,7 @@ export const itemsToView = (data: OrdersResponse, searchText: string) => data.co
 
 const PendingOrdersPage = () => {
   const dispatch = useDispatch();
+  const admin = useSelector(isAdmin);
   const orders = useSelector(ordersPendingState);
   const [data, setData] = useState({} as OrdersResponse);
   const [loading, setLoading] = useState(true);
@@ -206,7 +207,7 @@ const PendingOrdersPage = () => {
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
           columns={columns(onSort)}
-          options={options(onSelect, onSaved, setCount)}
+          options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}
           setPage={setPage}
@@ -218,7 +219,8 @@ const PendingOrdersPage = () => {
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({data.totalElements || 0} results)</p>
-        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />
+        {!admin &&
+        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -231,11 +233,11 @@ const PendingOrdersPage = () => {
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
               <p className={styles.mobileOrdersTitle}>Criteria
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
-              <ApproveButton className={styles.btnApproveMobile}
+              {!admin && <ApproveButton className={styles.btnApproveMobile}
                 mode="order"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />
+                text={"Approve"} />}
             </div>
           ))}
         <Pagination mobile

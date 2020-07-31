@@ -11,7 +11,7 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import {detailsTableTheme} from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {testDetails} from "../../../selectors/selectors";
+import {isAdmin, testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
 import {reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
@@ -112,6 +112,7 @@ const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) 
 const TestDetailsPage = () => {
   const width = useResizeListener();
   const [loading, setLoading] = useState(true);
+  const admin = useSelector(isAdmin);
   const {hash} = useParams();
   const testSelected = useSelector(testDetails);
   const [test, setTest] = useState({} as TestDetails);
@@ -120,7 +121,9 @@ const TestDetailsPage = () => {
   const [comment, setComment] = useState('');
 
   useEffect(() => {
-    if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
+    if (testSelected) {
+      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatDate(testSelected) as TestDetails);
+    }
   }, [testSelected]);
 
   const addComment = async () => {
@@ -153,6 +156,8 @@ const TestDetailsPage = () => {
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
     panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
+
+  const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
 
   return <>
     {loading && <Spinner />}
@@ -199,7 +204,7 @@ const TestDetailsPage = () => {
                   <span className={styles.testInfoBold}>Approved: </span>
                   {test.approved?.replace('T', ' ')}
                 </p>}
-                {!test.approved && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
+                {enableApprove && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
                   text={"Approve results"}
                   selected={[{
                     id: test.id,

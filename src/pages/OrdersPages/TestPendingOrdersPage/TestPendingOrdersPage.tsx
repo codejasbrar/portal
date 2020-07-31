@@ -10,7 +10,7 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useDispatch, useSelector} from "react-redux";
-import {testsPendingState} from "../../../selectors/selectors";
+import {isAdmin, testsPendingState} from "../../../selectors/selectors";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import {
@@ -80,7 +80,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
   },
 ];
 
-const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
+const options = (onSelect: any, onSaved: any, setCount: (count: number) => void, isAdmin: boolean) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -90,7 +90,7 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectableRows: 'multiple',
+  selectableRows: isAdmin ? 'none' : 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [25],
   rowHover: true,
@@ -112,6 +112,7 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
 
 const TestsPage = () => {
   const [data, setData] = useState({} as OrdersResponse);
+  const admin = useSelector(isAdmin);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const width = useResizeListener();
@@ -169,7 +170,7 @@ const TestsPage = () => {
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
           columns={testsNotApprovedColumns(onClickLink, onSort)}
-          options={options(onSelect, onSaved, setCount)}
+          options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}
           setPage={setPage}
@@ -181,7 +182,8 @@ const TestsPage = () => {
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({data.totalElements || 0} results)</p>
-        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />
+        {!admin &&
+        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -199,11 +201,11 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Biomarkers out of
                 range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
               </p>
-              <ApproveButton className={styles.btnApproveMobile}
+              {!admin && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />
+                text={"Approve"} />}
             </div>
           ))}
         <Pagination mobile

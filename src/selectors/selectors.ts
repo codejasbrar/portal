@@ -8,6 +8,8 @@ import {TestsState} from "../reducers/testsReducer";
 
 export const authState = (store: Storage): AuthState => store.auth;
 export const userState = (store: Storage): User => store.user;
+export const isAdmin = (store: Storage): boolean => !store.user.physician;
+
 export const ordersState = (store: Storage): OrdersState => store.orders;
 export const testsState = (store: Storage): TestsState => store.tests;
 
