@@ -3,7 +3,11 @@ import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
-import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
+import MUIDataTable, {
+  MUIDataTableCustomHeadRenderer,
+  MUIDataTableMeta,
+  MUIDataTableOptions
+} from "mui-datatables";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
@@ -15,14 +19,15 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender,
-  getWidth,
   itemsToView,
   NoMatches,
   reformatDate,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
-const columns = (onSort: (sortParam: 'received' | 'approved') => void) => [
+import LabSlipApiService from "../../../services/LabSlipApiService";
+
+const columns = (onSort: (sortParam: 'received' | 'approved') => void, onClickDownload: (orderId: number) => void) => [
   {
     name: "id",
     label: "Order ID",
@@ -67,6 +72,20 @@ const columns = (onSort: (sortParam: 'received' | 'approved') => void) => [
       customBodyRender: customDateColumnRender
     }
   },
+  {
+    name: "hash",
+    label: "Lab Slip",
+    options: {
+      filter: true,
+      sort: false,
+      customBodyRender: (value: string, tableMeta: MUIDataTableMeta) => {
+        const fileName = `${tableMeta.rowData[2]}_${tableMeta.rowData[0]}_labslip.pdf`;
+        return <button type="button"
+          className={styles.downloadLink}
+          onClick={() => getLabSlip(value, fileName)}>Download</button>
+      }
+    }
+  }
 ];
 
 const options = (onSearch: (count: number) => void) => ({
@@ -93,6 +112,25 @@ const options = (onSearch: (count: number) => void) => ({
   customSearchRender: SearchBar,
   customToolbar: () => <></>,
 }) as MUIDataTableOptions;
+
+const getLabSlip = async (hash: string, fileName: string) => {
+  try {
+    const response = await LabSlipApiService.getLabSlip(hash);
+    const blob = new Blob([response.data], {type: "application/pdf"});
+    const link = window.URL.createObjectURL(blob);
+    // Open PDF in new Tab
+    window.open(link, '_blank');
+    // Download PDF file without opening
+    const name = fileName;
+    const linkEl = document.createElement('a');
+    linkEl.href = link;
+    linkEl.download = name;
+    linkEl.target = '_blank';
+    linkEl.click();
+  } catch (e) {
+    if (e.response) window.confirm(e.response.data.message);
+  }
+};
 
 const ApprovedOrdersPage = () => {
   const dispatch = useDispatch();
@@ -127,6 +165,12 @@ const ApprovedOrdersPage = () => {
     setLoading(false);
   };
 
+  const onClickDownload = async (orderId: number) => {
+    const orderHash = orders.content.filter(order => order.id === orderId)[0].hash;
+    const labslip = await LabSlipApiService.getLabSlip(orderHash);
+    console.log(labslip);
+  };
+
   const onSort = (sortParam: 'received' | 'approved') => {
     if (sortParam !== currentSortParam) setSortParam(sortParam);
     if (sortParam === 'received') {
@@ -155,7 +199,7 @@ const ApprovedOrdersPage = () => {
         <MUIDataTable
           title={''}
           data={data.content ? data.content.map(reformatDate) : []}
-          columns={columns(onSort)}
+          columns={columns(onSort, onClickDownload)}
           options={options(setCount)}
         />
         <Pagination page={page}
@@ -182,6 +226,10 @@ const ApprovedOrdersPage = () => {
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
               <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
               </p>
+              <button type="button"
+                onClick={() => getLabSlip(item.hash, `${item.customerId}_${item.id}_labslip.pdf`)}
+                className={`${styles.mobileOrdersTitle} ${styles.downloadLink}`}>Download LabSlip
+              </button>
             </div>
           ))}
         <Pagination mobile
