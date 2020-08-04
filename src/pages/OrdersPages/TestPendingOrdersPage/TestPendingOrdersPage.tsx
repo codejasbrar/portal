@@ -23,6 +23,7 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
 import {SortDirection} from "../../../services/LabSlipApiService";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSort: () => void) => [
   {
@@ -73,11 +74,16 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: false,
+      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+        const markers = value;
+        if (!markers) {
+          return <></>;
+        }
+        const renderedMarkers = markers.map((marker: string) => <><DangerIcon className={styles.dangerIconLeft}/>{marker}; </>);
+        return <div className={styles.markersWrapper}>{renderedMarkers}</div>;
+      }
     },
-    customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
-      return value.join(", ");
-    }
-  },
+  }
 ];
 
 const options = (onSelect: any, onSaved: any, setCount: (count: number) => void, isAdmin: boolean) => ({
@@ -153,7 +159,7 @@ const TestsPage = () => {
   };
 
   const testsToView = itemsToView(data, searchText);
-
+console.log(testsToView)
   const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
