@@ -468,7 +468,7 @@
 
     &Wrapper {
         position:        relative;
-        margin-right:    22px;
+        margin-right:    32px;
         display:         flex;
         align-items:     center;
         justify-content: flex-end;
@@ -483,6 +483,8 @@
     width:       16px;
     height:      13px;
     margin-left: 4px;
+    position:    absolute;
+    right:       -22px;
 }
 
 .dangerIconLeft {

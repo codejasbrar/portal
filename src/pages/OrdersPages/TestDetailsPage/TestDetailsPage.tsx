@@ -271,7 +271,7 @@ const TestDetailsPage = () => {
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.dotWrapper}>
                           <span className={styles.mobileOrdersText}>{biomarker.value}</span>
-                          {biomarker.panic && <span className={styles.dot} />}
+                          {biomarker.panic &&  <DangerIcon className={styles.dangerIcon}/>}
                         </span>
                       </p>
                       {/*delete hide-class if Normal Range string is needed*/}

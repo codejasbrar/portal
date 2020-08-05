@@ -205,7 +205,11 @@ console.log(testsToView)
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
               <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
+                range: <span className={styles.mobileTestsText}>
+                  {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
+                    <div className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any)=><><DangerIcon className={styles.dangerIconLeft}/>{item}; </>)} </div>
+                    : "None"}
+              </span>
               </p>
               {!admin && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
