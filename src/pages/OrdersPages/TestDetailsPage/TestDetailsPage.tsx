@@ -18,6 +18,7 @@ import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
 import LabSlipApiService from "../../../services/LabSlipApiService";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -43,7 +44,7 @@ const columns = [
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
+        return <span className={styles.dotWrapper}>{value}{value && panic && <DangerIcon className={styles.dangerIcon}/>}</span>;
       },
 
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
@@ -270,7 +271,7 @@ const TestDetailsPage = () => {
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.dotWrapper}>
                           <span className={styles.mobileOrdersText}>{biomarker.value}</span>
-                          {biomarker.panic && <span className={styles.dot} />}
+                          {biomarker.panic &&  <DangerIcon className={styles.dangerIcon}/>}
                         </span>
                       </p>
                       {/*delete hide-class if Normal Range string is needed*/}
