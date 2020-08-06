@@ -32,13 +32,19 @@ export const customDateColumnRender = (value: string, tableMeta?: any, updateVal
   </>
 };
 
-const columns = (onSort: () => void) => [
+const columns = (onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Order ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
+        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>
+      },
     }
   },
   {
@@ -50,7 +56,7 @@ const columns = (onSort: () => void) => [
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
         return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => onSort()}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
         </td>
       },
       customBodyRender: customDateColumnRender
@@ -61,7 +67,13 @@ const columns = (onSort: () => void) => [
     label: "Customer ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
+        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>
+      },
     }
   },
   {
@@ -140,6 +152,24 @@ export const useResizeListener = () => {
   return width;
 };
 
+export const useData = (selector: (store: Storage) => OrdersResponse) => {
+  const [data, setData] = useState({} as OrdersResponse);
+  const items: OrdersResponse = useSelector(selector);
+
+  useEffect(() => {
+    if (items.content && items.content.length) {
+      setData({
+        ...items, content: items.content.map((item: Order) => {
+          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
+          return item;
+        })
+      })
+    }
+  }, [items]);
+
+  return data;
+};
+
 export const itemsToView = (data: OrdersResponse, searchText: string) => data.content ? data.content
   .map(reformatDate)
   .filter((item: any) => (String(item.id).indexOf(searchText) !== -1) || (String(item.customerId).indexOf(searchText) !== -1) ? 1 : 0) : [];
@@ -147,43 +177,26 @@ export const itemsToView = (data: OrdersResponse, searchText: string) => data.co
 const PendingOrdersPage = () => {
   const dispatch = useDispatch();
   const admin = useSelector(isAdmin);
-  const orders = useSelector(ordersPendingState);
-  const [data, setData] = useState({} as OrdersResponse);
+  const orders = useData(ordersPendingState);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [searchItemsCount, setCount] = useState(0);
-  const [receivedSortDirection, setReceivedSortDirection] = useState('desc' as SortDirection);
+  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
   const width = useResizeListener();
-
-  const onLoad = () => {
-    if (orders.content && orders.content.length) {
-      setData({
-        ...orders, content: orders.content.map((item: Order) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        })
-      });
-    }
-  };
-
-  useEffect(() => {
-    onLoad();
-  }, [orders]);
 
   useEffect(() => {
     if (orders.content && orders.content.length) onSaved();
-  }, [page, receivedSortDirection]);
+  }, [page, sort]);
 
   const onSaved = async () => {
     setLoading(true);
-    console.log(receivedSortDirection);
-    await dispatch(loadOrdersByStatus('PENDING', page, 'received', receivedSortDirection));
+    await dispatch(loadOrdersByStatus('PENDING', page, sort.param, sort.direction));
     setLoading(false);
   };
 
-  const onSort = () => {
-    setReceivedSortDirection(receivedSortDirection === 'desc' ? 'asc' : 'desc');
+  const onSort = (sortParam: string = 'received') => {
+    setSort({param: sortParam, direction: sort.direction === 'desc' ? 'asc' : 'desc'});
     setPage(0);
   };
 
@@ -191,9 +204,9 @@ const PendingOrdersPage = () => {
     onSaved();
   }, []);
 
-  const ordersToView = itemsToView(data, searchText);
+  const ordersToView = itemsToView(orders, searchText);
 
-  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -205,20 +218,20 @@ const PendingOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.content ? data.content.map(reformatDate) : []}
+          data={orders.content ? orders.content.map(reformatDate) : []}
           columns={columns(onSort)}
           options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={orders.totalPages}
+          itemsPerPage={orders.size}
           searchItems={searchItemsCount}
-          totalItems={data.totalElements} />
+          totalItems={orders.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({data.totalElements || 0} results)</p>
+        <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
         {!admin &&
         <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
@@ -243,10 +256,10 @@ const PendingOrdersPage = () => {
         <Pagination mobile
           page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={orders.totalPages}
+          itemsPerPage={orders.size}
           searchItems={ordersToView.length}
-          totalItems={data.totalElements} />
+          totalItems={orders.totalElements} />
         {ordersToView.length === 0 && <NoMatches />}
       </div>
     }

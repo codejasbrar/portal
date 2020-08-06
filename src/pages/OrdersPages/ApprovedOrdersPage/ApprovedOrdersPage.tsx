@@ -21,19 +21,24 @@ import {
   customDateColumnRender,
   itemsToView,
   NoMatches,
-  reformatDate,
+  reformatDate, useData,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
-import LabSlipApiService from "../../../services/LabSlipApiService";
+import LabSlipApiService, {SortDirection} from "../../../services/LabSlipApiService";
 
-const columns = (onSort: (sortParam: 'received' | 'approved') => void, onClickDownload: (orderId: number) => void) => [
+const columns = (onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Order ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
     }
   },
   {
@@ -55,7 +60,12 @@ const columns = (onSort: (sortParam: 'received' | 'approved') => void, onClickDo
     label: "Customer ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
     }
   },
   {
@@ -136,48 +146,29 @@ const ApprovedOrdersPage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
-  const [data, setData] = useState({} as OrdersResponse);
   const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
   const [page, setPage] = useState(0);
-  const [sortDirections, setSortDirections] = useState({'received': 'desc', 'approved': 'asc'} as any);
-  const [currentSortParam, setSortParam] = useState('received');
-  const orders = useSelector(ordersApprovedState);
+  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
+  const orders = useData(ordersApprovedState);
 
-  useEffect(() => {
-    if (orders.content && orders.content.length) {
-      setData({
-        ...orders, content: orders.content.map((item: Order) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        })
-      });
-    }
-  }, [orders]);
 
   useEffect(() => {
     if (orders.content && orders.content.length) onSaved();
-  }, [page, sortDirections.received, sortDirections.approved]);
+  }, [page, sort]);
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadOrdersByStatus('APPROVED', page, currentSortParam, sortDirections[currentSortParam]));
+    await dispatch(loadOrdersByStatus('APPROVED', page, sort.param, sort.direction));
     setLoading(false);
   };
 
-  const onClickDownload = async (orderId: number) => {
-    const orderHash = orders.content.filter(order => order.id === orderId)[0].hash;
-    const labslip = await LabSlipApiService.getLabSlip(orderHash);
-    console.log(labslip);
-  };
 
-  const onSort = (sortParam: 'received' | 'approved') => {
-    if (sortParam !== currentSortParam) setSortParam(sortParam);
-    if (sortParam === 'received') {
-      setSortDirections({...sortDirections, received: sortDirections.received === 'desc' ? 'asc' : 'desc'})
-    } else if (sortParam === 'approved') {
-      setSortDirections({...sortDirections, approved: sortDirections.approved === 'desc' ? 'asc' : 'desc'})
-    }
+  const onSort = (sortParam: string = 'received') => {
+    setSort({
+      param: sortParam,
+      direction: sortParam === sort.param ? sort.direction === 'desc' ? 'asc' : 'desc' : 'desc'
+    });
     setPage(0);
   };
 
@@ -186,7 +177,7 @@ const ApprovedOrdersPage = () => {
   }, []);
 
 
-  const ordersToView = itemsToView(data, searchText);
+  const ordersToView = itemsToView(orders, searchText);
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -198,20 +189,20 @@ const ApprovedOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.content ? data.content.map(reformatDate) : []}
-          columns={columns(onSort, onClickDownload)}
+          data={orders.content ? orders.content.map(reformatDate) : []}
+          columns={columns(onSort)}
           options={options(setCount)}
         />
         <Pagination page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={orders.totalPages}
+          itemsPerPage={orders.size}
           searchItems={searchItemsCount}
-          totalItems={data.totalElements} />
+          totalItems={orders.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({data.totalElements || 0} results)</p>
+        <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i) => (
@@ -235,10 +226,10 @@ const ApprovedOrdersPage = () => {
         <Pagination mobile
           page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={orders.totalPages}
+          itemsPerPage={orders.size}
           searchItems={ordersToView.length}
-          totalItems={data.totalElements} />
+          totalItems={orders.totalElements} />
         {ordersToView.length === 0 && <NoMatches />}
       </div>
     }

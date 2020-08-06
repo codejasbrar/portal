@@ -12,7 +12,7 @@ import {testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender,
   NoMatches,
-  reformatDate,
+  reformatDate, useData,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
@@ -24,13 +24,18 @@ import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
 import {SortDirection} from "../../../services/LabSlipApiService";
 
 
-const columns = (onClickLink: (id: number) => Test, onSort: (sortParam: 'received' | 'approved') => void) => [
+const columns = (onClickLink: (id: number) => Test, onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
       customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
         const link = onClickLink(value);
         return link && <Link
@@ -59,7 +64,12 @@ const columns = (onClickLink: (id: number) => Test, onSort: (sortParam: 'receive
     label: "Order ID",
     options: {
       filter: true,
-      sort: false
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('orderId')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
     }
   },
   {
@@ -67,7 +77,12 @@ const columns = (onClickLink: (id: number) => Test, onSort: (sortParam: 'receive
     label: "Customer ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
+        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
+        </td>,
     }
   },
   {
@@ -113,45 +128,36 @@ const options = (onSearch: (count: number) => void) => ({
 const TestApprovedPage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({} as OrdersResponse);
   const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const tests = useSelector(testsApprovedState);
+  const tests = useData(testsApprovedState);
   const [searchItemsCount, setCount] = useState(0);
-  const [sortDirections, setSortDirections] = useState({'received': 'desc', 'approved': 'asc'} as any);
-  const [currentSortParam, setSortParam] = useState('received');
+  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
   const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    if (tests && tests.content && tests.content.length) setData(tests);
-  }, [tests]);
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadTestsByStatus('APPROVED', page, currentSortParam, sortDirections[currentSortParam]));
+    await dispatch(loadTestsByStatus('APPROVED', page, sort.param, sort.direction));
     setLoading(false);
   };
 
   useEffect(() => {
     if (tests && tests.content && tests.content.length) onSaved();
-  }, [page, sortDirections.received, sortDirections.approved]);
+  }, [page, sort]);
 
   useEffect(() => {
     onSaved();
   }, []);
 
-  const onSort = (sortParam: 'received' | 'approved') => {
-    console.log('1');
-    if (sortParam !== currentSortParam) setSortParam(sortParam);
-    if (sortParam === 'received') {
-      setSortDirections({...sortDirections, received: sortDirections.received === 'desc' ? 'asc' : 'desc'})
-    } else if (sortParam === 'approved') {
-      setSortDirections({...sortDirections, approved: sortDirections.approved === 'desc' ? 'asc' : 'desc'})
-    }
+  const onSort = (sortParam: string = 'received') => {
+    setSort({
+      param: sortParam,
+      direction: sortParam === sort.param ? sort.direction === 'desc' ? 'asc' : 'desc' : 'desc'
+    });
     setPage(0);
   };
 
-  const testsToView = itemsToView(data, searchText);
+  const testsToView = itemsToView(tests, searchText);
 
   const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
 
@@ -165,20 +171,20 @@ const TestApprovedPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.content ? data.content.map(reformatDate) : []}
+          data={tests.content ? tests.content.map(reformatDate) : []}
           columns={columns(onClickLink, onSort)}
           options={options(setCount)}
         />
         <Pagination page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={tests.totalPages}
+          itemsPerPage={tests.size}
           searchItems={searchItemsCount}
-          totalItems={data.totalElements} />
+          totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.testsResultsInfo}>({data.totalElements || 0} results)</p>
+        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -201,10 +207,10 @@ const TestApprovedPage = () => {
         <Pagination mobile
           page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={tests.totalPages}
+          itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={data.totalElements} />
+          totalItems={tests.totalElements} />
         {testsToView.length === 0 && <NoMatches />}
       </div>
     }

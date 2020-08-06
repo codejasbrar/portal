@@ -44,7 +44,8 @@ const columns = [
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{value && panic && <DangerIcon className={styles.dangerIcon}/>}</span>;
+        return <span className={styles.dotWrapper}>{value}{panic && value ?
+          <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
 
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
@@ -155,7 +156,7 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
 
   const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
