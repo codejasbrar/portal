@@ -75,9 +75,9 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
         if (!markers) {
           return <div className={styles.markersWrapper} />;
         }
-        const renderedMarkers = markers.map((marker: string) => <>
-          <DangerIcon className={styles.dangerIconLeft} />{marker}; </>);
-        return <div className={styles.markersWrapper}>{renderedMarkers}</div>;
+        const renderedMarkers = markers.map((marker: string) => <li>
+          <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
+        return <ul className={styles.markersWrapper}>{renderedMarkers}</ul>;
       }
     },
   }

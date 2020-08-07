@@ -119,6 +119,7 @@
         width:            100%;
         outline:          0;
         vertical-align:   middle;
+        white-space:      nowrap;
 
         span {
             padding-left: 8px;
@@ -510,7 +511,13 @@
 }
 
 .markersWrapper {
-    max-width: 300px;
+    max-width:    293px;
+    padding-left: 0;
+    list-style:   none;
+
+    li {
+        white-space: nowrap;
+    }
 }
 
 
