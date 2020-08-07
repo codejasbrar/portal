@@ -9,22 +9,22 @@
         width:            100%;
         max-width:        400px;
         height:           36px;
-        line-height:      36px;
         color:            $text;
         font-family:      "Open Sans", Arial, sans-serif;
         font-size:        14px;
         letter-spacing:   0.3px;
         border:           1px solid $gray6;
         background-color: #ffffff;
-        padding-left:     40px;
+        padding:          8px 0px 8px 40px;
 
         &:focus {
             border: 1px solid $primary;
         }
 
         &::placeholder {
-            color:     $gray6;
-            font-size: 14px;
+            color:       $gray6;
+            font-size:   14px;
+            padding-top: 1px;
         }
     }
 

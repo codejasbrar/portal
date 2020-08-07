@@ -44,13 +44,15 @@ const columns = [
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{value && panic && <DangerIcon className={styles.dangerIcon}/>}</span>;
+        return <span className={styles.dotWrapper}>{value}{panic && value ?
+          <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
 
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${styles.sortIconActive}`} /></span>
+          </button>
         </td>),
     }
   },
@@ -125,7 +127,7 @@ const TestDetailsPage = () => {
     if (testSelected) {
       !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatDate(testSelected) as TestDetails);
     }
-  }, [testSelected]);
+  }, [testSelected, admin, history]);
 
   const addComment = async () => {
     if (comment.length && comment.trim().length > 0) {
@@ -155,7 +157,7 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
 
   const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');

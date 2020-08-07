@@ -1,5 +1,5 @@
 import LabSlipApiService, {OrderStatus} from "../services/LabSlipApiService";
-import {Order, OrdersQuantity} from "../interfaces/Order";
+import {Order} from "../interfaces/Order";
 import {Dispatch} from "react";
 import {logOut, refreshTokenAction} from "./authActions";
 import Token from "../helpers/localToken";
