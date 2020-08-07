@@ -22,7 +22,7 @@ const MobileNavigation = () => {
     (async () => {
       await dispatch(loadCounters());
     })();
-  }, []);
+  }, [dispatch]);
 
   return <div className={styles.mobileNavigation}>
     <h1 className={styles.heading30}>Physician portal</h1>

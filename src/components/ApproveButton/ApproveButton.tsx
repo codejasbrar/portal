@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 import Button from "../Button/Button";
 import Popup from "../Popup/Popup";
 import {Order} from "../../interfaces/Order";
-import LabSlipApiService from "../../services/LabSlipApiService";
 
 //Styles
 import styles from "./ApproveButton.module.scss";

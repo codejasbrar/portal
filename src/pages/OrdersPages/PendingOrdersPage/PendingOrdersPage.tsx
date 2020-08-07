@@ -15,15 +15,16 @@ import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
-import {isAdmin, ordersPendingState, userState} from "../../../selectors/selectors";
+import {isAdmin, ordersPendingState} from "../../../selectors/selectors";
 import {Test, TestDetails} from "../../../interfaces/Test";
-import {SortDirection} from "../../../services/LabSlipApiService";
+import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
+import {loadTestsByStatus} from "../../../actions/testsActions";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
 
-export const customDateColumnRender = (value: string, tableMeta?: any, updateValue?: any) => {
+export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
   const time = value.slice(value.indexOf('T') + 1, value.length);
   return <>
@@ -32,19 +33,21 @@ export const customDateColumnRender = (value: string, tableMeta?: any, updateVal
   </>
 };
 
-const columns = (onSort: (sortParam: string) => void) => [
+export const customHeadSortRender = (columnMeta: MUIDataTableCustomHeadRenderer, sortParam: string, onSort: (sortParam: string) => void) =>
+  <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+    <button className={styles.sortBlock}
+      onClick={() => onSort(columnMeta.name)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${sortParam === columnMeta.name ? styles.sortIconActive : ''}`} /></span>
+    </button>
+  </td>;
+
+const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Order ID",
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
-        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
-      },
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -53,12 +56,7 @@ const columns = (onSort: (sortParam: string) => void) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
-        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
-      },
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
       customBodyRender: customDateColumnRender
     }
   },
@@ -68,12 +66,7 @@ const columns = (onSort: (sortParam: string) => void) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => {
-        return <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>
-      },
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -108,12 +101,12 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void,
     }
   },
   customToolbar: () => '',
-  customToolbarSelect: (selected, displayData, setSelectedRows) => {
+  customToolbarSelect: (selected) => {
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}
       selected={onSelect(selected.data)} />;
-    },
+  },
   customSearchRender: SearchBar,
 } as MUIDataTableOptions);
 
@@ -174,24 +167,21 @@ export const itemsToView = (data: OrdersResponse, searchText: string) => data.co
   .map(reformatDate)
   .filter((item: any) => (String(item.id).indexOf(searchText) !== -1) || (String(item.customerId).indexOf(searchText) !== -1) ? 1 : 0) : [];
 
-const PendingOrdersPage = () => {
+export const usePageState = (type: "order" | "test", status: string, selector: (store: Storage) => OrdersResponse) => {
   const dispatch = useDispatch();
-  const admin = useSelector(isAdmin);
-  const orders = useData(ordersPendingState);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
-  const [searchItemsCount, setCount] = useState(0);
   const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
-  const width = useResizeListener();
+  const items = useData(selector);
 
   useEffect(() => {
-    if (orders.content && orders.content.length) onSaved();
+    if (items.content && items.content.length) onSaved();
   }, [page, sort]);
 
   const onSaved = async () => {
     setLoading(true);
-    await dispatch(loadOrdersByStatus('PENDING', page, sort.param, sort.direction));
+    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, page, sort.param, sort.direction));
+    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, page, sort.param, sort.direction));
     setLoading(false);
   };
 
@@ -203,6 +193,16 @@ const PendingOrdersPage = () => {
   useEffect(() => {
     onSaved();
   }, []);
+
+  return [loading, items as OrdersResponse, page as number, sort as any, onSort, setPage, onSaved]
+};
+
+const PendingOrdersPage = () => {
+  const [searchText, setSearchText] = useState('');
+  const [searchItemsCount, setCount] = useState(0);
+  const admin = useSelector(isAdmin);
+  const width = useResizeListener();
+  const [loading, orders, page, sort, onSort, setPage, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
 
   const ordersToView = itemsToView(orders, searchText);
 
@@ -219,7 +219,7 @@ const PendingOrdersPage = () => {
         <MUIDataTable
           title={''}
           data={orders.content ? orders.content.map(reformatDate) : []}
-          columns={columns(onSort)}
+          columns={columns(sort.param, onSort)}
           options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}

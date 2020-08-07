@@ -26,7 +26,7 @@ const Navigation = (props: NavigationPropsTypes) => {
     (async () => {
       await dispatch(loadCounters());
     })();
-  }, []);
+  }, [dispatch]);
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>

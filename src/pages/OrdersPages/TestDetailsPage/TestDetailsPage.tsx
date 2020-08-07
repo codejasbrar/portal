@@ -51,7 +51,8 @@ const columns = [
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${styles.sortIconActive}`} /></span>
+          </button>
         </td>),
     }
   },
@@ -126,7 +127,7 @@ const TestDetailsPage = () => {
     if (testSelected) {
       !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatDate(testSelected) as TestDetails);
     }
-  }, [testSelected]);
+  }, [testSelected, admin, history]);
 
   const addComment = async () => {
     if (comment.length && comment.trim().length > 0) {

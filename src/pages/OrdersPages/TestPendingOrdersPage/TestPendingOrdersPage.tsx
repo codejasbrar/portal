@@ -1,42 +1,36 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {isAdmin, testsPendingState} from "../../../selectors/selectors";
-import {loadTestsByStatus} from "../../../actions/testsActions";
 import {
-  customDateColumnRender,
+  customDateColumnRender, customHeadSortRender,
   NoMatches,
-  reformatDate, useData,
+  reformatDate, usePageState,
   useResizeListener,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
-import {SortDirection} from "../../../services/LabSlipApiService";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import {Order} from "../../../interfaces/Order";
 
-export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSort: (sortParam: string) => void) => [
+export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender: (value: any) => {
         const link = onClickLink(value);
         return link ? <Link to={`/orders/test/${link.hash}`} color="secondary">{value}</Link> : ''
       }
@@ -48,11 +42,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
       customBodyRender: customDateColumnRender
     }
   },
@@ -62,11 +52,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('orderId')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -75,11 +61,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -88,12 +70,13 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+      customBodyRender: (value: any) => {
         const markers = value;
         if (!markers) {
           return <div className={styles.markersWrapper} />;
         }
-        const renderedMarkers = markers.map((marker: string) => <><DangerIcon className={styles.dangerIconLeft}/>{marker}; </>);
+        const renderedMarkers = markers.map((marker: string) => <>
+          <DangerIcon className={styles.dangerIconLeft} />{marker}; </>);
         return <div className={styles.markersWrapper}>{renderedMarkers}</div>;
       }
     },
@@ -121,7 +104,7 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void,
   },
   customFooter: (rowCount) => setCount(rowCount),
   customToolbar: () => '',
-  customToolbarSelect: (selected, displayData, setSelectedRows) => {
+  customToolbarSelect: (selected) => {
     return <ApproveButton mode="result"
       text={"Approve results"}
       onSaved={onSaved}
@@ -133,40 +116,13 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void,
 const TestsPage = () => {
   const admin = useSelector(isAdmin);
   const [searchText, setSearchText] = useState('');
-  const [page, setPage] = useState(0);
   const width = useResizeListener();
-  const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
-  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
-  const dispatch = useDispatch();
-  const tests = useData(testsPendingState);
-
-  useEffect(() => {
-    onSaved();
-  }, []);
-
-  const onSaved = async () => {
-    setLoading(true);
-    await dispatch(loadTestsByStatus('PENDING', page, sort.param, sort.direction));
-    setLoading(false);
-  };
-
-
-  useEffect(() => {
-    if (tests.content && tests.content.length) onSaved();
-  }, [page, sort]);
-
-  const onSort = (sortParam: string = 'received') => {
-    setSort({
-      param: sortParam,
-      direction: sortParam === sort.param ? sort.direction === 'desc' ? 'asc' : 'desc' : 'desc'
-    });
-    setPage(0);
-  };
+  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'PENDING', testsPendingState);
 
   const testsToView = itemsToView(tests, searchText);
 
-  const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
+  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
@@ -181,7 +137,7 @@ const TestsPage = () => {
         <MUIDataTable
           title={''}
           data={tests.content ? tests.content.map(reformatDate) : []}
-          columns={testsNotApprovedColumns(onClickLink, onSort)}
+          columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
           options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}

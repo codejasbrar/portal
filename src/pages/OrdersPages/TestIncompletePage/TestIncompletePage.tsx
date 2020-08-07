@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -7,15 +7,13 @@ import MUIDataTable, {MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {useDispatch} from "react-redux";
 import {testsIncompleteState} from "../../../selectors/selectors";
-import {loadTestsByStatus} from "../../../actions/testsActions";
-import {reformatDate, useData, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {reformatDate, usePageState, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {itemsToView, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
-import {SortDirection} from "../../../services/LabSlipApiService";
+import {Order} from "../../../interfaces/Order";
 
 const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
   filterType: 'checkbox',
@@ -47,41 +45,13 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
 
 const TestIncompletePage = () => {
   const [searchText, setSearchText] = useState('');
-  const [page, setPage] = useState(0);
-  const width = useResizeListener();
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
-  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
-  const tests = useData(testsIncompleteState);
-
-
-  useEffect(() => {
-    if (tests.content && tests.content.length) onSaved();
-  }, [page, sort]);
-
-  useEffect(() => {
-    onSaved();
-  }, []);
-
-  const onSaved = async () => {
-    setLoading(true);
-    await dispatch(loadTestsByStatus('INCOMPLETE', page, sort.param, sort.direction));
-    setLoading(false);
-  };
-
-  const onSort = (sortParam: string = 'received') => {
-    setSort({
-      param: sortParam,
-      direction: sortParam === sort.param ? sort.direction === 'desc' ? 'asc' : 'desc' : 'desc'
-    });
-    setPage(0);
-  };
-
+  const width = useResizeListener();
+  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
 
   const testsToView = itemsToView(tests, searchText);
 
-  const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
+  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
@@ -96,7 +66,7 @@ const TestIncompletePage = () => {
         <MUIDataTable
           title={''}
           data={tests.content ? tests.content.map(reformatDate) : []}
-          columns={testsNotApprovedColumns(onClickLink, onSort)}
+          columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
           options={options(onSelect, onSaved, setCount)}
         />
         <Pagination page={page}

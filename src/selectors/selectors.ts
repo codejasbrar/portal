@@ -1,17 +1,12 @@
 import {User} from "../interfaces/User";
 import {AuthState} from "../interfaces/AuthState";
-import {Order, OrdersQuantity, OrdersResponse} from "../interfaces/Order";
-import {Test, TestDetails} from "../interfaces/Test";
-import {OrdersState} from "../reducers/ordersReducer";
-import {TestsState} from "../reducers/testsReducer";
+import {OrdersQuantity, OrdersResponse} from "../interfaces/Order";
+import {TestDetails} from "../interfaces/Test";
 
 
 export const authState = (store: Storage): AuthState => store.auth;
 export const userState = (store: Storage): User => store.user;
 export const isAdmin = (store: Storage): boolean => !store.user.physician;
-
-export const ordersState = (store: Storage): OrdersState => store.orders;
-export const testsState = (store: Storage): TestsState => store.tests;
 
 export const ordersPendingState = (store: Storage): OrdersResponse => (store.orders.pending);
 export const ordersApprovedState = (store: Storage): OrdersResponse => (store.orders.approved);

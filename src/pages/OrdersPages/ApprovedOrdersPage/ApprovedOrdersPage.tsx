@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -8,37 +8,29 @@ import MUIDataTable, {
   MUIDataTableMeta,
   MUIDataTableOptions
 } from "mui-datatables";
-import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {Order, OrdersResponse} from "../../../interfaces/Order";
-import {useDispatch, useSelector} from "react-redux";
 import {ordersApprovedState} from "../../../selectors/selectors";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
-  customDateColumnRender,
+  customDateColumnRender, customHeadSortRender,
   itemsToView,
   NoMatches,
-  reformatDate, useData,
+  reformatDate, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
-import LabSlipApiService, {SortDirection} from "../../../services/LabSlipApiService";
+import LabSlipApiService from "../../../services/LabSlipApiService";
 
-const columns = (onSort: (sortParam: string) => void) => [
+const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Order ID",
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('id')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -47,11 +39,7 @@ const columns = (onSort: (sortParam: string) => void) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('received')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
       customBodyRender: customDateColumnRender
     }
   },
@@ -61,11 +49,7 @@ const columns = (onSort: (sortParam: string) => void) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('customerId')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -74,11 +58,7 @@ const columns = (onSort: (sortParam: string) => void) => [
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort('approved')}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
       customBodyRender: customDateColumnRender
     }
   },
@@ -143,39 +123,10 @@ const getLabSlip = async (hash: string, fileName: string) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
   const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [page, setPage] = useState(0);
-  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
-  const orders = useData(ordersApprovedState);
-
-
-  useEffect(() => {
-    if (orders.content && orders.content.length) onSaved();
-  }, [page, sort]);
-
-  const onSaved = async () => {
-    setLoading(true);
-    await dispatch(loadOrdersByStatus('APPROVED', page, sort.param, sort.direction));
-    setLoading(false);
-  };
-
-
-  const onSort = (sortParam: string = 'received') => {
-    setSort({
-      param: sortParam,
-      direction: sortParam === sort.param ? sort.direction === 'desc' ? 'asc' : 'desc' : 'desc'
-    });
-    setPage(0);
-  };
-
-  useEffect(() => {
-    onSaved();
-  }, []);
-
+  const [loading, orders, page, sort, onSort, setPage] = usePageState('order', 'APPROVED', ordersApprovedState);
 
   const ordersToView = itemsToView(orders, searchText);
 
@@ -190,7 +141,7 @@ const ApprovedOrdersPage = () => {
         <MUIDataTable
           title={''}
           data={orders.content ? orders.content.map(reformatDate) : []}
-          columns={columns(onSort)}
+          columns={columns(sort.param, onSort)}
           options={options(setCount)}
         />
         <Pagination page={page}
