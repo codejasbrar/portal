@@ -34,7 +34,7 @@ const Verification = () => {
     return () => {
       dispatch(clearTempDataAction());
     };
-  }, []);
+  }, [dispatch, history]);
 
   useEffect(() => {
     if (auth.loggedIn) {

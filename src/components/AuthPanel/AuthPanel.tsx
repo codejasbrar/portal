@@ -9,7 +9,6 @@ import {ReactComponent as BurgerIcon} from "../../icons/burger.svg";
 
 //Components
 import {useDispatch, useSelector} from "react-redux";
-import {User} from "../../interfaces/User";
 import {loggedIn, userState} from "../../selectors/selectors";
 import {logOut} from "../../actions/authActions";
 import GoTo from "../GoTo/GoTo";

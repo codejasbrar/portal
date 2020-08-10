@@ -66,7 +66,7 @@ const LoginForm = () => {
     if (auth.tempData) {
       history.replace("/authentication/security-code")
     }
-  }, [auth.tempData]);
+  }, [auth.tempData, history]);
 
   return <>
     {isLoading && <Spinner />}

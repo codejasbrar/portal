@@ -11,13 +11,14 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import {detailsTableTheme} from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {testDetails} from "../../../selectors/selectors";
+import {isAdmin, testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
 import {reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
 import LabSlipApiService from "../../../services/LabSlipApiService";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -43,13 +44,15 @@ const columns = [
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{value && panic && <span className={styles.dot} />}</span>;
+        return <span className={styles.dotWrapper}>{value}{panic && value ?
+          <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
 
       customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
         (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
           <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon /></span></button>
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${styles.sortIconActive}`} /></span>
+          </button>
         </td>),
     }
   },
@@ -112,6 +115,7 @@ const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) 
 const TestDetailsPage = () => {
   const width = useResizeListener();
   const [loading, setLoading] = useState(true);
+  const admin = useSelector(isAdmin);
   const {hash} = useParams();
   const testSelected = useSelector(testDetails);
   const [test, setTest] = useState({} as TestDetails);
@@ -120,8 +124,10 @@ const TestDetailsPage = () => {
   const [comment, setComment] = useState('');
 
   useEffect(() => {
-    if (testSelected) setTest(reformatDate(testSelected) as TestDetails);
-  }, [testSelected]);
+    if (testSelected) {
+      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatDate(testSelected) as TestDetails);
+    }
+  }, [testSelected, admin, history]);
 
   const addComment = async () => {
     if (comment.length && comment.trim().length > 0) {
@@ -151,8 +157,10 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
   });
+
+  const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
 
   return <>
     {loading && <Spinner />}
@@ -199,7 +207,7 @@ const TestDetailsPage = () => {
                   <span className={styles.testInfoBold}>Approved: </span>
                   {test.approved?.replace('T', ' ')}
                 </p>}
-                {!test.approved && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
+                {enableApprove && <ApproveButton className={`${styles.testInfoBtn} ${styles.btnPrimary}`}
                   text={"Approve results"}
                   selected={[{
                     id: test.id,
@@ -265,7 +273,7 @@ const TestDetailsPage = () => {
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.dotWrapper}>
                           <span className={styles.mobileOrdersText}>{biomarker.value}</span>
-                          {biomarker.panic && <span className={styles.dot} />}
+                          {biomarker.panic &&  <DangerIcon className={styles.dangerIcon}/>}
                         </span>
                       </p>
                       {/*delete hide-class if Normal Range string is needed*/}

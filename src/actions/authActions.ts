@@ -46,7 +46,7 @@ export const logIn = (authData: AuthData) => async (dispatch: Dispatch<object>):
     if (errorData.response && errorData.response.data.message.includes('2FA')) {
       errorData.response.data.error === "CODE_INCORRECT" ? dispatch(codeIncorrectAction(errorData.response.data)) : dispatch(codeRequiredAction(errorData.response.config.data));
     } else {
-      dispatch(errorLoginAction(errorData));
+      dispatch(errorLoginAction(errorData.response.data));
     }
   });
 };

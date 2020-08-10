@@ -18,7 +18,6 @@ import OrdersPage from "./pages/OrdersPages/OrdersPages";
 import LabSlipApiService from "./services/LabSlipApiService";
 import Token from "./helpers/localToken";
 import {refreshTokenAction} from "./actions/authActions";
-import TestDetailsPage from "./pages/OrdersPages/TestDetailsPage/TestDetailsPage";
 
 
 new LabSlipApiService();
