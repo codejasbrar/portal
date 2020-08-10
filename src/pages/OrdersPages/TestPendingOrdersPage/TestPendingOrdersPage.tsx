@@ -1,37 +1,36 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {useDispatch, useSelector} from "react-redux";
-import {testsPendingState} from "../../../selectors/selectors";
-import {loadTestsByStatus} from "../../../actions/testsActions";
-import {Order, OrdersResponse} from "../../../interfaces/Order";
+import {useSelector} from "react-redux";
+import {isAdmin, testsPendingState} from "../../../selectors/selectors";
 import {
-  customDateColumnRender,
+  customDateColumnRender, customHeadSortRender,
   NoMatches,
-  reformatDate,
-  useResizeListener
+  reformatDate, usePageState,
+  useResizeListener,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
-import {SortDirection} from "../../../services/LabSlipApiService";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import {Order} from "../../../interfaces/Order";
 
-export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSort: () => void) => [
+export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
     label: "Test result ID",
     options: {
       filter: true,
-      sort: false,
-      customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender: (value: any) => {
         const link = onClickLink(value);
         return link ? <Link to={`/orders/test/${link.hash}`} color="secondary">{value}</Link> : ''
       }
@@ -43,11 +42,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: true,
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) =>
-        <td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => onSort()}>{columnMeta.label}<span><SortIcon /></span></button>
-        </td>,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
       customBodyRender: customDateColumnRender
     }
   },
@@ -56,7 +51,8 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     label: "Order ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -64,7 +60,8 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     label: "Customer ID",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
     }
   },
   {
@@ -73,14 +70,20 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, onSor
     options: {
       filter: true,
       sort: false,
+      customBodyRender: (value: any) => {
+        const markers = value;
+        if (!markers) {
+          return <div className={styles.markersWrapper} />;
+        }
+        const renderedMarkers = markers.map((marker: string) => <li>
+          <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
+        return <ul className={styles.markersWrapper}>{renderedMarkers}</ul>;
+      }
     },
-    customBodyRender: (value: any, tableMeta: any, updateValue: any) => {
-      return value.join(", ");
-    }
-  },
+  }
 ];
 
-const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
+const options = (onSelect: any, onSaved: any, setCount: (count: number) => void, isAdmin: boolean) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -90,7 +93,7 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
   search: false,
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
-  selectableRows: 'multiple',
+  selectableRows: isAdmin ? 'none' : 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [25],
   rowHover: true,
@@ -101,7 +104,7 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
   },
   customFooter: (rowCount) => setCount(rowCount),
   customToolbar: () => '',
-  customToolbarSelect: (selected, displayData, setSelectedRows) => {
+  customToolbarSelect: (selected) => {
     return <ApproveButton mode="result"
       text={"Approve results"}
       onSaved={onSaved}
@@ -111,51 +114,17 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
 } as MUIDataTableOptions);
 
 const TestsPage = () => {
-  const [data, setData] = useState({} as OrdersResponse);
+  const admin = useSelector(isAdmin);
   const [searchText, setSearchText] = useState('');
-  const [page, setPage] = useState(0);
   const width = useResizeListener();
-  const [loading, setLoading] = useState(true);
   const [searchItemsCount, setCount] = useState(0);
-  const [sortDirection, setSortDirection] = useState('desc' as SortDirection);
-  const dispatch = useDispatch();
-  const tests = useSelector(testsPendingState);
+  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'PENDING', testsPendingState);
 
-  useEffect(() => {
-    onSaved();
-  }, []);
+  const testsToView = itemsToView(tests, searchText);
 
-  const onSaved = async () => {
-    setLoading(true);
-    await dispatch(loadTestsByStatus('PENDING', page, 'received', sortDirection));
-    setLoading(false);
-  };
+  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
-  useEffect(() => {
-    if (tests && tests.content && tests.content.length) {
-      setData({
-        ...tests, content: tests.content.map((item: Order) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        })
-      })
-    }
-  }, [tests]);
-
-  useEffect(() => {
-    if (tests.content && tests.content.length) onSaved();
-  }, [page, sortDirection]);
-
-  const onSort = () => {
-    setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
-    setPage(0);
-  };
-
-  const testsToView = itemsToView(data, searchText);
-
-  const onClickLink = (id: number) => tests.content.filter(test => test.id === id)[0];
-
-  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => data.content[row.index]);
+  const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
   return <section className={styles.tests}>
     {loading && <Spinner />}
@@ -167,21 +136,22 @@ const TestsPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={data.content ? data.content.map(reformatDate) : []}
-          columns={testsNotApprovedColumns(onClickLink, onSort)}
-          options={options(onSelect, onSaved, setCount)}
+          data={tests.content ? tests.content.map(reformatDate) : []}
+          columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
+          options={options(onSelect, onSaved, setCount, admin)}
         />
         <Pagination page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={tests.totalPages}
+          itemsPerPage={tests.size}
           searchItems={searchItemsCount}
-          totalItems={data.totalElements} />
+          totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
-        <p className={styles.testsResultsInfo}>({data.totalElements || 0} results)</p>
-        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />
+        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
+        {!admin &&
+        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i) => (
@@ -197,22 +167,26 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
               <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
+                range: <span className={styles.mobileTestsText}>
+                  {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
+                    <div className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any)=><><DangerIcon className={styles.dangerIconLeft}/>{item}; </>)} </div>
+                    : "None"}
+              </span>
               </p>
-              <ApproveButton className={styles.btnApproveMobile}
+              {!admin && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />
+                text={"Approve"} />}
             </div>
           ))}
         <Pagination mobile
           page={page}
           setPage={setPage}
-          totalPages={data.totalPages}
-          itemsPerPage={data.size}
+          totalPages={tests.totalPages}
+          itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={data.totalElements} />
+          totalItems={tests.totalElements} />
         {testsToView.length === 0 && <NoMatches />}
       </div>
     }

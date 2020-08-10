@@ -7,13 +7,13 @@ import React, {useEffect, useState} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
 import MobileNavigation from "../../components/Navigation/MobileNavigation";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
-import {userState} from "../../selectors/selectors";
+import {isAdmin} from "../../selectors/selectors";
 
 const OrdersPage = () => {
-  const user = useSelector(userState);
+  const admin = useSelector(isAdmin);
   const [width, setWidth] = useState(getWidth());
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            {user && !user.physician && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
+            {admin && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
           </div>
         </div>
       </section>

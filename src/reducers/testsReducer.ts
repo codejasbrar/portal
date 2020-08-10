@@ -1,7 +1,6 @@
-import {GET_TEST_SUCCESS, GET_TESTS_BY_STATUS, GET_TESTS_ERROR, GET_TESTS_SUCCESS} from "../actions/testsActions";
+import {GET_TEST_SUCCESS, GET_TESTS_SUCCESS} from "../actions/testsActions";
 import {OrdersState} from "./ordersReducer";
 import {TestDetails} from "../interfaces/Test";
-import {Order} from "../interfaces/Order";
 
 export interface TestsState extends OrdersState {
   details: TestDetails | null,
