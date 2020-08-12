@@ -16,6 +16,7 @@ import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Order} from "../../../interfaces/Order";
+import {useCounters} from "../../../components/Navigation/Navigation";
 
 
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
@@ -103,6 +104,8 @@ const TestApprovedPage = () => {
   const width = useResizeListener();
   const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', testsApprovedState);
 
+  const count = useCounters().approvedResults;
+
   const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
@@ -130,7 +133,7 @@ const TestApprovedPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
+        <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
           .map((item: any, i: number) => (

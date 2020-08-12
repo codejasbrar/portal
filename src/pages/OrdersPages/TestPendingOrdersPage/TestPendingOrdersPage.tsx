@@ -19,6 +19,7 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {Order} from "../../../interfaces/Order";
+import {useCounters} from "../../../components/Navigation/Navigation";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -101,11 +102,18 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
     }
   },
   customToolbar: () => '',
-  customToolbarSelect: (selected) => {
-    return <ApproveButton mode="result"
+  customToolbarSelect: (selected, data, setSelectedRows) => {
+    let selectedItems;
+    try {
+      selectedItems = onSelect(selected.data);
+      selectedItems.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
+    }
+    return <ApproveButton type="approved" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
-      selected={onSelect(selected.data)} />
+      selected={selectedItems} />
   },
   customFooter: () => <></>,
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -116,6 +124,7 @@ const TestsPage = () => {
   const width = useResizeListener();
   const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', testsPendingState);
 
+  const count = useCounters().pendingResults;
   const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
@@ -145,7 +154,7 @@ const TestsPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
-        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
+        <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         {!admin &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />

@@ -20,6 +20,7 @@ import {
 } from "../PendingOrdersPage/PendingOrdersPage";
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
+import {useCounters} from "../../../components/Navigation/Navigation";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -124,6 +125,7 @@ const ApprovedOrdersPage = () => {
   const width = useResizeListener();
   const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', ordersApprovedState);
   const ordersToView = orders.content || [];
+  const count = useCounters().approvedOrders;
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -148,7 +150,7 @@ const ApprovedOrdersPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
+        <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
           .map((item: any, i: number) => (

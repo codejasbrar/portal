@@ -12,8 +12,7 @@ type NavigationPropsTypes = {
   desktop?: boolean
 };
 
-const Navigation = (props: NavigationPropsTypes) => {
-  const user = useSelector(userState);
+export const useCounters = () => {
   const quantity = useSelector(resultsQuantity);
   const [counters, setCounters] = useState({} as OrdersQuantity);
   const dispatch = useDispatch();
@@ -27,6 +26,13 @@ const Navigation = (props: NavigationPropsTypes) => {
       await dispatch(loadCounters());
     })();
   }, [dispatch]);
+
+  return counters;
+};
+
+const Navigation = (props: NavigationPropsTypes) => {
+  const user = useSelector(userState);
+  const counters = useCounters();
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>

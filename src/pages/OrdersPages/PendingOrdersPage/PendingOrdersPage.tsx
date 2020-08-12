@@ -20,6 +20,7 @@ import {isAdmin, ordersPendingState} from "../../../selectors/selectors";
 import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {TestDetails} from "../../../interfaces/Test";
+import {useCounters} from "../../../components/Navigation/Navigation";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -101,11 +102,18 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
     }
   },
   customToolbar: () => '',
-  customToolbarSelect: (selected) => {
+  customToolbarSelect: (selected, data, setSelectedRows) => {
+    let selectedItems;
+    try {
+      selectedItems = onSelect(selected.data);
+      selectedItems.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
+    }
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}
-      selected={onSelect(selected.data)} />;
+      selected={selectedItems} />;
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
   customFooter: () => <></>,
@@ -182,18 +190,17 @@ export const usePageState = (type: "order" | "test", status: string, selector: (
     debouncedSearch(searchText && searchText.length > 2 ? searchText : '');
   }, [searchText]);
 
-  const onSaved = async (type: string, status: string, page: number, sort: any, searchString: string) => {
+  const onSaved = async () => {
     setLoading(true);
     if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, page, sort.param, sort.direction, searchString));
     if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, page, sort.param, sort.direction, searchString));
     setLoading(false);
   };
 
-  const debouncedOnSaved = useMemo(() => debounce(onSaved, 0), []);
-
   useEffect(() => {
-    debouncedOnSaved(type, status, page, sort, searchString);
+    onSaved();
   }, [page, sort, searchString]);
+
 
   const onSort = (sortParam: string = 'received') => {
     setSort({param: sortParam, direction: sort.direction === 'desc' ? 'asc' : 'desc'});
@@ -201,7 +208,7 @@ export const usePageState = (type: "order" | "test", status: string, selector: (
   };
 
   useEffect(() => {
-    onSaved(type, status, page, sort, searchString);
+    onSaved();
   }, []);
 
   return [loading, items as OrdersResponse, page as number, sort as any, onSort, setPage, searchText, setSearchText, onSaved]
@@ -211,9 +218,11 @@ const PendingOrdersPage = () => {
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
   const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
+  const count = useCounters().pendingOrders;
+
+  const ordersToView = orders.content || [];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
-  const ordersToView = orders.content || [];
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -238,7 +247,7 @@ const PendingOrdersPage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
+        <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         {!admin &&
         <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />

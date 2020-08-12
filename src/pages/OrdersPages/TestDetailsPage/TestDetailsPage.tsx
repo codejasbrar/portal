@@ -31,7 +31,13 @@ const columns = [
     label: "Biomarker",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
+        (<th key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
+          <button className={styles.sortBlock}
+            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${styles.sortIconActive}`} /></span>
+          </button>
+        </th>),
     }
   },
   {
@@ -39,21 +45,13 @@ const columns = [
     label: "Result",
     options: {
       filter: true,
-      sort: true,
-
+      sort: false,
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
         return <span className={styles.dotWrapper}>{value}{panic && value ?
           <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
-
-      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer, updateDirection: (params: any) => any) =>
-        (<td key={columnMeta.index} style={{borderBottom: "1px solid #C3C8CD"}}>
-          <button className={styles.sortBlock}
-            onClick={() => updateDirection(0)}>{columnMeta.label}<span><SortIcon className={`${styles.sortIcon} ${styles.sortIconActive}`} /></span>
-          </button>
-        </td>),
     }
   },
   {

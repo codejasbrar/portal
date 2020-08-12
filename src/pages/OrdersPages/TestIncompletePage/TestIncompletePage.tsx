@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -13,6 +13,7 @@ import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
+import {useCounters} from "../../../components/Navigation/Navigation";
 
 const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
   filterType: 'checkbox',
@@ -32,10 +33,19 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
       noMatch: "No results found",
     }
   },
-  customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
-    text={"Approve results"}
-    onSaved={onSaved}
-    selected={onSelect(selected.data)} />,
+  customToolbarSelect: (selected, data, setSelectedRows) => {
+    let selectedItems;
+    try {
+      selectedItems = onSelect(selected.data);
+      selectedItems.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
+    }
+    return <ApproveButton type="pending" mode="result"
+      text={"Approve results"}
+      onSaved={onSaved}
+      selected={selectedItems} />
+  },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
   customToolbar: () => '',
   customFooter: () => <></>,
@@ -47,6 +57,8 @@ const TestIncompletePage = () => {
   const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
 
   const testsToView = tests.content || [];
+
+  const count = useCounters().incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -75,7 +87,7 @@ const TestIncompletePage = () => {
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
-        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
+        <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         <ApproveButton type="pending"
           mode="result"
           onSaved={onSaved}
