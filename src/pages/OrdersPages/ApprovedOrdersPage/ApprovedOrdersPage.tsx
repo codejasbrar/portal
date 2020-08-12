@@ -15,9 +15,7 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender, customHeadSortRender,
-  itemsToView,
-  NoMatches,
-  reformatDate, usePageState,
+  NoMatches, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
@@ -78,7 +76,7 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   }
 ];
 
-const options = (onSearch: (count: number) => void) => ({
+const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
   filter: false,
   download: false,
   print: false,
@@ -91,7 +89,6 @@ const options = (onSearch: (count: number) => void) => ({
   rowsPerPageOptions: [25],
   rowHover: true,
   pagination: false,
-  customFooter: (rowCount) => onSearch(rowCount),
   selectableRows: 'none',
   textLabels: {
     body: {
@@ -99,8 +96,9 @@ const options = (onSearch: (count: number) => void) => ({
     }
   },
   customToolbarSelect: () => <></>,
-  customSearchRender: SearchBar,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
   customToolbar: () => <></>,
+  customFooter: () => <></>,
 }) as MUIDataTableOptions;
 
 const getLabSlip = async (hash: string, fileName: string) => {
@@ -123,12 +121,9 @@ const getLabSlip = async (hash: string, fileName: string) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const [searchItemsCount, setCount] = useState(0);
-  const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage] = usePageState('order', 'APPROVED', ordersApprovedState);
-
-  const ordersToView = itemsToView(orders, searchText);
+  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', ordersApprovedState);
+  const ordersToView = orders.content || [];
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -140,15 +135,15 @@ const ApprovedOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={orders.content ? orders.content.map(reformatDate) : []}
+          data={orders.content || []}
           columns={columns(sort.param, onSort)}
-          options={options(setCount)}
+          options={options(searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={orders.totalPages}
           itemsPerPage={orders.size}
-          searchItems={searchItemsCount}
+          searchItems={ordersToView.length}
           totalItems={orders.totalElements} />
       </MuiThemeProvider>
       :
@@ -156,7 +151,7 @@ const ApprovedOrdersPage = () => {
         <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {ordersToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Order
                 ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>

@@ -8,14 +8,13 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {testsIncompleteState} from "../../../selectors/selectors";
-import {reformatDate, usePageState, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {usePageState, useResizeListener, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import {itemsToView, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
 
-const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
+const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -33,23 +32,21 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void)
       noMatch: "No results found",
     }
   },
-  customFooter: (rowCount) => setCount(rowCount),
   customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
     text={"Approve results"}
     onSaved={onSaved}
     selected={onSelect(selected.data)} />,
-  customSearchRender: SearchBar,
-  customToolbar: () => ''
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
+  customToolbar: () => '',
+  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 
 const TestIncompletePage = () => {
-  const [searchText, setSearchText] = useState('');
-  const [searchItemsCount, setCount] = useState(0);
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
+  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
 
-  const testsToView = itemsToView(tests, searchText);
+  const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -65,15 +62,15 @@ const TestIncompletePage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content ? tests.content.map(reformatDate) : []}
+          data={tests.content || []}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, setCount)}
+          options={options(onSelect, onSaved, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
-          searchItems={searchItemsCount}
+          searchItems={testsToView.length}
           totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
@@ -86,7 +83,7 @@ const TestIncompletePage = () => {
           text={"Approve all results"} />
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}

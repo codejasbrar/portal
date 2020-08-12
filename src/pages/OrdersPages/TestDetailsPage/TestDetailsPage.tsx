@@ -13,7 +13,7 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {isAdmin, testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
-import {reformatDate, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {reformatItem, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
@@ -125,7 +125,7 @@ const TestDetailsPage = () => {
 
   useEffect(() => {
     if (testSelected) {
-      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatDate(testSelected) as TestDetails);
+      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
     }
   }, [testSelected, admin, history]);
 

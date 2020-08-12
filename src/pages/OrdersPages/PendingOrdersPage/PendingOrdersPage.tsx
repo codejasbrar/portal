@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import styles from "../OrdersPages.module.scss";
 
@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
+import {debounce} from "@material-ui/core";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
@@ -16,9 +17,9 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
 import {isAdmin, ordersPendingState} from "../../../selectors/selectors";
-import {Test, TestDetails} from "../../../interfaces/Test";
 import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
 import {loadTestsByStatus} from "../../../actions/testsActions";
+import {TestDetails} from "../../../interfaces/Test";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -79,7 +80,7 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void, isAdmin: boolean) => ({
+const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -88,7 +89,6 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void,
   searchOpen: true,
   search: false,
   responsive: "scrollFullHeight",
-  customFooter: (rowCount) => onSearch(rowCount),
   rowsPerPage: 25,
   pagination: false,
   selectableRows: isAdmin ? 'none' : 'multiple',
@@ -107,7 +107,8 @@ const options = (onSelect: any, onSaved: any, onSearch: (count: number) => void,
       onSaved={onSaved}
       selected={onSelect(selected.data)} />;
   },
-  customSearchRender: SearchBar,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
+  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 export const NoMatches = () => (
@@ -118,7 +119,7 @@ export const NoMatches = () => (
   </div>
 );
 
-export const reformatDate = (order: Order | Test | TestDetails) => {
+export const reformatItem = (order: Order | TestDetails): any => {
   const offsetHours = new Date().getTimezoneOffset() / 60;
   const dateReceived = new Date(order.received);
   const dateApproved = order.approved ? new Date(order.approved) : '';
@@ -126,6 +127,7 @@ export const reformatDate = (order: Order | Test | TestDetails) => {
   if (dateApproved) dateApproved.setHours(dateApproved.getHours() - offsetHours);
   return {
     ...order,
+    criteriaMet: order.criteriaMet ? "Yes" : 'No',
     received: `${dateReceived.getMonth() + 1}/${dateReceived.getDate()}/${dateReceived.getFullYear()}T${dateReceived.toLocaleTimeString()}`,
     approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}T${dateApproved.toLocaleTimeString()}` : ''
   }
@@ -150,12 +152,9 @@ export const useData = (selector: (store: Storage) => OrdersResponse) => {
   const items: OrdersResponse = useSelector(selector);
 
   useEffect(() => {
-    if (items.content && items.content.length) {
+    if (items.content) {
       setData({
-        ...items, content: items.content.map((item: Order) => {
-          item.criteriaMet = item.criteriaMet ? "Yes" : 'No';
-          return item;
-        })
+        ...items, content: items.content.map(reformatItem)
       })
     }
   }, [items]);
@@ -163,27 +162,38 @@ export const useData = (selector: (store: Storage) => OrdersResponse) => {
   return data;
 };
 
-export const itemsToView = (data: OrdersResponse, searchText: string) => data.content ? data.content
-  .map(reformatDate)
-  .filter((item: any) => (String(item.id).indexOf(searchText) !== -1) || (String(item.customerId).indexOf(searchText) !== -1) ? 1 : 0) : [];
-
 export const usePageState = (type: "order" | "test", status: string, selector: (store: Storage) => OrdersResponse) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
+  const [searchText, setSearchText] = useState('');
+  const [searchString, setSearchString] = useState('');
   const items = useData(selector);
 
-  useEffect(() => {
-    if (items.content && items.content.length) onSaved();
-  }, [page, sort]);
+  const onSearch = (value: string) => {
+    setSearchString(value);
+    setPage(0);
+  };
 
-  const onSaved = async () => {
+  const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchString]);
+
+  useEffect(() => {
+    debouncedSearch(searchText && searchText.length > 2 ? searchText : '');
+  }, [searchText]);
+
+  const onSaved = async (type: string, status: string, page: number, sort: any, searchString: string) => {
     setLoading(true);
-    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, page, sort.param, sort.direction));
-    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, page, sort.param, sort.direction));
+    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, page, sort.param, sort.direction, searchString));
+    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, page, sort.param, sort.direction, searchString));
     setLoading(false);
   };
+
+  const debouncedOnSaved = useMemo(() => debounce(onSaved, 0), []);
+
+  useEffect(() => {
+    debouncedOnSaved(type, status, page, sort, searchString);
+  }, [page, sort, searchString]);
 
   const onSort = (sortParam: string = 'received') => {
     setSort({param: sortParam, direction: sort.direction === 'desc' ? 'asc' : 'desc'});
@@ -191,22 +201,19 @@ export const usePageState = (type: "order" | "test", status: string, selector: (
   };
 
   useEffect(() => {
-    onSaved();
+    onSaved(type, status, page, sort, searchString);
   }, []);
 
-  return [loading, items as OrdersResponse, page as number, sort as any, onSort, setPage, onSaved]
+  return [loading, items as OrdersResponse, page as number, sort as any, onSort, setPage, searchText, setSearchText, onSaved]
 };
 
 const PendingOrdersPage = () => {
-  const [searchText, setSearchText] = useState('');
-  const [searchItemsCount, setCount] = useState(0);
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
-
-  const ordersToView = itemsToView(orders, searchText);
+  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
+  const ordersToView = orders.content || [];
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -218,15 +225,15 @@ const PendingOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={orders.content ? orders.content.map(reformatDate) : []}
+          data={orders.content || []}
           columns={columns(sort.param, onSort)}
-          options={options(onSelect, onSaved, setCount, admin)}
+          options={options(onSelect, onSaved, admin, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={orders.totalPages}
           itemsPerPage={orders.size}
-          searchItems={searchItemsCount}
+          searchItems={ordersToView.length}
           totalItems={orders.totalElements} />
       </MuiThemeProvider>
       :

@@ -34,5 +34,6 @@ export interface TestDetails {
   status: string,
   order: OrderDetails,
   biomarkers: Biomarker[],
-  testResultComments: TestComment[]
+  testResultComments: TestComment[],
+  criteriaMet?: boolean | 'Yes' | 'No'
 }

@@ -9,14 +9,12 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches,
-  reformatDate, usePageState,
+  NoMatches, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
-import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
 
 
@@ -77,7 +75,7 @@ const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (
   },
 ];
 
-const options = (onSearch: (count: number) => void) => ({
+const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
   filter: false,
   download: false,
   print: false,
@@ -95,19 +93,17 @@ const options = (onSearch: (count: number) => void) => ({
       noMatch: "No results found",
     }
   },
-  customFooter: (rowCount) => onSearch(rowCount),
   customToolbarSelect: () => <></>,
-  customSearchRender: SearchBar,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
   customToolbar: () => <></>,
+  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 const TestApprovedPage = () => {
-  const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [searchItemsCount, setCount] = useState(0);
-  const [loading, tests, page, sort, onSort, setPage] = usePageState('test', 'APPROVED', testsApprovedState);
+  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', testsApprovedState);
 
-  const testsToView = itemsToView(tests, searchText);
+  const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -121,15 +117,15 @@ const TestApprovedPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content ? tests.content.map(reformatDate) : []}
+          data={tests.content || []}
           columns={columns(onClickLink, sort.param, onSort)}
-          options={options(setCount)}
+          options={options(searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
-          searchItems={searchItemsCount}
+          searchItems={testsToView.length}
           totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
@@ -137,14 +133,16 @@ const TestApprovedPage = () => {
         <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>
-              <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link className={styles.mobileTestsLink}
-                  to={`/orders/test/${item.hash}`}
-                >{item.id}</Link></span></p>
+              <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link
+                className={styles.mobileTestsLink}
+                to={`/orders/test/${item.hash}`}
+              >{item.id}</Link></span></p>
               <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
-              <p className={styles.mobileOrdersTitle}>Order ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
+              <p className={styles.mobileOrdersTitle}>Order
+                ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>

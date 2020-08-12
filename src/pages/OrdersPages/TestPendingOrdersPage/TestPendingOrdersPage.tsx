@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -12,13 +12,11 @@ import {useSelector} from "react-redux";
 import {isAdmin, testsPendingState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches,
-  reformatDate, usePageState,
+  NoMatches, usePageState,
   useResizeListener,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
-import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {Order} from "../../../interfaces/Order";
 
@@ -83,7 +81,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
   }
 ];
 
-const options = (onSelect: any, onSaved: any, setCount: (count: number) => void, isAdmin: boolean) => ({
+const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -102,7 +100,6 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void,
       noMatch: "No results found",
     }
   },
-  customFooter: (rowCount) => setCount(rowCount),
   customToolbar: () => '',
   customToolbarSelect: (selected) => {
     return <ApproveButton mode="result"
@@ -110,17 +107,16 @@ const options = (onSelect: any, onSaved: any, setCount: (count: number) => void,
       onSaved={onSaved}
       selected={onSelect(selected.data)} />
   },
-  customSearchRender: SearchBar,
+  customFooter: () => <></>,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
 const TestsPage = () => {
   const admin = useSelector(isAdmin);
-  const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [searchItemsCount, setCount] = useState(0);
-  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'PENDING', testsPendingState);
+  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', testsPendingState);
 
-  const testsToView = itemsToView(tests, searchText);
+  const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -136,15 +132,15 @@ const TestsPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content ? tests.content.map(reformatDate) : []}
+          data={tests.content || []}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, setCount, admin)}
+          options={options(onSelect, onSaved, admin, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
-          searchItems={searchItemsCount}
+          searchItems={testsToView.length}
           totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
@@ -154,7 +150,7 @@ const TestsPage = () => {
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
         <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
         {testsToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
