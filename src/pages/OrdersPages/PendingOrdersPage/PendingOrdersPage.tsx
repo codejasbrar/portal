@@ -195,7 +195,7 @@ export const usePageState = (type: "order" | "test", status: string, selector: (
   const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchParams.searchString]);
 
   useEffect(() => {
-    debouncedSearch(searchText && searchText.length > 2 ? searchText : '');
+    debouncedSearch(searchText && searchText.length > 1 ? searchText : '');
   }, [searchText]);
 
   const onSaved = async () => {

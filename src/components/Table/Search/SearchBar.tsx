@@ -12,7 +12,7 @@ export default (
     <input className={styles.searchInput}
       type={'text'}
       value={searchText || ''}
-      placeholder="Search: Order ID or Customer ID"
+      placeholder="Search: Order/Test ID or Customer ID"
       onChange={(e: any) => {
         handleSearch(e.target.value.replace(/\D/gi, ''));
       }} />
