@@ -131,7 +131,7 @@ const ApprovedOrdersPage = () => {
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
           .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>

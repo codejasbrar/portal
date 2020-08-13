@@ -257,7 +257,7 @@ const PendingOrdersPage = () => {
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         {!admin &&
         <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
           .map((item: any, i: any) => (
             <div key={i} className={styles.mobileOrdersItem}>

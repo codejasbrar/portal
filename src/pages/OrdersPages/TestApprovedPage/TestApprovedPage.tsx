@@ -115,7 +115,7 @@ const TestApprovedPage = () => {
       :
       <div className={styles.mobileOrders}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>

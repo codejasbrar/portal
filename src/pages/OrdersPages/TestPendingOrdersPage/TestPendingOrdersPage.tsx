@@ -136,7 +136,7 @@ const TestsPage = () => {
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         {!admin &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
