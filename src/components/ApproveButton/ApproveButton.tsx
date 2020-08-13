@@ -25,6 +25,7 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
       Are you sure you want to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'} the
