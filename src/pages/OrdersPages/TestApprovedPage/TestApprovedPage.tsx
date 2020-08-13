@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -6,18 +6,17 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {testsApprovedState} from "../../../selectors/selectors";
+import {resultsQuantity, testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches,
-  reformatDate, usePageState,
+  NoMatches, tableBaseOptions, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
-import {itemsToView} from "../PendingOrdersPage/PendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
+import {useSelector} from "react-redux";
 
 
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
@@ -77,37 +76,18 @@ const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (
   },
 ];
 
-const options = (onSearch: (count: number) => void) => ({
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
-  rowsPerPageOptions: [],
-  rowHover: true,
-  selectableRows: 'none',
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
-  customFooter: (rowCount) => onSearch(rowCount),
-  customToolbarSelect: () => <></>,
-  customSearchRender: SearchBar,
-  customToolbar: () => <></>,
+const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
+  ...tableBaseOptions,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
 const TestApprovedPage = () => {
-  const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [searchItemsCount, setCount] = useState(0);
-  const [loading, tests, page, sort, onSort, setPage] = usePageState('test', 'APPROVED', testsApprovedState);
+  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', testsApprovedState);
 
-  const testsToView = itemsToView(tests, searchText);
+  const count = useSelector(resultsQuantity).approvedResults;
+
+  const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -121,30 +101,32 @@ const TestApprovedPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content ? tests.content.map(reformatDate) : []}
+          data={tests.content || []}
           columns={columns(onClickLink, sort.param, onSort)}
-          options={options(setCount)}
+          options={options(searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
-          searchItems={searchItemsCount}
+          searchItems={testsToView.length}
           totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <p className={styles.testsResultsInfo}>({count || 0} results)</p>
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>
-              <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link className={styles.mobileTestsLink}
-                  to={`/orders/test/${item.hash}`}
-                >{item.id}</Link></span></p>
+              <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link
+                className={styles.mobileTestsLink}
+                to={`/orders/test/${item.hash}`}
+              >{item.id}</Link></span></p>
               <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
-              <p className={styles.mobileOrdersTitle}>Order ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
+              <p className={styles.mobileOrdersTitle}>Order
+                ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>

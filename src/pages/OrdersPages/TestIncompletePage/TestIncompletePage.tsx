@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -7,49 +7,40 @@ import MUIDataTable, {MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {testsIncompleteState} from "../../../selectors/selectors";
-import {reformatDate, usePageState, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
+import {resultsQuantity, testsIncompleteState} from "../../../selectors/selectors";
+import {usePageState, useResizeListener, NoMatches, tableBaseOptions} from "../PendingOrdersPage/PendingOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import {itemsToView, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
+import {useSelector} from "react-redux";
 
-const options = (onSelect: any, onSaved: any, setCount: (count: number) => void) => ({
-  filterType: 'checkbox',
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [25],
-  rowHover: true,
-  textLabels: {
-    body: {
-      noMatch: "No results found",
+const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
+  ...tableBaseOptions,
+  selectableRows: 'multiple',
+  customToolbarSelect: (selected, data, setSelectedRows) => {
+    const selectedItems = onSelect(selected.data);
+    try {
+      selectedItems.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
     }
+    return <ApproveButton type="pending" mode="result"
+      text={"Approve results"}
+      onSaved={onSaved}
+      selected={selectedItems} />
   },
-  customFooter: (rowCount) => setCount(rowCount),
-  customToolbarSelect: (selected) => <ApproveButton type="pending" mode="result"
-    text={"Approve results"}
-    onSaved={onSaved}
-    selected={onSelect(selected.data)} />,
-  customSearchRender: SearchBar,
-  customToolbar: () => ''
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
 
 const TestIncompletePage = () => {
-  const [searchText, setSearchText] = useState('');
-  const [searchItemsCount, setCount] = useState(0);
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
+  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
 
-  const testsToView = itemsToView(tests, searchText);
+  const testsToView = tests.content || [];
+
+  const count = useSelector(resultsQuantity).incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
@@ -65,28 +56,28 @@ const TestIncompletePage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content ? tests.content.map(reformatDate) : []}
+          data={tests.content || []}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, setCount)}
+          options={options(onSelect, onSaved, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
-          searchItems={searchItemsCount}
+          searchItems={testsToView.length}
           totalItems={tests.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
-        <p className={styles.testsResultsInfo}>({tests.totalElements || 0} results)</p>
+        <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         <ApproveButton type="pending"
           mode="result"
           onSaved={onSaved}
           selected={tests.content}
           text={"Approve all results"} />
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}

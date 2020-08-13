@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -10,18 +10,17 @@ import MUIDataTable, {
 } from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {ordersApprovedState} from "../../../selectors/selectors";
+import {ordersApprovedState, resultsQuantity} from "../../../selectors/selectors";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender, customHeadSortRender,
-  itemsToView,
-  NoMatches,
-  reformatDate, usePageState,
+  NoMatches, tableBaseOptions, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
+import {useSelector} from "react-redux";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -78,29 +77,9 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   }
 ];
 
-const options = (onSearch: (count: number) => void) => ({
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
-  rowsPerPageOptions: [25],
-  rowHover: true,
-  pagination: false,
-  customFooter: (rowCount) => onSearch(rowCount),
-  selectableRows: 'none',
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
-  customToolbarSelect: () => <></>,
-  customSearchRender: SearchBar,
-  customToolbar: () => <></>,
+const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
+  ...tableBaseOptions,
+  customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 }) as MUIDataTableOptions;
 
 const getLabSlip = async (hash: string, fileName: string) => {
@@ -123,12 +102,10 @@ const getLabSlip = async (hash: string, fileName: string) => {
 };
 
 const ApprovedOrdersPage = () => {
-  const [searchItemsCount, setCount] = useState(0);
-  const [searchText, setSearchText] = useState('');
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage] = usePageState('order', 'APPROVED', ordersApprovedState);
-
-  const ordersToView = itemsToView(orders, searchText);
+  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', ordersApprovedState);
+  const ordersToView = orders.content || [];
+  const count = useSelector(resultsQuantity).approvedOrders;
 
   return <section className={styles.orders}>
     {loading && <Spinner />}
@@ -140,23 +117,23 @@ const ApprovedOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={orders.content ? orders.content.map(reformatDate) : []}
+          data={orders.content || []}
           columns={columns(sort.param, onSort)}
-          options={options(setCount)}
+          options={options(searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={orders.totalPages}
           itemsPerPage={orders.size}
-          searchItems={searchItemsCount}
+          searchItems={ordersToView.length}
           totalItems={orders.totalElements} />
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
-        <p className={styles.ordersResultsInfo}>({orders.totalElements || 0} results)</p>
-        <SearchBarMobile onChange={(e: any) => setSearchText(e.target.value)} />
+        <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
+        <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
-          .map((item: any, i) => (
+          .map((item: any, i: number) => (
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Order
                 ID: <span className={styles.mobileOrdersText}>{item.id}</span></p>
