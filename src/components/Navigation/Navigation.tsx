@@ -1,38 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {resultsQuantity, userState} from "../../selectors/selectors";
-import {loadCounters} from "../../actions/countersActions";
-import {OrdersQuantity} from "../../interfaces/Order";
 
 type NavigationPropsTypes = {
   desktop?: boolean
 };
 
-export const useCounters = () => {
-  const quantity = useSelector(resultsQuantity);
-  const [counters, setCounters] = useState({} as OrdersQuantity);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (quantity) setCounters(quantity);
-  }, [quantity]);
-
-  useEffect(() => {
-    (async () => {
-      await dispatch(loadCounters());
-    })();
-  }, [dispatch]);
-
-  return counters;
-};
-
 const Navigation = (props: NavigationPropsTypes) => {
   const user = useSelector(userState);
-  const counters = useCounters();
+  const counters = useSelector(resultsQuantity);
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>

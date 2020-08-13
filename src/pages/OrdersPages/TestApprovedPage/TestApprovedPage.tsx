@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -6,17 +6,17 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {testsApprovedState} from "../../../selectors/selectors";
+import {resultsQuantity, testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, usePageState,
+  NoMatches, tableBaseOptions, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Order} from "../../../interfaces/Order";
-import {useCounters} from "../../../components/Navigation/Navigation";
+import {useSelector} from "react-redux";
 
 
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
@@ -77,34 +77,15 @@ const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (
 ];
 
 const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
-  rowsPerPageOptions: [],
-  rowHover: true,
-  selectableRows: 'none',
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
-  customToolbarSelect: () => <></>,
+  ...tableBaseOptions,
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
-  customToolbar: () => <></>,
-  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 const TestApprovedPage = () => {
   const width = useResizeListener();
   const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', testsApprovedState);
 
-  const count = useCounters().approvedResults;
+  const count = useSelector(resultsQuantity).approvedResults;
 
   const testsToView = tests.content || [];
 

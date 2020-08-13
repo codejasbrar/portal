@@ -7,36 +7,20 @@ import MUIDataTable, {MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {testsIncompleteState} from "../../../selectors/selectors";
-import {usePageState, useResizeListener, NoMatches} from "../PendingOrdersPage/PendingOrdersPage";
+import {resultsQuantity, testsIncompleteState} from "../../../selectors/selectors";
+import {usePageState, useResizeListener, NoMatches, tableBaseOptions} from "../PendingOrdersPage/PendingOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
-import {useCounters} from "../../../components/Navigation/Navigation";
+import {useSelector} from "react-redux";
 
 const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
-  filterType: 'checkbox',
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [25],
-  rowHover: true,
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
+  ...tableBaseOptions,
+  selectableRows: 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
-    let selectedItems;
+    const selectedItems = onSelect(selected.data);
     try {
-      selectedItems = onSelect(selected.data);
       selectedItems.map((item: Order) => item.id);
     } catch (e) {
       setSelectedRows([]);
@@ -47,8 +31,6 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
       selected={selectedItems} />
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
-  customToolbar: () => '',
-  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 
@@ -58,7 +40,7 @@ const TestIncompletePage = () => {
 
   const testsToView = tests.content || [];
 
-  const count = useCounters().incompleteResults;
+  const count = useSelector(resultsQuantity).incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 

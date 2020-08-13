@@ -16,11 +16,10 @@ import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {loadOrdersByStatus} from "../../../actions/ordersActions";
 import {useDispatch, useSelector} from "react-redux";
-import {isAdmin, ordersPendingState} from "../../../selectors/selectors";
+import {isAdmin, ordersPendingState, resultsQuantity} from "../../../selectors/selectors";
 import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {TestDetails} from "../../../interfaces/Test";
-import {useCounters} from "../../../components/Navigation/Navigation";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -81,7 +80,7 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   },
 ];
 
-const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
+export const tableBaseOptions = {
   filterType: 'checkbox',
   filter: false,
   download: false,
@@ -92,31 +91,35 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   responsive: "scrollFullHeight",
   rowsPerPage: 25,
   pagination: false,
-  selectableRows: isAdmin ? 'none' : 'multiple',
   selectToolbarPlacement: 'above',
   rowsPerPageOptions: [25],
   rowHover: true,
+  selectableRows: 'none',
   textLabels: {
     body: {
       noMatch: "No results found",
     }
   },
   customToolbar: () => '',
+  customFooter: () => <></>
+};
+
+const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
+  ...tableBaseOptions,
+  selectableRows: isAdmin ? 'none' : 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
-    let selectedItems;
+    const items = onSelect(selected.data);
     try {
-      selectedItems = onSelect(selected.data);
-      selectedItems.map((item: Order) => item.id);
+      items.map((item: Order) => item.id)
     } catch (e) {
       setSelectedRows([]);
     }
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}
-      selected={selectedItems} />;
+      selected={items} />;
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
-  customFooter: () => <></>,
 } as MUIDataTableOptions);
 
 export const NoMatches = () => (
@@ -173,18 +176,23 @@ export const useData = (selector: (store: Storage) => OrdersResponse) => {
 export const usePageState = (type: "order" | "test", status: string, selector: (store: Storage) => OrdersResponse) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [sort, setSort] = useState({param: 'received', direction: 'desc' as SortDirection});
   const [searchText, setSearchText] = useState('');
-  const [searchString, setSearchString] = useState('');
+  const [searchParams, setSearchParams] = useState({
+    page: 0,
+    sort: {param: 'received', direction: 'desc' as SortDirection},
+    searchString: ''
+  });
   const items = useData(selector);
 
   const onSearch = (value: string) => {
-    setSearchString(value);
-    setPage(0);
+    setSearchParams({...searchParams, page: 0, searchString: value});
   };
 
-  const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchString]);
+  const onSetPage = (page: number) => {
+    setSearchParams({...searchParams, page: page})
+  };
+
+  const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchParams.searchString]);
 
   useEffect(() => {
     debouncedSearch(searchText && searchText.length > 2 ? searchText : '');
@@ -192,33 +200,32 @@ export const usePageState = (type: "order" | "test", status: string, selector: (
 
   const onSaved = async () => {
     setLoading(true);
-    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, page, sort.param, sort.direction, searchString));
-    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, page, sort.param, sort.direction, searchString));
+    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
+    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
     setLoading(false);
   };
 
   useEffect(() => {
     onSaved();
-  }, [page, sort, searchString]);
+  }, [searchParams.page, searchParams.sort, searchParams.searchString]);
 
 
   const onSort = (sortParam: string = 'received') => {
-    setSort({param: sortParam, direction: sort.direction === 'desc' ? 'asc' : 'desc'});
-    setPage(0);
+    setSearchParams({
+      ...searchParams,
+      page: 0,
+      sort: {param: sortParam, direction: searchParams.sort.direction === 'desc' ? 'asc' : 'desc'}
+    })
   };
 
-  useEffect(() => {
-    onSaved();
-  }, []);
-
-  return [loading, items as OrdersResponse, page as number, sort as any, onSort, setPage, searchText, setSearchText, onSaved]
+  return [loading, items as OrdersResponse, searchParams.page as number, searchParams.sort as any, onSort, onSetPage, searchText, setSearchText, onSaved]
 };
 
 const PendingOrdersPage = () => {
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
   const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
-  const count = useCounters().pendingOrders;
+  const count = useSelector(resultsQuantity).pendingOrders;
 
   const ordersToView = orders.content || [];
 

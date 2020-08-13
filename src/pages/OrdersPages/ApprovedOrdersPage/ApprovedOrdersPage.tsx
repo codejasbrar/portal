@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from "../OrdersPages.module.scss";
 import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -10,17 +10,17 @@ import MUIDataTable, {
 } from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {ordersApprovedState} from "../../../selectors/selectors";
+import {ordersApprovedState, resultsQuantity} from "../../../selectors/selectors";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, usePageState,
+  NoMatches, tableBaseOptions, usePageState,
   useResizeListener
 } from "../PendingOrdersPage/PendingOrdersPage";
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
-import {useCounters} from "../../../components/Navigation/Navigation";
+import {useSelector} from "react-redux";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -78,28 +78,8 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
 ];
 
 const options = (searchText: string, setSearchText: (searchText: string) => void) => ({
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
-  selectToolbarPlacement: 'none',
-  rowsPerPageOptions: [25],
-  rowHover: true,
-  pagination: false,
-  selectableRows: 'none',
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
-  customToolbarSelect: () => <></>,
+  ...tableBaseOptions,
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
-  customToolbar: () => <></>,
-  customFooter: () => <></>,
 }) as MUIDataTableOptions;
 
 const getLabSlip = async (hash: string, fileName: string) => {
@@ -125,7 +105,7 @@ const ApprovedOrdersPage = () => {
   const width = useResizeListener();
   const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', ordersApprovedState);
   const ordersToView = orders.content || [];
-  const count = useCounters().approvedOrders;
+  const count = useSelector(resultsQuantity).approvedOrders;
 
   return <section className={styles.orders}>
     {loading && <Spinner />}

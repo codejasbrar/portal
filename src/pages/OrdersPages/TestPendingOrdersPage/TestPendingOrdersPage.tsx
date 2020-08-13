@@ -9,17 +9,16 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useSelector} from "react-redux";
-import {isAdmin, testsPendingState} from "../../../selectors/selectors";
+import {isAdmin, resultsQuantity, testsPendingState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, usePageState,
+  NoMatches, tableBaseOptions, usePageState,
   useResizeListener,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {Order} from "../../../interfaces/Order";
-import {useCounters} from "../../../components/Navigation/Navigation";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -74,7 +73,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
         if (!markers) {
           return <div className={styles.markersWrapper} />;
         }
-        const renderedMarkers = markers.map((marker: string) => <li>
+        const renderedMarkers = markers.map((marker: string, idx: number) => <li key={marker + idx}>
           <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
         return <ul className={styles.markersWrapper}>{renderedMarkers}</ul>;
       }
@@ -83,29 +82,11 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
 ];
 
 const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
-  filterType: 'checkbox',
-  filter: false,
-  download: false,
-  print: false,
-  viewColumns: false,
-  searchOpen: true,
-  search: false,
-  responsive: "scrollFullHeight",
-  rowsPerPage: 25,
+  ...tableBaseOptions,
   selectableRows: isAdmin ? 'none' : 'multiple',
-  selectToolbarPlacement: 'above',
-  rowsPerPageOptions: [25],
-  rowHover: true,
-  textLabels: {
-    body: {
-      noMatch: "No results found",
-    }
-  },
-  customToolbar: () => '',
   customToolbarSelect: (selected, data, setSelectedRows) => {
-    let selectedItems;
+    const selectedItems = onSelect(selected.data);
     try {
-      selectedItems = onSelect(selected.data);
       selectedItems.map((item: Order) => item.id);
     } catch (e) {
       setSelectedRows([]);
@@ -115,7 +96,6 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
       onSaved={onSaved}
       selected={selectedItems} />
   },
-  customFooter: () => <></>,
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
@@ -123,8 +103,7 @@ const TestsPage = () => {
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
   const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', testsPendingState);
-
-  const count = useCounters().pendingResults;
+  const count = useSelector(resultsQuantity).pendingResults;
   const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
