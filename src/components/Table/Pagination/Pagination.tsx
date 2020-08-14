@@ -16,7 +16,7 @@ const Pagination = (props: CommonPaginationPropsTypes) => {
   const lastPageItems = props.itemsPerPage - ((props.itemsPerPage * props.totalPages) - props.totalItems);
   return <div className={`${styles.pagination} ${props.mobile ? styles.paginationMobile : ''}`}>
     <div className={styles.paginationWrap}>
-      {props.totalItems && <><span className={styles.text}>Showing results </span>
+      {props.totalItems > 0 && <><span className={styles.text}>Showing results </span>
         {props.searchItems && (props.searchItems === props.itemsPerPage || (props.searchItems === lastPageItems && props.page + 1 === props.totalPages)) ?
           <strong>{props.page * props.itemsPerPage + 1}-{props.page * props.itemsPerPage + props.itemsPerPage > props.totalItems ? props.totalItems : props.page * props.itemsPerPage + props.itemsPerPage} </strong> :
           <strong>{props.searchItems} </strong>}

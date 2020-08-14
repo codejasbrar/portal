@@ -291,19 +291,20 @@
         tr {
             &:first-child {
                 th {
-                    padding-bottom: 12px;
+                    padding-right: 28px;
                 }
 
                 .sortBlock {
-                    text-align:     right;
-                    padding-bottom: 12px;
+                    padding-left: 0;
                 }
             }
 
             th {
-                padding: 14px;
+                padding: 14px 14px 0px 14px;
 
                 &:last-child {
+                    padding-right: 8px;
+
                     div {
                         text-align:    right;
                         padding-right: 5px;

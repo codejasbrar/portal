@@ -9,9 +9,9 @@
         margin-bottom: 17px;
     }
 
-    @include breakpoint($tablet_horizontal) {
-        display: none;
-    }
+    //@include breakpoint($tablet_horizontal) {
+    //    display: none;
+    //}
 }
 
 .mobileNavigation {
