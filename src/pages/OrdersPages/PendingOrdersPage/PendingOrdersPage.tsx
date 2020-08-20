@@ -113,6 +113,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
       items.map((item: Order) => item.id)
     } catch (e) {
       setSelectedRows([]);
+      return <></>;
     }
     return <ApproveButton mode="order"
       text={"Approve orders"}

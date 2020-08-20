@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import Button from "../Button/Button";
 import Popup from "../Popup/Popup";
@@ -46,9 +46,14 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
       props.type && props.type === 'pending' ? await dispatch(savePendingResults(hashes)) : await dispatch(saveApprovedResults(hashes));
     await props.onSaved();
+    //setLoading(false);
+    //setShowPopup(false);
+  };
+
+  useEffect(() => () => {
     setLoading(false);
     setShowPopup(false);
-  };
+  }, []);
 
   return <>
     <Button className={props.className ? props.className : ''}
