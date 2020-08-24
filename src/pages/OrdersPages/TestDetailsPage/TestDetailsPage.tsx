@@ -211,6 +211,7 @@ const TestDetailsPage = () => {
                     id: test.id,
                     received: test.received,
                     approved: '',
+                    observed: '',
                     customerId: test.order?.customerId,
                     hash: hash,
                     panicValueBiomarkers: [''],
