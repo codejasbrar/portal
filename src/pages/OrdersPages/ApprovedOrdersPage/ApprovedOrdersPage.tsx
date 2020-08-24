@@ -84,9 +84,7 @@ const options = (searchText: string, setSearchText: (searchText: string) => void
 
 const getLabSlip = async (hash: string, fileName: string) => {
   // @ts-ignore
-  const isSafari = /constructor/i.test(window.HTMLElement) || (function (p) {
-    return p.toString() === "[object SafariRemoteNotification]";
-  })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+  const isSafari = /constructor/i.test(window.HTMLElement) || ((p) => p.toString() === "[object SafariRemoteNotification]")(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
   try {
     const response = await LabSlipApiService.getLabSlip(hash);
     const blob = new Blob([response.data], {type: "application/pdf"});
