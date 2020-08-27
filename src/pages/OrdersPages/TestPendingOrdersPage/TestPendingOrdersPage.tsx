@@ -35,6 +35,16 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
     }
   },
   {
+    name: "observed",
+    label: "Collected",
+    options: {
+      filter: true,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender: customDateColumnRender
+    }
+  },
+  {
     name: "received",
     label: "Received",
     options: {
