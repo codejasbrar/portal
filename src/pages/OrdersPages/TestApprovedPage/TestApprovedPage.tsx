@@ -37,6 +37,16 @@ const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (
     }
   },
   {
+    name: "observed",
+    label: "Collected",
+    options: {
+      filter: true,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender: customDateColumnRender
+    }
+  },
+  {
     name: "received",
     label: "Received",
     options: {

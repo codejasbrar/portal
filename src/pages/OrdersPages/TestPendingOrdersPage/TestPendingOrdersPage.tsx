@@ -35,6 +35,16 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
     }
   },
   {
+    name: "observed",
+    label: "Collected",
+    options: {
+      filter: true,
+      sort: true,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender: customDateColumnRender
+    }
+  },
+  {
     name: "received",
     label: "Received",
     options: {
@@ -71,7 +81,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
       customBodyRender: (value: any) => {
         const markers = value;
         if (!markers) {
-          return <div className={styles.markersWrapper} />;
+          return <div className={styles.markersWrapper}>None</div>;
         }
         const renderedMarkers = markers.map((marker: string, idx: number) => <li key={marker + idx}>
           <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
@@ -90,6 +100,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
       selectedItems.map((item: Order) => item.id);
     } catch (e) {
       setSelectedRows([]);
+      return <></>;
     }
     return <ApproveButton type="approved" mode="result"
       text={"Approve results"}

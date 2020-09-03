@@ -24,6 +24,7 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
       selectedItems.map((item: Order) => item.id);
     } catch (e) {
       setSelectedRows([]);
+      return <></>;
     }
     return <ApproveButton type="pending" mode="result"
       text={"Approve results"}
