@@ -6,6 +6,7 @@ export interface AuthState {
   error?: LoginError,
   loading: boolean,
   tempData?: AuthData,
+  message?: string
 }
 
 interface AuthRequest {
@@ -17,7 +18,8 @@ interface AuthRequest {
 interface AuthSuccess {
   type: typeof LOGIN_SUCCESS,
   payload: IAuth,
-  loading: boolean
+  loading: boolean,
+  message?: string
 }
 
 interface AuthError {

@@ -11,7 +11,7 @@ export interface IAuth {
 
 export interface AuthData {
   username: string,
-  password: string,
+  password?: string,
   securityCode?: string
 }
 
@@ -28,6 +28,14 @@ export default class AuthApiService {
 
   static async refreshToken(token: string): Promise<AxiosResponse> {
     return await client.post('/authenticate/refresh', {"refreshToken": token})
+  }
+
+  static async requestPasswordReset(email: string): Promise<AxiosResponse> {
+    return await client.post('/authenticate/requestPasswordReset', {"email": email})
+  }
+
+  static async resetPassword(userData: AuthData): Promise<AxiosResponse> {
+    return await client.post('/authenticate/resetPassword', userData);
   }
 }
 

@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {useHistory} from 'react-router-dom';
 
 //Styles
 import styles from "../../../components/LoginForm/LoginForm.module.scss";
@@ -7,18 +8,30 @@ import Input from "../../../components/Input/Input";
 import {Link} from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
+import AuthApiService from "../../../services/AuthApiService";
+import {log} from "util";
+import {useDispatch} from "react-redux";
+import {codeRequiredAction, fillAuthTempDataAction} from "../../../actions/authActions";
 
 const PasswordRecovery = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validation = ValidateFields([{name: "Email", type: "email", value: email}]);
     setError(validation.message);
     if (!validation.valid) return;
-    setSubmitted(true);
+    AuthApiService.requestPasswordReset(email).then(response => {
+      dispatch(fillAuthTempDataAction({username: email}, response.data.status as string))
+      history.push('/authentication/security-code')
+    }).catch(error => {
+      setError(error.response.data.message);
+    })
+    //setSubmitted(true);
   };
 
   return <div className={`${styles.FormWrapper} ${styles.PasswordRecovery}`}>
