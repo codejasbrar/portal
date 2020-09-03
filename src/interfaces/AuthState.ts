@@ -18,7 +18,7 @@ interface AuthRequest {
 interface AuthSuccess {
   type: typeof LOGIN_SUCCESS,
   payload: IAuth,
-  loading: boolean
+  loading: boolean,
   message?: string
 }
 
