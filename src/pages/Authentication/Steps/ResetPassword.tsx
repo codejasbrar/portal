@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useHistory} from "react-router-dom";
 import searchToObject from "../../../helpers/searchToObject";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 
 //Styles
@@ -12,24 +12,18 @@ import ValidateFields from "../../../helpers/validateFields";
 import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
 import {loadUserByToken} from "../../../actions/userActions";
+import {authState} from "../../../selectors/selectors";
+import AuthApiService from "../../../services/AuthApiService";
+import {clearTempDataAction} from "../../../actions/authActions";
 
 const ResetPassword = () => {
-  const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
+  const auth = useSelector(authState);
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [localError, setLocalError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const searchStringParams = searchToObject(location.search);
-
-  useEffect(() => {
-    if (searchStringParams && searchStringParams.token) {
-      dispatch(loadUserByToken());
-    } else {
-      history.replace('/authentication')
-    }
-  }, [dispatch, history, searchStringParams]);
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +38,13 @@ const ResetPassword = () => {
       setLocalError("Passwords didn't match");
       return;
     }
-    setSubmitted(true);
+    if(!auth.tempData) return;
+    AuthApiService.resetPassword({username: auth.tempData?.username, securityCode: auth.tempData.securityCode, "password": password}).then(response => {
+      setSubmitted(true);
+      dispatch(clearTempDataAction());
+    }).catch(error => {
+      setLocalError(error.response.data.message);
+    })
   };
 
   return <div className={`${styles.FormWrapper} ${styles.ResetPassword}`}>

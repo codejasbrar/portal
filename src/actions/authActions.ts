@@ -12,13 +12,15 @@ export const REFRESH_TOKEN_REQUEST = 'REFRESH_TOKEN_REQUEST';
 export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCEESS';
 export const REFRESH_TOKEN_ERROR = 'REFRESH_TOKEN_ERROR';
 export const CLEAR_TEMP_DATA = 'CLEAR_TEMP_DATA';
+export const FILL_TEMP = 'FILL_TEMP';
 
 export const requestLoginAction = () => ({type: LOGIN_REQUEST});
 export const successLoginAction = (data: IAuth) => ({type: LOGIN_SUCCESS, payload: data});
 export const errorLoginAction = (error: Error) => ({type: LOGIN_ERROR, payload: error});
 
-export const codeRequiredAction = (data: IAuth) => ({type: CODE_REQUIRED, payload: data});
+export const codeRequiredAction = (data: IAuth | AuthData, message?: string) => ({type: CODE_REQUIRED, payload: data, message: message});
 export const codeIncorrectAction = (error: Error) => ({type: CODE_INCORRECT, payload: error});
+export const fillAuthTempDataAction = (data: IAuth | AuthData, message?: string) => ({type: FILL_TEMP, payload: data, message: message})
 
 export const logoutAction = () => ({type: LOGOUT});
 
@@ -44,7 +46,8 @@ export const logIn = (authData: AuthData) => async (dispatch: Dispatch<object>):
     dispatch(successLoginAction(response.data));
   }).catch((errorData) => {
     if (errorData.response && errorData.response.data.message.includes('2FA')) {
-      errorData.response.data.error === "CODE_INCORRECT" ? dispatch(codeIncorrectAction(errorData.response.data)) : dispatch(codeRequiredAction(errorData.response.config.data));
+      console.log(errorData.response.config.data);
+      errorData.response.data.error === "CODE_INCORRECT" ? dispatch(codeIncorrectAction(errorData.response.data)) : dispatch(codeRequiredAction(errorData.response.config.data, errorData.response.data.message));
     } else {
       dispatch(errorLoginAction(errorData.response.data));
     }
