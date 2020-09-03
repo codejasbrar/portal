@@ -81,7 +81,7 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
       customBodyRender: (value: any) => {
         const markers = value;
         if (!markers) {
-          return <div className={styles.markersWrapper} />;
+          return <div className={styles.markersWrapper}>None</div>;
         }
         const renderedMarkers = markers.map((marker: string, idx: number) => <li key={marker + idx}>
           <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
