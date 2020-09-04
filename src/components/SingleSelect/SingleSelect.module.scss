@@ -1,0 +1,111 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.Select {
+
+    height: 36px;
+    border: 1px solid $gray6;
+    background-color: #fff;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+
+
+    &:hover, &:focus {
+        background-color: $gray8;
+        outline: none;
+    }
+
+    &:focus {
+        border-color: $primary;
+    }
+
+    &Wrapper {
+        width: 100%;
+    }
+
+    &Area {
+        position: relative;
+    }
+
+    &Label {
+        color: $text;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        line-height: 23px;
+        margin: 0 0 3px 0
+    }
+
+    &Value {
+        color: $text;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        line-height: 20px;
+        position: relative;
+        z-index: 1;
+
+        &Icon {
+            g path {
+                fill: $primary !important;
+            }
+            transition: transform 0.3s;
+
+            &Opened {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    &Dropdown {
+
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+
+        &Wrapper {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            background-color: transparent;
+            width: 100%;
+            padding: 1px;
+            height: 0;
+            transition: height 0.3s;
+            overflow: hidden;
+        }
+
+        &Opened {
+            width: 100%;
+            padding: 0;
+            border: 1px solid $gray6;
+            background-color: #fff;
+        }
+
+        &Item {
+            list-style: none;
+            padding: 4px 8px;
+            color: $text;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            line-height: 30px;
+            height: 36px;
+            cursor: pointer;
+
+            &:hover, &:focus {
+                background-color: $gray8;
+                outline: none;
+            }
+        }
+    }
+
+}
+
+.SelectDisabled {
+    border: 1px solid #c3c8cd;
+    background-color: #fff;
+    opacity: 0.5;
+    pointer-events: none;
+}

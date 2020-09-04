@@ -1,6 +1,4 @@
-import React, {useEffect, useState} from "react";
-import {useLocation, useHistory} from "react-router-dom";
-import searchToObject from "../../../helpers/searchToObject";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 
@@ -11,14 +9,12 @@ import styles from "../../../components/LoginForm/LoginForm.module.scss";
 import ValidateFields from "../../../helpers/validateFields";
 import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
-import {loadUserByToken} from "../../../actions/userActions";
 import {authState} from "../../../selectors/selectors";
 import AuthApiService from "../../../services/AuthApiService";
 import {clearTempDataAction} from "../../../actions/authActions";
 
 const ResetPassword = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const auth = useSelector(authState);
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');

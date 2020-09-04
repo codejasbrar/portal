@@ -12,7 +12,8 @@ type InputPropsTypes = {
   type?: "text" | "password",
   autofocus?: boolean,
   valid?: boolean,
-  error?: boolean
+  error?: boolean,
+  className?: string
 };
 
 const Input = (props: InputPropsTypes) => {
@@ -21,7 +22,7 @@ const Input = (props: InputPropsTypes) => {
     props.onChange(event.currentTarget.value)
   };
 
-  return <div className={styles.InputWrapper}>
+  return <div className={`${styles.InputWrapper} ${props.className ? props.className : ''}`}>
     <label className={styles.InputLabel} htmlFor={props.name}>{props.label}</label>
     <input type={props.type || 'text'}
       className={`${styles.Input} ${props.error ? styles.InputError : ''} ${props.valid ? styles.InputValid : ''}`}
@@ -29,7 +30,9 @@ const Input = (props: InputPropsTypes) => {
       autoFocus={props.autofocus}
       name={props.name}
       placeholder={props.placeholder}
-      onChange={handleChange} />
+      onChange={handleChange}
+      tabIndex={1}
+    />
   </div>
 }
 
