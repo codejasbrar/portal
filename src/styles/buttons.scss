@@ -139,8 +139,11 @@
 }
 
 .link {
-
     &Primary {
         color: $primary;
+
+        &:visited {
+            color: $primary;
+        }
     }
 }

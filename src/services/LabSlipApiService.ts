@@ -14,6 +14,12 @@ export default class LabSlipApiService {
     }
   }).then(response => response.data);
 
+  static getAllOrders = async (searchString?: string) => await client.get(`/getOrdersByStatus?search=${searchString || ''}&size=1000`, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }).then(response => response.data);
+
   static saveApprovedOrders = async (hashes: string[]) => await client.post('/saveApprovedOrders', {hashes}, {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`

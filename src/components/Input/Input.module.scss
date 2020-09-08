@@ -38,5 +38,11 @@
         font-weight:    600;
         text-align:     left;
     }
+
+    &Disabled {
+        pointer-events:   none;
+        background-color: #fff;
+        opacity:          0.5;
+    }
 }
 
