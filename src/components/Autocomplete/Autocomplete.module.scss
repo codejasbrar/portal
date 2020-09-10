@@ -5,6 +5,16 @@
 .Autocomplete {
     position: relative;
 
+    &Clear {
+        position: absolute;
+        top:      36px;
+        right:    6px;
+    }
+
+    &Input {
+        padding-right: 24px;
+    }
+
     &Dropdown {
         margin:   0;
         padding:  0;
@@ -35,6 +45,7 @@
             left:       0;
             background: #fff;
             border:     1px solid $gray6;
+            z-index:    1;
         }
     }
 }

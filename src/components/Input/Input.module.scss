@@ -27,6 +27,7 @@
 
     &Wrapper {
         margin-bottom: 24px;
+        position:      relative;
     }
 
     &Label {
@@ -43,6 +44,24 @@
         pointer-events:   none;
         background-color: #fff;
         opacity:          0.5;
+    }
+
+    &IconRight {
+        position: absolute;
+        right:    8px;
+        top:      33px;
+    }
+
+    &Error {
+        border: 1px solid $error;
+
+        &Message {
+            position:  absolute;
+            bottom:    -19px;
+            left:      4px;
+            font-size: 12px;
+            color:     $error;
+        }
     }
 }
 

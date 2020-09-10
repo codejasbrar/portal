@@ -1,0 +1,49 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+
+.Datepicker {
+
+    width:   100%;
+    display: block;
+
+    [class*="react-date-picker__wrapper"] {
+        border:           1px solid $gray6;
+        color:            $text;
+        background-color: #fff;
+        padding:          0 2px 0 4px;
+        box-sizing:       border-box;
+        height:           36px;
+
+        &:focus {
+            outline: none;
+            border:  1px solid $primary;
+        }
+    }
+
+    [class*="react-date-picker__inputGroup"] {
+        height:        36px;
+        border-radius: 0;
+        margin:        0;
+        font-size:     16px;
+        border:        none;
+    }
+
+    [class*="react-date-picker__inputGroup__input"] {
+        padding-left: 0 !important;
+    }
+
+    &Error {
+        [class*="react-date-picker__wrapper"] {
+            border: 1px solid $error;
+        }
+
+        &Message {
+            position:  absolute;
+            bottom:    -19px;
+            left:      4px;
+            font-size: 12px;
+            color:     $error;
+        }
+    }
+}

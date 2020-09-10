@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 
 //Styles
 import styles from "./Autocomplete.module.scss";
+
+import {ReactComponent as CloseIcon} from "../../icons/close.svg";
 import Input from "../Input/Input";
 import ClickOutside from "../ClickOutside/ClickOutside";
 
@@ -25,21 +27,29 @@ type AutocompletePropsTypes = {
     input?: string,
     wrapper?: string
   },
-  disabled?: boolean
+  disabled?: boolean,
 };
 
 const Autocomplete = (props: AutocompletePropsTypes) => {
   const [value, setValue] = useState('');
+  const [selected, setSelected] = useState({} as Option);
   const [opened, setOpened] = useState(false);
 
   const selectOption = (option: Option) => {
     setOpened(false);
+    setSelected(option);
     props.onSelect(option);
   };
 
   const onChange = (text: string) => {
     setOpened(true);
+    setSelected({} as Option);
     setValue(text);
+  };
+
+  const clearValue = () => {
+    setSelected({} as Option);
+    setValue('');
   };
 
   useEffect(() => {
@@ -49,7 +59,7 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
   return <div className={`${styles.Autocomplete} ${props.classes ? props.classes.wrapper : ''}`}>
     <ClickOutside onClickOutside={() => setOpened(false)}>
       <>
-        <Input className={props.classes ? props.classes.input : ''}
+        <Input classes={{input: `${styles.AutocompleteInput} ${props.classes ? props.classes.input : ''}`}}
           value={value}
           onChange={onChange}
           label={props.label}
@@ -60,6 +70,8 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
           }}
           autoComplete='off'
         />
+        {!!Object.keys(selected).length &&
+        <button type='button' onClick={() => clearValue()} className={styles.AutocompleteClear}><CloseIcon /></button>}
         {!!props.options.length && opened && <div className={styles.AutocompleteDropdownWrapper}>
           <ul className={styles.AutocompleteDropdown}
             style={{height: props.options.length ? `${(props.options.length * 36) + 2}px` : 0}}>

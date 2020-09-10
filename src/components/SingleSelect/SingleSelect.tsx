@@ -7,22 +7,27 @@ import styles from "./SingleSelect.module.scss";
 import ClickOutside from "../ClickOutside/ClickOutside";
 import {ReactComponent as ArrowIcon} from "../../icons/arrow_down.svg";
 
-type Option = {
+export type SelectOption = {
   name: string,
   value: string
 };
 
 type SingleSelectPropsTypes = {
   label: string,
-  options: Option[],
+  options: SelectOption[],
   placeholder?: string,
   disabled?: boolean,
   className?: string
+  onSelect?: (option: SelectOption) => void,
+  error?: {
+    valid: boolean,
+    message: string
+  }
 };
 
 const SingleSelect = (props: SingleSelectPropsTypes) => {
   const [opened, setOpened] = useState(false);
-  const [option, setOption] = useState({} as Option);
+  const [option, setOption] = useState({} as SelectOption);
 
   const closeList = () => {
     setOpened(false);
@@ -36,15 +41,16 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
     setOpened(!opened);
   };
 
-  const selectOption = (option: Option) => {
+  const selectOption = (option: SelectOption) => {
     setOption(option);
+    if (props.onSelect) props.onSelect(option);
     closeList();
   };
 
   return <div className={`${styles.SelectWrapper} ${props.className ? props.className : ''}`}>
     <p className={styles.SelectLabel}>{props.label}</p>
     <ClickOutside className={styles.SelectArea} onClickOutside={closeList}>
-      <div className={`${styles.Select} ${props.disabled ? styles.SelectDisabled : ''}`}
+      <div className={`${styles.Select} ${props.disabled ? styles.SelectDisabled : ''} ${props.error && !props.error.valid ? styles.SelectError : ''}`}
         tabIndex={1}
         onClick={toggleList}>
         <span className={styles.SelectValue}>{option.name || props.placeholder || 'Please select'}</span>
@@ -53,12 +59,13 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
       <div className={`${styles.SelectDropdownWrapper} ${opened ? styles.SelectDropdownOpened : ''}`}
         style={{height: opened ? `${((props.options.length * 36) + 2)}px` : 0}}>
         <ul className={styles.SelectDropdown} tabIndex={0}>
-          {props.options.map((option: Option) => <li tabIndex={1}
+          {props.options.map((option: SelectOption) => <li tabIndex={1}
             className={styles.SelectDropdownItem}
             onClick={() => selectOption(option)}>{option.name}</li>)}
         </ul>
       </div>
     </ClickOutside>
+    {props.error && !props.error.valid && <span className={styles.SelectErrorMessage}>{props.error?.message}</span>}
   </div>
 };
 

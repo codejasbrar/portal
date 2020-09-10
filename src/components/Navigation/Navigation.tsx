@@ -2,10 +2,10 @@ import React from "react";
 
 //Styles
 import styles from "./Navigation.module.scss";
+
 import {Link, NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {resultsQuantity, userState} from "../../selectors/selectors";
-import Button from "../Button/Button";
 
 type NavigationPropsTypes = {
   desktop?: boolean
@@ -54,7 +54,7 @@ const Navigation = (props: NavigationPropsTypes) => {
       </NavLink>
     </nav>
     {!user.physician && <div className={styles.navButtonBlock}>
-      <Button><Link to='/labslip'>Create lab slip</Link></Button>
+      <Link className={styles.navButton} to='/labslip'>Create lab slip</Link>
     </div>}
   </div>
 };

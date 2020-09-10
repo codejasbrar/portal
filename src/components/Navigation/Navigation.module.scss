@@ -92,3 +92,16 @@
         width: 100%;
     }
 }
+
+.nav {
+    &Button {
+        display:         flex;
+        @include buttonBaseStyles();
+        justify-content: center;
+        align-items:     center;
+
+        &:visited {
+            color: #fff;
+        }
+    }
+}

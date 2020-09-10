@@ -1,6 +1,8 @@
+export type ValidFieldTypes = "email" | "password" | "text" | "code" | "select" | "datepicker";
+
 type FieldObject = {
   name: string,
-  type: "email" | "password" | "text" | "code",
+  type: ValidFieldTypes,
   value: string
 }
 
