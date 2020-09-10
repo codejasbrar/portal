@@ -1,7 +1,7 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useMemo, useState} from "react";
 
 //Styles
-import styles from "./AddCustomerForm.module.scss";
+import styles from "../../../pages/Labslip/LabSlipPage.module.scss";
 
 import {Customer} from "./CustomerInformation";
 import Input from "../../Input/Input";
@@ -35,72 +35,6 @@ interface FormFieldsEnchancedTypes extends FormField {
   }
   onChangeValue: (value: string) => void
 }
-
-const formFields: FormField[] = [
-  {
-    type: 'text',
-    name: 'customerId',
-    label: 'Customer ID number',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'customerFirstName',
-    label: 'First name',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'customerLastName',
-    label: 'Last name',
-    required: true
-  },
-  {
-    type: 'select',
-    name: 'customerGender',
-    label: 'Gender',
-    required: true,
-    options: [{name: 'Male', value: 'M'}, {name: 'Female', value: 'F'}],
-    placeholder: 'Please select your gender'
-  },
-  {
-    type: 'datepicker',
-    name: 'customerDateOfBirth',
-    label: 'Date of birth',
-    required: true
-  },
-  {
-    type: 'email',
-    name: 'customerEmail',
-    label: 'Email',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'addressLine1',
-    label: 'Street adress',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'addrCity',
-    label: 'City',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'addrState',
-    label: 'State',
-    required: true
-  },
-  {
-    type: 'text',
-    name: 'addrZipCode',
-    label: 'Zip code',
-    required: true
-  },
-];
-
 
 const Field = (props: {
   field: FormFieldsEnchancedTypes
@@ -142,9 +76,7 @@ const mapFormFields = (fields: FormField[]) => fields.map((field: FormField) => 
 
 const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
   const [error, setError] = useState(false);
-  const formFieldsEnchanced = useMemo(() => {
-    return mapFormFields(props.fields)
-  }, []);
+  const formFieldsEnchanced = useMemo(() => mapFormFields(props.fields), []);
 
 
   const mapFormValuesToCustomerObject = () => {
@@ -173,7 +105,7 @@ const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
 
   return <form onSubmit={onSubmit}>
     {formFieldsEnchanced.map((field: FormFieldsEnchancedTypes) => <Field field={field} />)}
-    <Button type='submit'>{props.submitText || 'Add customer details'}</Button>
+    <Button className={styles.formBtn} type='submit'>{props.submitText || 'Add customer details'}</Button>
   </form>
 };
 

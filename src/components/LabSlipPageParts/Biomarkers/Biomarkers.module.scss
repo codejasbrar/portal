@@ -1,0 +1,30 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+@import "../../../styles/common";
+
+.Biomarkers {
+    display:         flex;
+    justify-content: space-between;
+    padding-top:     40px;
+    min-height:      580px;
+    align-items:     flex-start;
+
+    &Search {
+
+        &Wrapper {
+            padding-top: 10px;
+            flex:        0 0 48%;
+        }
+    }
+
+    &Selected {
+
+        &Wrapper {
+            padding:          40px;
+            box-shadow:       0 0 30px 1px rgba(0, 0, 0, 0.08);
+            border-radius:    9px;
+            background-color: #ffffff;
+            flex:             0 0 48%;
+        }
+    }
+}
