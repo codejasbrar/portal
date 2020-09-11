@@ -6,10 +6,15 @@
     display:         flex;
     justify-content: space-between;
     padding-top:     40px;
+    padding-bottom:  40px;
     min-height:      580px;
     align-items:     flex-start;
 
     &Search {
+
+        &Input {
+            max-width: 370px;
+        }
 
         &Wrapper {
             padding-top: 10px;
@@ -26,5 +31,143 @@
             background-color: #ffffff;
             flex:             0 0 48%;
         }
+    }
+}
+
+.PanelsList {
+    max-height:       600px;
+    overflow-y:       auto;
+    padding:          12px 40px;
+    box-shadow:       0 0 30px 1px rgba(0, 0, 0, 0.08);
+    border-radius:    9px;
+    background-color: #ffffff;
+    margin-bottom:    32px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.PlanPanel {
+    list-style:   none;
+    min-height:   44px;
+    border-top:   1px solid $gray7;
+    padding-left: 16px;
+    padding-top:  10px;
+
+    &:first-child {
+        border: none;
+    }
+
+    &Name {
+        display:         flex;
+        align-items:     center;
+        justify-content: space-between;
+        font-size:       14px;
+        letter-spacing:  0.3px;
+        line-height:     20px;
+        width:           100%;
+        margin-bottom:   10px;
+
+        &Btn {
+            display:     flex;
+            align-items: center;
+        }
+    }
+
+    &Btn {
+        height: 26px;
+        width:  26px;
+
+        svg {
+            g path {
+                fill: $primary;
+            }
+        }
+
+        &Opened {
+            transform: rotate(180deg);
+        }
+    }
+
+    &Add {
+        height:          30px;
+        width:           30px;
+        display:         flex;
+        justify-content: center;
+        align-items:     center;
+
+        &Dot {
+            height:           12px;
+            width:            12px;
+            border-radius:    50%;
+            background-color: lightgreen;
+
+            &Red {
+                background-color: $error;
+            }
+        }
+    }
+
+    &Text {
+
+    }
+
+    &List {
+        list-style: none;
+
+        &Title {
+            //padding-left: 20px;
+            margin-bottom: 12px;
+            font-size:     16px;
+            font-weight:   600;
+        }
+    }
+
+    &CheckboxLabel {
+        font-size:      14px;
+        letter-spacing: 0.3px;
+        line-height:    20px;
+        margin-left:    16px;
+    }
+}
+
+.LabPanel {
+
+    &List {
+        padding-left: 40px;
+        list-style:   none;
+
+        &Item {
+            height:         32px;
+            vertical-align: middle;
+
+            &:before {
+                vertical-align: middle;
+                content:        '•';
+                font-size:      24px;
+                margin-right:   6px;
+            }
+        }
+    }
+}
+
+.SelectedList {
+
+    padding-left: 0;
+
+    &Remove {
+        display: flex;
+
+        button {
+            color:       $primary;
+            font-size:   12px;
+            margin-left: auto;
+            height:      23px;
+        }
+    }
+
+    .PlanPanel {
+        padding-left: 0;
     }
 }

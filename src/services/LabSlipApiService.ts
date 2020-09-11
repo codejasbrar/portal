@@ -70,4 +70,14 @@ export default class LabSlipApiService {
       'Accept': 'application/pdf'
     }
   });
+
+  static getPanels = async () => await Promise.all([client.get('/planPanels', {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }), client.get('/labPanels', {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  })]);
 }

@@ -12,14 +12,10 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const [loading, setLoading] = useState(false);
   const [customer, setCustomer] = useState({} as Customer);
 
-  useEffect(() => {
-    console.log(customer);
-  }, [customer]);
-
   return <section className={styles.LabslipSection}>
     {loading && <Spinner />}
     <CustomerInformation onSetLoading={setLoading} onSetCustomer={setCustomer} customer={customer} />
-    <Biomarkers />
+    <Biomarkers onSetLoading={setLoading} />
   </section>
 };
 

@@ -52,6 +52,26 @@
         top:      33px;
     }
 
+    &Iconed {
+        padding-left: 32px;
+
+        &Icon {
+            position: absolute;
+            top:      9px;
+            left:     8px;
+        }
+    }
+
+    &Clear {
+        padding-right: 32px;
+
+        &Btn {
+            position: absolute;
+            right:    8px;
+            top:      9px;
+        }
+    }
+
     &Error {
         border: 1px solid $error;
 

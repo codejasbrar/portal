@@ -60,6 +60,7 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
         style={{height: opened ? `${((props.options.length * 36) + 2)}px` : 0}}>
         <ul className={styles.SelectDropdown} tabIndex={0}>
           {props.options.map((option: SelectOption) => <li tabIndex={1}
+            key={`${option.name}`}
             className={styles.SelectDropdownItem}
             onClick={() => selectOption(option)}>{option.name}</li>)}
         </ul>
