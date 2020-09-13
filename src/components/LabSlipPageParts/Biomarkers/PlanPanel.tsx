@@ -29,10 +29,6 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
     }
   };
 
-  const onCheckLabPanel = (panel: Panel) => {
-    if (onSelectLabPanel) onSelectLabPanel(props.panel);
-  };
-
   return <li className={styles.PlanPanel} key={`${id}_${code}`}>
     <div className={styles.PlanPanelName}>
       <p className={styles.PlanPanelNameBtn}>
@@ -49,7 +45,7 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
     {labPanels && listOpened && <ul className={styles.PlanPanelList}>
       <p className={styles.PlanPanelListTitle}>Lab panels:</p>
       {labPanels.map(panel => <LabPanel key={`${code}-${id}-${panel.code}`} selectedPanels={selectedPanels}
-        onSelect={onCheckLabPanel}
+        onSelect={onSelectLabPanel}
         selectable
         panel={panel} />)}
     </ul>}

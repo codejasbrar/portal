@@ -32,7 +32,6 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
   }, []);
 
   const compareSelectedPanels = () => labPanels.filter(panel => selectedCodesArray.includes(panel.code));
-  ;
 
   return <section className={styles.container}>
     <div className={styles.Biomarkers}>
