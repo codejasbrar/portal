@@ -8,9 +8,12 @@ import Input from "../../Input/Input";
 import {ReactComponent as SearchIcon} from "../../../icons/search.svg";
 import PanelsList from "./PanelsList";
 import {Panel} from "../../../interfaces/Test";
+import {on} from "cluster";
 
 type BiomarkersPropsTypes = {
-  onSetLoading: (state: boolean) => void
+  onSetLoading: (state: boolean) => void,
+  onChangePanelsArray: (panels: number[]) => void,
+  labPanels: number[]
 };
 
 const Biomarkers = (props: BiomarkersPropsTypes) => {
@@ -18,7 +21,15 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
   const [planPanels, setPlanPanels] = useState([] as Panel[]);
   const [selectedCodesArray, setSelectedCodes] = useState([] as number[]);
   const [searchText, setSearchText] = useState('');
-  const {onSetLoading} = props;
+  const {onSetLoading, onChangePanelsArray} = props;
+
+  useEffect(() => {
+    onChangePanelsArray(selectedCodesArray);
+  }, [selectedCodesArray]);
+
+  useEffect(() => {
+    setSearchText('');
+  }, [props.labPanels])
 
   useEffect(() => {
     (async () => {

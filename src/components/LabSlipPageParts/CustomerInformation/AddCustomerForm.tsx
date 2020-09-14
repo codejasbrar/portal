@@ -80,9 +80,17 @@ const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
 
 
   const mapFormValuesToCustomerObject = () => {
-    const customer = {} as any;
+    const customer = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      orders: [{} as any]
+    } as any;
     formFieldsEnchanced.forEach((field: FormFieldsEnchancedTypes) => {
-      customer[field.name] = field.value;
+      if(field.name === 'customerId') customer.id = field.value;
+      if(field.name === 'customerFirstName') customer.firstName = field.value;
+      if(field.name === 'customerLastName') customer.lastName = field.value;
+      customer.orders[0][field.name] = field.value;
     });
     return customer;
   };

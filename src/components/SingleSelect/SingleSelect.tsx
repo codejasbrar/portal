@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 //Styles
 import styles from "./SingleSelect.module.scss";
@@ -19,6 +19,7 @@ type SingleSelectPropsTypes = {
   disabled?: boolean,
   className?: string
   onSelect?: (option: SelectOption) => void,
+  value?: string,
   error?: {
     valid: boolean,
     message: string
@@ -46,6 +47,14 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
     if (props.onSelect) props.onSelect(option);
     closeList();
   };
+
+  useEffect(() => {
+    if(props.value && props.options) {
+      setOption(props.options.filter(option => option.value === props.value)[0]);
+    } else {
+      setOption({} as SelectOption);
+    }
+  }, [props.value])
 
   return <div className={`${styles.SelectWrapper} ${props.className ? props.className : ''}`}>
     <p className={styles.SelectLabel}>{props.label}</p>

@@ -13,6 +13,10 @@
 
     &Input {
         padding-right: 24px;
+
+        &Wrapper {
+            margin-bottom: 0;
+        }
     }
 
     &Dropdown {

@@ -80,4 +80,10 @@ export default class LabSlipApiService {
       'Authorization': `Bearer ${Token.get().token}`
     }
   })]);
+
+  static searchCustomer = async (searchString: string) => await client.get(`/customers?search=${searchString}`, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }).then(response => response.data);
 }

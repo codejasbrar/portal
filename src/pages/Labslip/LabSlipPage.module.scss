@@ -82,3 +82,21 @@
 .formBtn {
     margin-top: 6px;
 }
+
+.SubmitPanel {
+    position: sticky;
+    bottom: 0;
+    width: 100vw;
+    height: 96px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 0 30px 1px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+
+    &Btn {
+        max-width: 150px;
+        margin: 0 10px;
+    }
+}

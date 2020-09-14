@@ -6,31 +6,26 @@ import Autocomplete, {Option} from "../../Autocomplete/Autocomplete";
 import {TestDetails} from "../../../interfaces/Test";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {debounce} from "@material-ui/core";
-import {Order} from "../../../interfaces/Order";
-import SingleSelect from "../../SingleSelect/SingleSelect";
+import {Order, OrderDetails} from "../../../interfaces/Order";
+import SingleSelect, {SelectOption} from "../../SingleSelect/SingleSelect";
 import {ReactComponent as CloseIcon} from "../../../icons/close.svg";
 import Input from "../../Input/Input";
 import Popup from "../../Popup/Popup";
 import AddCustomerForm, {FormField} from "./AddCustomerForm";
+import {LabSlipInfo} from "../../../pages/Labslip/LabSlipPage";
+import {on} from "cluster";
 
 type CustomerInformationPropsTypes = {
   onSetLoading: (state: boolean) => void,
-  customer: Customer,
-  onSetCustomer: (customer: Customer) => void
+  onSetLabSlipInfo: (info: LabSlipInfo) => void,
+  labSlipInfo: LabSlipInfo
 };
 
 export type Customer = {
-  customerId: number,
-  customerFirstName: string,
-  customerLastName: string,
-  customerGender: string,
-  customerDateOfBirth: string,
-  customerPhone: string,
-  addrState: string,
-  addrCity: string,
-  addrZipCode: number,
-  addressLine1: string,
-  addressLine2: string,
+  id: number,
+  firstName: string,
+  lastName: string,
+  orders: OrderDetails[]
 };
 
 const formFields: FormField[] = [
@@ -99,41 +94,33 @@ const formFields: FormField[] = [
 ];
 
 const CustomerInformation = (props: CustomerInformationPropsTypes) => {
-  const [options, setOptions] = useState([] as Option[]);
+  const [results, setResults] = useState([] as Customer[]);
   const [searchText, setSearchText] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
-  const {onSetLoading, onSetCustomer, customer} = props;
+  const {onSetLoading, onSetLabSlipInfo, labSlipInfo} = props;
+  const {customer, laboratory, order} = labSlipInfo;
 
   const onSearchChanged = (text: string) => {
-    if (customer && customer.customerId) onSetCustomer({} as Customer);
+    if (customer && customer.id) onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: ''});
     setSearchText(text);
-  };
-
-  const onSelectOrder = async (option: Option) => {
-    onSetLoading(true);
-    try {
-      const result = await LabSlipApiService.getResult(option.value);
-      onSetCustomer(mapTestToCustomer(result.data));
-      setSearchText(result.data.order.id);
-    } catch (e) {
-      window.confirm('No associated customer');
-      setSearchText('');
-    }
-    onSetLoading(false);
   };
 
   useEffect(() => {
     debouncedSearch(searchText);
   }, [searchText]);
 
+  useEffect(() => {
+    setResults(results);
+  },[labSlipInfo])
+
   const onSearch = async (text: string) => {
     try {
       if (text.length <= 1) {
-        setOptions([]);
+        setResults([]);
         return;
       }
-      const result = await LabSlipApiService.getAllOrders(text);
-      setOptions(result.content.length ? mapOrdersToOptions(result.content) : []);
+      const results = await LabSlipApiService.searchCustomer(text);
+      setResults(results);
     } catch (e) {
       console.log(e)
     }
@@ -146,33 +133,37 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
 
   const debouncedSearch = useMemo(() => debounce(onSearch, 700), []);
 
-  const mapOrdersToOptions = (orders: Order[]) => orders.map((order: Order) => {
-    return {text: `Order ID: ${order.id}; Customer ID: ${order.customerId}`, value: order.hash} as Option
+  const mapResponseToOptions = (customers: Customer[]) => customers.map((customer: Customer) => {
+    return {text: `${customer.id} ${customer.firstName} ${customer.lastName}`, value: customer.id.toString()} as Option
   });
 
   const removeCustomer = () => {
-    props.onSetCustomer({} as Customer);
+    onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: ''})
+    setResults([] as Customer[])
   };
 
-  const mapTestToCustomer = (test: TestDetails) => {
-    return {
-      customerId: test.order.customerId,
-      customerFirstName: test.order.customerFirstName,
-      customerLastName: test.order.customerLastName,
-      customerGender: test.order.customerGender,
-      customerDateOfBirth: test.order.customerDateOfBirth,
-      customerPhone: test.order.customerPhone,
-      addrState: test.order.addrState,
-      addrCity: test.order.addrCity,
-      addrZipCode: test.order.addrZipCode,
-      addressLine1: test.order.addressLine1,
-      addressLine2: test.order.addressLine2,
+  const onSelectCustomer = (option: Option) => {
+    if(option.value === 'NEW_CUSTOMER') {
+      onSetLabSlipInfo({...labSlipInfo, customer})
+    } else {
+      onSetLabSlipInfo({
+        ...labSlipInfo,
+        customer: results.filter(customer => customer.id === parseInt(option.value))[0]
+      });
     }
   };
 
   const closePopup = () => {
     setPopupOpen(false);
   };
+
+  const onOrderSelect = (option: SelectOption) => {
+    onSetLabSlipInfo({...labSlipInfo, order: option.value});
+  };
+
+  const onLabSelect = (option: SelectOption) => {
+    onSetLabSlipInfo({...labSlipInfo, laboratory: option.value});
+  }
 
   return <>
     <div className={styles.LabslipTop}>
@@ -182,31 +173,34 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
           <SingleSelect className={styles.LabslipInfoItem}
             label="Select a lab"
             options={[{name: "Quest 97520229", value: "Quest"}]}
+            value={laboratory}
+            onSelect={onLabSelect}
             placeholder="Select a lab" />
-          <Autocomplete classes={{wrapper: styles.LabslipInfoItem}}
-            label="Select an order ID"
-            placeholder="Order ID or Customer ID"
-            options={options}
-            onSelect={onSelectOrder}
-            onChange={onSearchChanged}
-            name={'orderId'} />
           <div className={styles.LabslipInfoItem}>
-            <Input classes={{root: styles.LabslipInfoCustomer}}
+            <Autocomplete classes={{wrapper: styles.LabslipInfoCustomer}}
               name="customer"
               label="Select a customer"
               placeholder="Enter customer name or ID number"
-              onChange={(e) => {
-                console.log(e)
-              }}
-              value={customer && customer.customerId ? `${customer.customerFirstName} ${customer.customerLastName}` : ''}
-              disabled />
-            {customer && !customer.customerId ? <p className={styles.LabslipInfoCustomerAdd}>
+              options={results ? mapResponseToOptions(results) : []}
+              onChange={onSearchChanged}
+              onSelect={onSelectCustomer}
+              onClear={removeCustomer}
+              value={labSlipInfo.customer && labSlipInfo.customer.id ? `${labSlipInfo.customer.id} ${labSlipInfo.customer.firstName} ${labSlipInfo.customer.lastName}` : ''}
+            />
+            {customer && !customer.id ? <p className={styles.LabslipInfoCustomerAdd}>
                 Customer does not exist? <a className={styles.linkPrimary} onClick={openPopup} href="#">Add customer
                 details</a>
               </p> :
-              <button className={styles.LabslipInfoCustomerClear} onClick={removeCustomer} type={"button"}><CloseIcon />
-              </button>}
+              <></>}
           </div>
+          <SingleSelect className={styles.LabslipInfoItem}
+            label="Select an order ID (optional)"
+            placeholder="Order ID"
+            value={labSlipInfo.order}
+            onSelect={onOrderSelect}
+            options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {return {name: order.id.toString(), value: order.id.toString()}}) : []}
+            disabled={!customer.id || customer.orders && !customer.orders[0].id}
+          />
         </div>
       </div>
     </div>
@@ -215,7 +209,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
         <button type="button" onClick={closePopup} className={styles.LabslipCustomerPopupClose}><CloseIcon /></button>
         <h3 className={styles.heading20}>Add customer details</h3>
         <AddCustomerForm onSetCustomer={(customer: Customer) => {
-          onSetCustomer(customer);
+          onSetLabSlipInfo({...labSlipInfo, customer: customer})
           closePopup();
         }} fields={formFields} />
       </div>

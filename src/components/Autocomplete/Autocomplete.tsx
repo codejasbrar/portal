@@ -13,9 +13,10 @@ export type Option = {
 };
 
 type AutocompletePropsTypes = {
-  //value: string,
+  value?: string,
   onChange: (text: string) => void,
   onSelect: (option: Option) => void,
+  onClear?: () => void,
   name: string,
   label: string,
   options: Option[],
@@ -36,8 +37,10 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
   const [opened, setOpened] = useState(false);
 
   const selectOption = (option: Option) => {
+    console.log(option);
     setOpened(false);
     setSelected(option);
+    setValue(option.text);
     props.onSelect(option);
   };
 
@@ -45,21 +48,26 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
     setOpened(true);
     setSelected({} as Option);
     setValue(text);
-  };
-
-  const clearValue = () => {
-    setSelected({} as Option);
-    setValue('');
+    props.onChange(text);
   };
 
   useEffect(() => {
-    props.onChange(value);
-  }, [value]);
+    if(props.value) selectOption({
+      text: props.value,
+      value: 'NEW_CUSTOMER'
+    })
+  }, [props.value])
+
+  const clearValue = () => {
+    setSelected({} as Option);
+    if(props.onClear) props.onClear();
+    setValue('');
+  };
 
   return <div className={`${styles.Autocomplete} ${props.classes ? props.classes.wrapper : ''}`}>
     <ClickOutside onClickOutside={() => setOpened(false)}>
       <>
-        <Input classes={{input: `${styles.AutocompleteInput} ${props.classes ? props.classes.input : ''}`}}
+        <Input classes={{input: `${styles.AutocompleteInput} ${props.classes ? props.classes.input : ''}`, root: styles.AutocompleteInputWrapper}}
           value={value}
           onChange={onChange}
           label={props.label}
