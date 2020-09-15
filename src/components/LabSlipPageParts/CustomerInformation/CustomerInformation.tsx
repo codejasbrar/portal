@@ -165,7 +165,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
 
   return <>
     <div className={styles.LabslipTop}>
-      <div className={styles.container}>
+      <div className={`${styles.container} ${styles.LabslipTopContainer}`}>
         <h1 className={styles.heading30}>Create lab slip</h1>
         <div className={styles.LabslipInfoWrapper}>
           <SingleSelect className={styles.LabslipInfoItem}

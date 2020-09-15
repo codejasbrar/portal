@@ -5,16 +5,26 @@
 .Labslip {
     &Section {
         padding-top: 70px;
-        background-color: $gray8;
+
+        @include breakpoint($tablet) {
+            padding-top: 60px;
+        }
     }
 
     &Top {
         background-color: $gray8;
         padding: 70px 0 32px 0;
 
-        @include breakpoint($max_width) {
-            max-width: 375px;
-            margin: 0 auto;
+        @include breakpoint($tablet) {
+            padding-top: 36px;
+            padding-bottom: 20px;
+        }
+
+        &Container {
+            @include breakpoint($tablet) {
+                max-width: 500px;
+                margin: 0 auto;
+            }
         }
     }
 
@@ -41,9 +51,17 @@
             justify-content: space-between;
             align-items:     flex-start;
 
-            @include breakpoint($max_width) {
-                flex-direction: column;
+
+            @include breakpoint($mid_width) {
+                flex-wrap: wrap;
+                justify-content: center;
             }
+
+            @include breakpoint($tablet) {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
         }
 
         &Item {
@@ -51,7 +69,28 @@
             position: relative;
 
             @include breakpoint($max_width) {
+                flex-basis: 30%;
+                min-width: 285px;
+            }
+
+            @include breakpoint($mid_width) {
+                flex-basis: 340px;
+                margin-left: 16px;
+                margin-right: 16px;
+                margin-bottom: 20px;
+            }
+
+            @include breakpoint($tablet) {
+                margin-bottom: 0;
+                margin-left: 0;
+                margin-right: 0;
                 flex-basis: auto;
+                width: 100%;
+
+                &:nth-child(2) {
+                    margin-bottom: 20px;
+
+                }
             }
         }
     }
@@ -69,6 +108,18 @@
             padding:       70px 9% 168px 7%;
             border-radius: 0;
             animation:     slideIn 0.6s forwards;
+
+            @include breakpoint($mobile) {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                max-width: none;
+                padding: 70px 20px;
+                animation: none;
+               min-width: auto;
+            }
         }
 
         &Close {
@@ -108,6 +159,12 @@
     background-color: #fff;
     box-shadow: 0 0 30px 1px rgba(0, 0, 0, 0.08);
     z-index: 10;
+
+    @include breakpoint($tablet) {
+        height: 68px;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
 
     &Btn {
         max-width: 150px;

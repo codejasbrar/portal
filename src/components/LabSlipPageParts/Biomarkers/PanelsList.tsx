@@ -74,7 +74,8 @@ const PanelsList = (props: PanelsListPropsTypes) => {
       </>;
     case "all":
       return <ul className={styles.SelectedList}>
-        {!!panels.length && <div className={styles.SelectedListRemove}>
+        {!!panels.length && <div className={`${styles.SelectedListRemove} ${styles.SelectedListRemoveAll}`}>
+          <h4 className={styles.heading14}>All lab panels:</h4>
           <button type={'button'} onClick={onRemoveAll}>Clear all</button>
         </div>}
         {!!panels.length && panels.map(panel => panel.labPanels ? <></> :

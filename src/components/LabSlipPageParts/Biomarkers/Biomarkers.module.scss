@@ -10,10 +10,23 @@
     min-height:      580px;
     align-items:     flex-start;
 
+    @include breakpoint($tablet) {
+        max-width: calc(500px - 32px);
+        margin: 0 auto;
+        flex-direction: column;
+        padding-top: 30px;
+    }
+
+
     &Search {
 
         &Input {
             max-width: 370px;
+
+            @include breakpoint($tablet) {
+                max-width: none;
+                order: 0;
+            }
         }
 
         &Wrapper {
@@ -30,6 +43,12 @@
             border-radius:    9px;
             background-color: #ffffff;
             flex:             0 0 48%;
+
+            @include breakpoint($tablet) {
+                padding: 12px 24px;
+                flex-basis: auto;
+                width: 100%;
+            }
         }
     }
 }
@@ -43,9 +62,18 @@
     background-color: #ffffff;
     margin-bottom:    32px;
 
+    @include breakpoint($tablet) {
+        padding: 12px 24px;
+    }
+
     &:last-child {
         margin-bottom: 0;
+
+        @include breakpoint($tablet) {
+            margin-bottom: 24px;
+        }
     }
+
 }
 
 .PlanPanel {
@@ -69,6 +97,11 @@
         width:           100%;
         margin-bottom:   10px;
 
+        @include breakpoint($tablet) {
+            flex-wrap: wrap;
+        }
+
+
         &Btn {
             display:     flex;
             align-items: center;
@@ -78,6 +111,10 @@
     &Btn {
         height: 26px;
         width:  26px;
+
+        @include breakpoint($tablet) {
+            margin-left: auto;
+        }
 
         svg {
             g path {
@@ -129,6 +166,7 @@
         letter-spacing: 0.3px;
         line-height:    20px;
         margin-left:    16px;
+        display: inline-block;
     }
 }
 
@@ -159,11 +197,37 @@
     &Remove {
         display: flex;
 
+        @include breakpoint($tablet) {
+            width: 100%;
+        }
+
         button {
             color:       $primary;
             font-size:   12px;
             margin-left: auto;
             height:      23px;
+
+            @include breakpoint($tablet) {
+                margin-right: auto;
+                margin-left: 0;
+                padding-left: 0;
+            }
+        }
+
+        &All {
+            padding-bottom: 4px;
+            h4 {
+                margin-bottom: 0;
+            }
+
+            button {
+                margin-left: auto;
+                margin-right: 0;
+
+                @include breakpoint($tablet) {
+                    padding-right: 0;
+                }
+            }
         }
     }
 
