@@ -24,23 +24,23 @@ const defaultLabSlipInfo: LabSlipInfo = {
 const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const [loading, setLoading] = useState(false);
   const [labSlipInfo, setLabSlipInfo] = useState(defaultLabSlipInfo);
-  const [labPanels, setLabPanels] = useState([] as number[]);
+  const [labPanels, setLabPanels] = useState([] as number[] | undefined);
 
   const onDiscard = () => {
-    setLabSlipInfo(defaultLabSlipInfo);
-    setLabPanels([]);
+    setLabSlipInfo({...defaultLabSlipInfo});
+    setLabPanels(undefined);
   };
 
   const onApprove = () => {
     window.confirm(`${JSON.stringify(labSlipInfo)}; ${JSON.stringify(labPanels)}`)
   };
 
-  const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labPanels && labPanels.length > 0;
+  const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanels && labPanels.length > 0;
 
   return <section className={styles.LabslipSection}>
     {loading && <Spinner />}
-    <CustomerInformation onSetLoading={setLoading} onSetLabSlipInfo={setLabSlipInfo} labSlipInfo={labSlipInfo} />
-    <Biomarkers onSetLoading={setLoading} onChangePanelsArray={setLabPanels} labPanels={labPanels} />
+    <CustomerInformation onSetLoading={setLoading} onSetLabSlipInfo={setLabSlipInfo} labSlipInfo={labSlipInfo}/>
+    <Biomarkers onSetLoading={setLoading} onChangePanelsArray={setLabPanels} selectedPanels={labPanels}/>
     <SubmitPanel onDiscard={onDiscard} onSubmit={onApprove} disabledSubmit={!isAllRequiredDataFilled()}/>
   </section>
 };

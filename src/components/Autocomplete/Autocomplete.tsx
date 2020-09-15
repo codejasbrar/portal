@@ -37,7 +37,6 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
   const [opened, setOpened] = useState(false);
 
   const selectOption = (option: Option) => {
-    console.log(option);
     setOpened(false);
     setSelected(option);
     setValue(option.text);
@@ -52,10 +51,14 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
   };
 
   useEffect(() => {
-    if(props.value) selectOption({
-      text: props.value,
-      value: 'NEW_CUSTOMER'
-    })
+    if(props.value) {
+      selectOption({
+        text: props.value,
+        value: 'NEW_CUSTOMER'
+      })
+    } else {
+      clearValue();
+    }
   }, [props.value])
 
   const clearValue = () => {

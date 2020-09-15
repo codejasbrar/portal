@@ -5,11 +5,17 @@
 .Labslip {
     &Section {
         padding-top: 70px;
+        background-color: $gray8;
     }
 
     &Top {
         background-color: $gray8;
         padding: 70px 0 32px 0;
+
+        @include breakpoint($max_width) {
+            max-width: 375px;
+            margin: 0 auto;
+        }
     }
 
     &Info {
@@ -34,11 +40,19 @@
             display:         flex;
             justify-content: space-between;
             align-items:     flex-start;
+
+            @include breakpoint($max_width) {
+                flex-direction: column;
+            }
         }
 
         &Item {
             flex:     0 0 370px;
             position: relative;
+
+            @include breakpoint($max_width) {
+                flex-basis: auto;
+            }
         }
     }
 

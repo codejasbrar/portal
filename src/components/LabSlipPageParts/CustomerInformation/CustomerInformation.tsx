@@ -18,7 +18,7 @@ import {on} from "cluster";
 type CustomerInformationPropsTypes = {
   onSetLoading: (state: boolean) => void,
   onSetLabSlipInfo: (info: LabSlipInfo) => void,
-  labSlipInfo: LabSlipInfo
+  labSlipInfo: LabSlipInfo,
 };
 
 export type Customer = {
@@ -30,7 +30,7 @@ export type Customer = {
 
 const formFields: FormField[] = [
   {
-    type: 'text',
+    type: 'id',
     name: 'customerId',
     label: 'Customer ID number',
     required: true
@@ -109,10 +109,6 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     debouncedSearch(searchText);
   }, [searchText]);
 
-  useEffect(() => {
-    setResults(results);
-  },[labSlipInfo])
-
   const onSearch = async (text: string) => {
     try {
       if (text.length <= 1) {
@@ -165,6 +161,8 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     onSetLabSlipInfo({...labSlipInfo, laboratory: option.value});
   }
 
+  const autoCompleteValue = customer && customer.id ? `${customer.id} ${customer.firstName} ${customer.lastName}` : '';
+
   return <>
     <div className={styles.LabslipTop}>
       <div className={styles.container}>
@@ -185,7 +183,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
               onChange={onSearchChanged}
               onSelect={onSelectCustomer}
               onClear={removeCustomer}
-              value={labSlipInfo.customer && labSlipInfo.customer.id ? `${labSlipInfo.customer.id} ${labSlipInfo.customer.firstName} ${labSlipInfo.customer.lastName}` : ''}
+              value={autoCompleteValue}
             />
             {customer && !customer.id ? <p className={styles.LabslipInfoCustomerAdd}>
                 Customer does not exist? <a className={styles.linkPrimary} onClick={openPopup} href="#">Add customer

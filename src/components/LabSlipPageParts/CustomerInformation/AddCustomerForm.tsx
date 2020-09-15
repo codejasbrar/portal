@@ -41,6 +41,7 @@ const Field = (props: {
 }) => {
   const {field} = props;
   switch (field.type) {
+    case "id":
     case "text":
     case "email":
       return <Input error={field.error}
@@ -112,7 +113,7 @@ const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
   };
 
   return <form onSubmit={onSubmit}>
-    {formFieldsEnchanced.map((field: FormFieldsEnchancedTypes) => <Field field={field} />)}
+    {formFieldsEnchanced.map((field: FormFieldsEnchancedTypes) => <Field key={`${field.type}_${field.name}`} field={field} />)}
     <Button className={styles.formBtn} type='submit'>{props.submitText || 'Add customer details'}</Button>
   </form>
 };
