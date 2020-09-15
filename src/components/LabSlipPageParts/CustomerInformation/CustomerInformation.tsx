@@ -48,6 +48,12 @@ const formFields: FormField[] = [
     required: true
   },
   {
+    type: 'text',
+    name: 'customerPhone',
+    label: 'Phone number',
+    required: true
+  },
+  {
     type: 'select',
     name: 'customerGender',
     label: 'Gender',

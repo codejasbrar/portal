@@ -13,6 +13,7 @@ import {on} from "cluster";
 type BiomarkersPropsTypes = {
   onSetLoading: (state: boolean) => void,
   onChangePanelsArray: (panels: number[]) => void,
+  onChangeBiomarkersArray: (markers: string[]) => void,
   selectedPanels: number[] | undefined;
 };
 
@@ -21,14 +22,24 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
   const [planPanels, setPlanPanels] = useState([] as Panel[]);
   const [selectedCodesArray, setSelectedCodes] = useState([] as number[]);
   const [searchText, setSearchText] = useState('');
-  const {onSetLoading, onChangePanelsArray, selectedPanels} = props;
+  const {onSetLoading, onChangePanelsArray, selectedPanels, onChangeBiomarkersArray} = props;
 
   useEffect(() => {
     onChangePanelsArray(selectedCodesArray);
+    onChangeBiomarkersArray(mapSelectedPanelsToBiomarkersArray());
   }, [selectedCodesArray]);
 
+  const mapSelectedPanelsToBiomarkersArray = () => {
+    const selectedBiomarkers = [] as string[];
+    labPanels.filter(panel => selectedCodesArray?.includes(panel.code)).forEach(panel => {
+      if (panel.biomarkers) panel.biomarkers.forEach(marker => {
+        selectedBiomarkers.push(marker.abbr)
+      })
+    })
+    return selectedBiomarkers;
+  };
+
   useEffect(() => {
-    console.log(selectedPanels);
     if(!selectedPanels) setSelectedCodes([]);
   }, [selectedPanels])
 

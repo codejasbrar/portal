@@ -23,6 +23,14 @@
         align-items:      center;
         justify-content:  center;
 
+        &Hide {
+            display: none;
+        }
+
+        &Show {
+            display: flex;
+        }
+
 
         @media screen and (max-width: $big_mobile_horizontal) {
             padding:          15% 0 0 0;

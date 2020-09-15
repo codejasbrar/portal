@@ -86,4 +86,10 @@ export default class LabSlipApiService {
       'Authorization': `Bearer ${Token.get().token}`
     }
   }).then(response => response.data);
+
+  static createOrder = async (lab: string, postData: object) => await client.post(`/createOrder/${lab}`, {...postData}, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  })
 }

@@ -110,6 +110,7 @@ const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
     });
     const valid = formFieldsEnchanced.filter((field: FormFieldsEnchancedTypes) => field.error).length === 0;
     if (valid) props.onSetCustomer(mapFormValuesToCustomerObject());
+    e.currentTarget.reset();
   };
 
   return <form onSubmit={onSubmit}>

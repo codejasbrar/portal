@@ -42,7 +42,6 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
           }
           break;
         case "id":
-          console.log(field)
           if ((/\D/g).test(field.value)) {
             message = "ID must contain only digits";
             valid = false;
