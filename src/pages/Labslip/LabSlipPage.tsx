@@ -38,7 +38,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const onApprove = async () => {
    setLoading(true);
     const data = {
-      id: '',
+      id: labSlipInfo.order,
       customerId: labSlipInfo.customer.id,
       customerFirstName: labSlipInfo.customer.firstName,
       customerLastName: labSlipInfo.customer.lastName,

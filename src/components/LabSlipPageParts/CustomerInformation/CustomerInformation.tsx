@@ -14,6 +14,7 @@ import Popup from "../../Popup/Popup";
 import AddCustomerForm, {FormField} from "./AddCustomerForm";
 import {LabSlipInfo} from "../../../pages/Labslip/LabSlipPage";
 import {on} from "cluster";
+import STATES_ABBRS from "../../../constants/statesAbbrs";
 
 type CustomerInformationPropsTypes = {
   onSetLoading: (state: boolean) => void,
@@ -86,10 +87,12 @@ const formFields: FormField[] = [
     required: true
   },
   {
-    type: 'text',
+    type: 'select',
     name: 'addrState',
     label: 'State',
-    required: true
+    required: true,
+    placeholder: 'Please select state',
+    options: STATES_ABBRS.map(state => {return {name: state.name, value: state.abbr}})
   },
   {
     type: 'text',

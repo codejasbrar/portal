@@ -51,9 +51,9 @@ const Field = (props: {
     case "select":
       return <SingleSelect error={field.error}
         onSelect={(option: SelectOption) => field.onChangeValue(option.value)}
-        label={'Gender'}
+        label={field.label}
         options={field.options || []}
-        placeholder={'Please select gender'} />
+        placeholder={field.placeholder} />
     case "datepicker":
       return <Datepicker error={field.error}
         selected={field.value as string}
