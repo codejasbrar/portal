@@ -96,6 +96,7 @@
 .nav {
     &Button {
         display:         flex;
+        white-space:     nowrap;
         @include buttonBaseStyles();
         justify-content: center;
         align-items:     center;
