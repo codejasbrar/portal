@@ -200,14 +200,14 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
               </p> :
               <></>}
           </div>
-          <SingleSelect className={styles.LabslipInfoItem}
-            label="Select an order ID (optional)"
-            placeholder="Order ID"
-            value={labSlipInfo.order}
-            onSelect={onOrderSelect}
-            options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {return {name: order.id.toString(), value: order.id.toString()}}) : []}
-            disabled={!customer.id || customer.orders && !customer.orders[0].id}
-          />
+          {/*<SingleSelect className={styles.LabslipInfoItem}*/}
+          {/*  label="Select an order ID (optional)"*/}
+          {/*  placeholder="Order ID"*/}
+          {/*  value={labSlipInfo.order}*/}
+          {/*  onSelect={onOrderSelect}*/}
+          {/*  options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {return {name: order.id.toString(), value: order.id.toString()}}) : []}*/}
+          {/*  disabled={!customer.id || customer.orders && !customer.orders[0].id}*/}
+          {/*/>*/}
         </div>
       </div>
     </div>
