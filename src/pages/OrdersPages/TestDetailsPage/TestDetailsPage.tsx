@@ -64,6 +64,11 @@ const columns = [
     }
   },
   {
+    //check the CommonTableTheme.ts str:135
+    name: 'addOn',
+    label: 'Add-on',
+  },
+  {
     name: "units",
     label: "Unit",
     options: {
@@ -85,7 +90,7 @@ const options: MUIDataTableOptions = {
   rowsPerPage: 45,
   selectToolbarPlacement: 'none',
   rowsPerPageOptions: [],
-  rowHover: true,
+  rowHover: false,
   selectableRows: 'none',
   textLabels: {
     body: {
@@ -95,6 +100,21 @@ const options: MUIDataTableOptions = {
   customSort(items, index, isDesc) {
     return items.sort(sortByName).sort(sortByPanic)
   },
+
+  customRowRender(data, dataIndex, rowIndex) {
+    const isAddedOn = data[3];
+    return <tr className={`MuiTableRow-root MUIDataTableBodyRow-root-46 ${styles.tableRow} ${isAddedOn ? styles.tableRowHighlighted : ''}`}
+      data-testid={`MUIDataTableBodyRow-${rowIndex}`}
+      id={`MUIDataTableBodyRow-${rowIndex}`}>
+      {data.map(item => <td className="MuiTableCell-root MuiTableCell-body MUIDataTableBodyCell-root-50"
+        data-colindex={dataIndex}
+        data-testid={`MuiDataTableBodyCell-${dataIndex}-${rowIndex}`}>
+        <div className={`MUIDataTableBodyCell-root-50 ${styles.tableRowText}`}
+          data-testid={`MuiDataTableBodyCell-${dataIndex}-${rowIndex}`}>{item}</div>
+      </td>)}
+    </tr>
+  }
+
 
 } as MUIDataTableOptions;
 
@@ -266,13 +286,14 @@ const TestDetailsPage = () => {
                 <div className={styles.mobileOrders}>
                   <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
                   {test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic).map(biomarker =>
-                    <div key={biomarker.id} className={styles.mobileOrdersItem}>
+                    <div key={biomarker.id}
+                      className={`${styles.mobileOrdersItem} ${biomarker.addOn ? styles.tableRowHighlighted : ''}`}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.name}</span></p>
                       <p className={styles.mobileOrdersTitle}>Result:&nbsp;
                         <span className={styles.dotWrapper}>
                           <span className={styles.mobileOrdersText}>{biomarker.value}</span>
-                          {biomarker.panic &&  <DangerIcon className={styles.dangerIcon}/>}
+                          {biomarker.panic && <DangerIcon className={styles.dangerIcon} />}
                         </span>
                       </p>
                       {/*delete hide-class if Normal Range string is needed*/}

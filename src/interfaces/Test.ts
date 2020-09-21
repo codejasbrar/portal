@@ -16,6 +16,7 @@ export interface Biomarker {
   id: number,
   name: string,
   value: number,
+  addOn: boolean,
   minPanicValue: number,
   maxPanicValue: number,
   units: string,
