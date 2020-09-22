@@ -155,6 +155,8 @@ const TestsPage = () => {
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
+              <p className={styles.mobileTestsTitle}>Collected: <span className={styles.mobileTestsText}>{item.observed.replace('T', ' ')}</span>
+              </p>
               <p className={styles.mobileTestsTitle}>Received: <span className={styles.mobileTestsText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileTestsTitle}>Order
@@ -164,7 +166,8 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Biomarkers out of
                 range: <span className={styles.mobileTestsText}>
                   {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
-                    <div className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any)=><><DangerIcon className={styles.dangerIconLeft}/>{item}; </>)} </div>
+                    <div className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any) => <><DangerIcon
+                      className={styles.dangerIconLeft} />{item}; </>)} </div>
                     : "None"}
               </span>
               </p>

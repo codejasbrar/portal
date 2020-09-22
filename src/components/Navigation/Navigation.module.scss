@@ -3,7 +3,7 @@
 @import "../../styles/common";
 
 .navigation {
-    margin-right: 80px;
+    margin-right: 40px;
 
     &Title {
         margin-bottom: 17px;
@@ -90,5 +90,19 @@
 
     @include breakpoint($tablet_horizontal) {
         width: 100%;
+    }
+}
+
+.nav {
+    &Button {
+        display:         flex;
+        white-space:     nowrap;
+        @include buttonBaseStyles();
+        justify-content: center;
+        align-items:     center;
+
+        &:visited {
+            color: #fff;
+        }
     }
 }

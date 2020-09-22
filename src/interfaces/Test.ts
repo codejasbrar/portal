@@ -12,15 +12,6 @@ export interface Test {
   hash: string
 }
 
-export interface Biomarker {
-  id: number,
-  name: string,
-  value: number,
-  minPanicValue: number,
-  maxPanicValue: number,
-  units: string,
-}
-
 export interface TestComment {
   message: string,
   id: number,
@@ -39,3 +30,22 @@ export interface TestDetails {
   testResultComments: TestComment[],
   criteriaMet?: boolean | 'Yes' | 'No'
 }
+
+export interface Biomarker {
+  id: number,
+  name: string,
+  abbr: string,
+  value: number,
+  minPanicValue: number,
+  maxPanicValue: number,
+  units: string,
+  addOn: boolean
+}
+
+export type Panel = {
+  id: number,
+  code: number,
+  name: string,
+  biomarkers?: Biomarker[],
+  labPanels?: Panel[]
+};

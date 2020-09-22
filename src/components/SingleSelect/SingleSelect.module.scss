@@ -1,0 +1,127 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.Select {
+
+    height:           36px;
+    border:           1px solid $gray6;
+    background-color: #fff;
+    padding:          4px 8px 4px 11px;
+    display:          flex;
+    justify-content:  space-between;
+    align-items:      center;
+    cursor:           pointer;
+    margin-bottom:    24px;
+
+
+    &:hover, &:focus {
+        background-color: $gray8;
+        outline:          none;
+    }
+
+    &:focus {
+        border-color: $primary;
+    }
+
+    &Wrapper {
+        width:    100%;
+        position: relative;
+    }
+
+    &Area {
+        position: relative;
+    }
+
+    &Label {
+        color:          $text;
+        font-size:      14px;
+        font-weight:    600;
+        letter-spacing: 0.3px;
+        line-height:    23px;
+        margin:         0 0 3px 0
+    }
+
+    &Value {
+        color:          $text;
+        font-size:      16px;
+        letter-spacing: 0.3px;
+        line-height:    20px;
+        position:       relative;
+        z-index:        1;
+
+        &Icon {
+            g path {
+                fill: $primary !important;
+            }
+
+            transition: transform 0.2s;
+
+            &Opened {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    &Dropdown {
+
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+
+        &Wrapper {
+            position:         absolute;
+            top:              36px;
+            left:             0;
+            width:            100%;
+            max-height:           0;
+            transition:       max-height 0.2s;
+            overflow:         hidden;
+            z-index:          2;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+
+        &Opened {
+            width: 100%;
+            padding: 0;
+            border: 1px solid $gray6;
+            max-height: 200px;
+            background-color: #fff;
+        }
+
+        &Item {
+            list-style:     none;
+            padding:        4px 20px 4px 8px;
+            color:          $text;
+            font-size:      16px;
+            letter-spacing: 0.3px;
+            line-height:    30px;
+            height:         36px;
+            cursor:         pointer;
+
+            &:hover, &:focus {
+                background-color: $gray8;
+                outline:          none;
+            }
+        }
+    }
+
+}
+
+.SelectDisabled {
+    background-color: #fff;
+    opacity:          0.5;
+    pointer-events:   none;
+}
+
+.SelectError {
+    border: 1px solid $error;
+
+    &Message {
+        position:  absolute;
+        bottom:    -19px;
+        left:      4px;
+        font-size: 12px;
+        color:     $error;
+    }
+}

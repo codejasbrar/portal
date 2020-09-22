@@ -2,22 +2,7 @@
 @import "../../styles/mixins";
 
 .Button {
-    width:            100%;
-    height:           36px;
-    font-family:      "Open Sans", sans-serif;
-    font-weight:      600;
-    letter-spacing:   0.3px;
-    border-radius:    3px;
-    background-color: $primary;
-    color:            #fff;
-
-    &:hover {
-        background-color: lighten($primary, 8);
-    }
-
-    &:active {
-        background-color: darken($primary, 8);
-    }
+    @include buttonBaseStyles();
 
     &Secondary {
         background-color: $gray7;

@@ -1,0 +1,55 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+
+.Autocomplete {
+    position: relative;
+
+    &Clear {
+        position: absolute;
+        top:      36px;
+        right:    6px;
+    }
+
+    &Input {
+        padding-right: 24px;
+
+        &Wrapper {
+            margin-bottom: 0;
+        }
+    }
+
+    &Dropdown {
+        margin:   0;
+        padding:  0;
+        overflow: hidden;
+
+        &Item {
+            list-style:     none;
+            padding:        4px 8px;
+            color:          $text;
+            font-size:      14px;
+            letter-spacing: 0.3px;
+            line-height:    30px;
+            height:         36px;
+            cursor:         pointer;
+
+            &:hover, &:focus {
+                background-color: $gray8;
+                outline:          none;
+            }
+        }
+
+        &Wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+            width:      100%;
+            position:   absolute;
+            top:        63px;
+            left:       0;
+            background: #fff;
+            border:     1px solid $gray6;
+            z-index:    1;
+        }
+    }
+}
