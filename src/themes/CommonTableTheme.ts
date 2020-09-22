@@ -132,6 +132,12 @@ const detailsTableStylesObject = {
           // delete if Normal Range column is needed
           display: 'none'
         },
+        '&:nth-child(4)': {
+          textAlign: 'right !important',
+
+          // delete if Addon column is needed
+          display: 'none'
+        },
         '&:last-child': {
           textAlign: 'right !important',
           width: '26%'

@@ -14,6 +14,12 @@ export default class LabSlipApiService {
     }
   }).then(response => response.data);
 
+  static getAllOrders = async (searchString?: string) => await client.get(`/getOrdersByStatus?search=${searchString || ''}&size=1000`, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }).then(response => response.data);
+
   static saveApprovedOrders = async (hashes: string[]) => await client.post('/saveApprovedOrders', {hashes}, {
     headers: {
       'Authorization': `Bearer ${Token.get().token}`
@@ -64,4 +70,26 @@ export default class LabSlipApiService {
       'Accept': 'application/pdf'
     }
   });
+
+  static getPanels = async () => await Promise.all([client.get('/planPanels', {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }), client.get('/labPanels', {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  })]);
+
+  static searchCustomer = async (searchString: string) => await client.get(`/customers?search=${searchString}`, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  }).then(response => response.data);
+
+  static createOrder = async (lab: string, postData: object) => await client.post(`/createOrder/${lab}`, {...postData}, {
+    headers: {
+      'Authorization': `Bearer ${Token.get().token}`
+    }
+  })
 }

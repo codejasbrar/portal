@@ -48,7 +48,9 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            {admin && <Route path="/orders/tests-incomplete" component={TestIncompletePage} />}
+            {admin ? <Route path="/orders/tests-incomplete" component={TestIncompletePage} /> : <Route path="/orders/tests-incomplete">
+              <Redirect to="/orders/pending" />
+            </Route>}
           </div>
         </div>
       </section>

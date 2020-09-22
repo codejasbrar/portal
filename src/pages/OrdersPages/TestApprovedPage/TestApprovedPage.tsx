@@ -133,6 +133,8 @@ const TestApprovedPage = () => {
                 className={styles.mobileTestsLink}
                 to={`/orders/test/${item.hash}`}
               >{item.id}</Link></span></p>
+              <p className={styles.mobileOrdersTitle}>Collected: <span className={styles.mobileOrdersText}>{item.observed.replace('T', ' ')}</span>
+              </p>
               <p className={styles.mobileOrdersTitle}>Received: <span className={styles.mobileOrdersText}>{item.received.replace('T', ' ')}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Order
@@ -140,6 +142,8 @@ const TestApprovedPage = () => {
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
+              {/*<p className={styles.mobileOrdersTitle}>Criteria*/}
+              {/*  met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>*/}
               <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
               </p>
             </div>

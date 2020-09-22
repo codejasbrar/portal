@@ -8,7 +8,8 @@ type PopupPropsTypes = {
   children: ReactElement,
   show: boolean,
   classes?: string,
-  onClose: () => void
+  onClose: () => void,
+  fullScreen?: boolean
 };
 
 const Popup = (props: PopupPropsTypes) => {
@@ -22,11 +23,13 @@ const Popup = (props: PopupPropsTypes) => {
       BodyScroll.enable();
     }
   }, [props.show]);
-  return props.show ? <div className={styles.modalOverlay} onClick={() => props.onClose()}>
-    <div className={`${styles.modal} ${props.classes ? props.classes : ''}`} onClick={(e) => e.stopPropagation()}>
+  return <div className={`${styles.modalOverlay} ${props.show ? styles.modalOverlayShow : styles.modalOverlayHide} ${props.fullScreen ? styles.modalOverlayFullscreen : ''}`}
+    onClick={() => props.onClose()}>
+    <div className={`${styles.modal} ${props.classes ? props.classes : ''} ${props.fullScreen ? styles.modalFullscreen : ''}`}
+      onClick={(e) => e.stopPropagation()}>
       {props.children}
     </div>
-  </div> : <></>;
+  </div>;
 }
 
 export default Popup;

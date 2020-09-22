@@ -23,10 +23,24 @@
         align-items:      center;
         justify-content:  center;
 
+        &Hide {
+            display: none;
+        }
+
+        &Show {
+            display: flex;
+        }
+
+        &Fullscreen {
+            position: absolute;
+            top:      70px;
+
+        }
+
 
         @media screen and (max-width: $big_mobile_horizontal) {
-            padding:          15% 0 0 0;
-            align-items:      start;
+            padding:     15% 0 0 0;
+            align-items: start;
         }
     }
 

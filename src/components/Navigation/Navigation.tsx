@@ -2,7 +2,8 @@ import React from "react";
 
 //Styles
 import styles from "./Navigation.module.scss";
-import {NavLink} from "react-router-dom";
+
+import {Link, NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {resultsQuantity, userState} from "../../selectors/selectors";
 
@@ -52,6 +53,9 @@ const Navigation = (props: NavigationPropsTypes) => {
         <span className={styles.navlinkNumber}>{counters.approvedResults ? `(${counters.approvedResults})` : ''}</span>
       </NavLink>
     </nav>
+    {!user.physician && <div className={styles.navButtonBlock}>
+      <Link className={styles.navButton} to='/labslip'>Create lab slip</Link>
+    </div>}
   </div>
 };
 
