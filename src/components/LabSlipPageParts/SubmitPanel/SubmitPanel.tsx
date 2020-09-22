@@ -14,8 +14,13 @@ const SubmitPanel = (props: SubmitPanelPropsTypes) => {
   const {onDiscard, onSubmit, disabledSubmit} = props;
 
   return <div className={styles.SubmitPanel}>
-    <Button onClick={() => onDiscard()} className={styles.SubmitPanelBtn} secondary>Discard lab slip</Button>
-    <Button className={styles.SubmitPanelBtn} onClick={() => onSubmit()} disabled={disabledSubmit}>Create lab slip</Button>
+    <Button onClick={() => onDiscard()}
+      className={styles.SubmitPanelBtn}
+      secondary><>Discard <span className={styles.hideMobile}>lab slip</span></>
+    </Button>
+    <Button className={styles.SubmitPanelBtn} onClick={() => onSubmit()} disabled={disabledSubmit}><>Create <span
+      className={styles.hideMobile}>lab slip</span></>
+    </Button>
   </div>
 };
 

@@ -76,7 +76,7 @@ const PanelsList = (props: PanelsListPropsTypes) => {
       return <ul className={styles.SelectedList}>
         {!!panels.length && <div className={`${styles.SelectedListRemove} ${styles.SelectedListRemoveAll}`}>
           <h4 className={styles.heading14}>All lab panels:</h4>
-          <button type={'button'} onClick={onRemoveAll}>Clear all</button>
+          <button type={'button'} onClick={onRemoveAll}>Remove all</button>
         </div>}
         {!!panels.length && panels.map(panel => panel.labPanels ? <></> :
           <LabPanel key={`${panel.code}1${panel.id}`} onRemove={onRemove} panel={panel} />)}

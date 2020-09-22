@@ -9,6 +9,7 @@ type PopupPropsTypes = {
   show: boolean,
   classes?: string,
   onClose: () => void,
+  fullScreen?: boolean
 };
 
 const Popup = (props: PopupPropsTypes) => {
@@ -22,8 +23,10 @@ const Popup = (props: PopupPropsTypes) => {
       BodyScroll.enable();
     }
   }, [props.show]);
-  return <div className={`${styles.modalOverlay} ${props.show ? styles.modalOverlayShow : styles.modalOverlayHide}`} onClick={() => props.onClose()}>
-    <div className={`${styles.modal} ${props.classes ? props.classes : ''}`} onClick={(e) => e.stopPropagation()}>
+  return <div className={`${styles.modalOverlay} ${props.show ? styles.modalOverlayShow : styles.modalOverlayHide} ${props.fullScreen ? styles.modalOverlayFullscreen : ''}`}
+    onClick={() => props.onClose()}>
+    <div className={`${styles.modal} ${props.classes ? props.classes : ''} ${props.fullScreen ? styles.modalFullscreen : ''}`}
+      onClick={(e) => e.stopPropagation()}>
       {props.children}
     </div>
   </div>;

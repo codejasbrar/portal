@@ -162,13 +162,87 @@
     z-index: 10;
 
     @include breakpoint($tablet) {
-        height: 68px;
-        padding-left: 6px;
+        height:        68px;
+        padding-left:  6px;
         padding-right: 6px;
     }
 
     &Btn {
         max-width: 150px;
-        margin: 0 10px;
+        margin:    0 10px;
+    }
+}
+
+button span.hideMobile {
+    @include breakpoint($mobile) {
+        display: none;
+    }
+}
+
+.Success {
+
+    width:      570px;
+    text-align: center;
+
+    &Wrapper {
+        min-height:      853px;
+        padding-top:     141px;
+        display:         flex;
+        justify-content: center;
+
+        @include breakpoint($mobile) {
+            padding-top: 111px;
+            min-height:  510px;
+        }
+    }
+
+    &Title {
+        font-size:      30px;
+        font-weight:    600;
+        letter-spacing: 0.3px;
+        line-height:    44px;
+        margin-bottom:  20px;
+        margin-top:     20px;
+
+        @include breakpoint($mobile) {
+            font-size:     24px;
+            line-height:   36px;
+            margin-bottom: 10px;
+        }
+    }
+
+    &Text {
+        font-size:      16px;
+        letter-spacing: 0.3px;
+        line-height:    24px;
+        padding-left:   50px;
+        padding-right:  50px;
+
+        @include breakpoint($tablet) {
+            padding-left:  24px;
+            padding-right: 24px;
+        }
+
+        @include breakpoint($mobile) {
+            padding-left:   16px;
+            padding-right:  16px;
+            font-size:      14px;
+            letter-spacing: 0.3px;
+            line-height:    20px;
+        }
+    }
+
+    &Link {
+        color:         $primary;
+        padding-left:  0;
+        padding-right: 0;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        &:visited {
+            color: $primary;
+        }
     }
 }

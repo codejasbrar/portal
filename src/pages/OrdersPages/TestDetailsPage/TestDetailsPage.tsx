@@ -297,9 +297,9 @@ const TestDetailsPage = () => {
                         </span>
                       </p>
                       {/*delete hide-class if Normal Range string is needed*/}
-                      <p className={`${styles.mobileOrdersTitle} ${styles.hide}`}>Normal range:&nbsp;
-                        <span className={styles.mobileOrdersText}>{biomarker.normalRange}</span>
-                      </p>
+                      {/*<p className={`${styles.mobileOrdersTitle} ${styles.hide}`}>Normal range:&nbsp;*/}
+                      {/*  <span className={styles.mobileOrdersText}>{biomarker.normalRange}</span>*/}
+                      {/*</p>*/}
                       <p className={styles.mobileOrdersTitle}>Unit:&nbsp;
                         <span className={styles.mobileOrdersText}>{biomarker.units}</span></p>
                     </div>

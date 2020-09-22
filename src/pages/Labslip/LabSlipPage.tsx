@@ -2,12 +2,16 @@ import React, {useEffect, useState} from "react";
 
 //Styles
 import styles from "./LabSlipPage.module.scss";
+
+
 import Spinner from "../../components/Spinner/Spinner";
 import CustomerInformation, {Customer} from "../../components/LabSlipPageParts/CustomerInformation/CustomerInformation";
 import Biomarkers from "../../components/LabSlipPageParts/Biomarkers/Biomarkers";
 import SubmitPanel from "../../components/LabSlipPageParts/SubmitPanel/SubmitPanel";
 import LabSlipApiService from "../../services/LabSlipApiService";
 import Popup from "../../components/Popup/Popup";
+import {ReactComponent as SuccessIcon} from "../../icons/success.svg";
+import {Link} from "react-router-dom";
 
 type LabSlipPagePropsTypes = {};
 
@@ -28,7 +32,8 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const [labSlipInfo, setLabSlipInfo] = useState(defaultLabSlipInfo);
   const [biomarkers, setBiomarkers] = useState([] as string[]);
   const [labPanels, setLabPanels] = useState([] as number[] | undefined);
-  const [submitMessage, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(true);
+  const [error, setError] = useState('');
 
   const clear = () => {
     setLabSlipInfo({...defaultLabSlipInfo});
@@ -36,7 +41,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   };
 
   const onApprove = async () => {
-   setLoading(true);
+    setLoading(true);
     const data = {
       id: labSlipInfo.order,
       customerId: labSlipInfo.customer.id,
@@ -59,33 +64,50 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
 
     await LabSlipApiService.createOrder(labSlipInfo.laboratory, data).then((response) => {
       setLoading(false);
-      setMessage('Order successfully created');
+      setSubmitted(true);
+      setError('');
       clear();
     }).catch(error => {
       setLoading(false);
-      setMessage(`ERROR: ${error.response.data.message}`);
+      setError(`ERROR: ${error.response.data.message}`);
     })
   };
 
   useEffect(() => {
-    if(!!submitMessage.length) {
+    if (!!error.length) {
       setTimeout(() => {
-        setMessage('');
+        setError('');
       }, 6000)
     }
-  }, [submitMessage])
+  }, [error])
 
 
   const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanels && labPanels.length > 0;
 
   return <section className={styles.LabslipSection}>
     {loading && <Spinner />}
-    <CustomerInformation onSetLoading={setLoading} onSetLabSlipInfo={setLabSlipInfo} labSlipInfo={labSlipInfo}/>
-    <Biomarkers onSetLoading={setLoading} onChangeBiomarkersArray={setBiomarkers} onChangePanelsArray={setLabPanels} selectedPanels={labPanels}/>
-    <SubmitPanel onDiscard={clear} onSubmit={onApprove} disabledSubmit={!isAllRequiredDataFilled()}/>
-    <Popup show={!!submitMessage.length} onClose={() => setMessage('')}>
-      <h4 className={styles.heading20}>{submitMessage}</h4>
-    </Popup>
+    {submitted ? <div className={styles.SuccessWrapper}>
+      <div className={styles.Success}>
+        <SuccessIcon />
+        <h3 className={styles.SuccessTitle}>Success!</h3>
+        <p className={styles.SuccessText}>Your lap slip was created. You can now return to
+          the <Link className={styles.SuccessLink} to="/">Physician
+            Portal</Link> or <button className={styles.SuccessLink}
+            type={'button'}
+            onClick={() => setSubmitted(false)}>Custom Lab Slip Tool</button>.
+        </p>
+      </div>
+    </div> : <>
+      <CustomerInformation onSetLoading={setLoading} onSetLabSlipInfo={setLabSlipInfo} labSlipInfo={labSlipInfo} />
+      <Biomarkers onSetLoading={setLoading}
+        onChangeBiomarkersArray={setBiomarkers}
+        onChangePanelsArray={setLabPanels}
+        selectedPanels={labPanels} />
+      <SubmitPanel onDiscard={clear} onSubmit={onApprove} disabledSubmit={!isAllRequiredDataFilled()} />
+      <Popup show={!!error.length} onClose={() => setError('')}>
+        <h4 className={styles.heading20}>{error}</h4>
+      </Popup>
+    </>}
   </section>
 };
 
