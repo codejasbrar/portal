@@ -32,7 +32,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const [labSlipInfo, setLabSlipInfo] = useState(defaultLabSlipInfo);
   const [biomarkers, setBiomarkers] = useState([] as string[]);
   const [labPanels, setLabPanels] = useState([] as number[] | undefined);
-  const [submitted, setSubmitted] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
   const clear = () => {
