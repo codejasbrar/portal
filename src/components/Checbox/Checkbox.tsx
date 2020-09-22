@@ -11,6 +11,9 @@ type CheckboxPropsTypes = {
   onChange: (val: boolean) => void,
   name: string,
   label: string,
+  classes?: {
+    label?: string
+  }
 };
 
 const Checkbox = (props: CheckboxPropsTypes) => {
@@ -25,7 +28,7 @@ const Checkbox = (props: CheckboxPropsTypes) => {
     <label className={styles.CheckboxLabel}><input type="checkbox"
       className={styles.Checkbox}
       onChange={handleChange}
-      checked={props.checked} /><span className={styles.CheckboxLabelName}>{props.label}</span></label>
+      checked={props.checked} /><span className={`${styles.CheckboxLabelName} ${props.classes && props.classes.label ? props.classes.label : ''}`}>{props.label}</span></label>
   </div>
 
 };

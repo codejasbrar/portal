@@ -1,6 +1,8 @@
+export type ValidFieldTypes = "email" | "password" | "text" | "code" | "select" | "datepicker" | "id";
+
 type FieldObject = {
   name: string,
-  type: "email" | "password" | "text" | "code",
+  type: ValidFieldTypes,
   value: string
 }
 
@@ -36,6 +38,12 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
         case "code":
           if (field.value.length !== 6 && !(/\D/g).test(field.value)) {
             message = "Required 6 digit security code";
+            valid = false;
+          }
+          break;
+        case "id":
+          if ((/\D/g).test(field.value)) {
+            message = "ID must contain only digits";
             valid = false;
           }
           break;

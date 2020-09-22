@@ -21,12 +21,17 @@
 
     &::placeholder {
         color:       $gray6;
-        font-size:   14px;
+        font-size:   16px;
         padding-top: 2px;
     }
 
     &Wrapper {
         margin-bottom: 24px;
+        position:      relative;
+
+        @include breakpoint($tablet) {
+            margin-bottom: 20px;
+        }
     }
 
     &Label {
@@ -37,6 +42,50 @@
         line-height:    1.7;
         font-weight:    600;
         text-align:     left;
+    }
+
+    &Disabled {
+        pointer-events:   none;
+        background-color: #fff;
+        opacity:          0.5;
+    }
+
+    &IconRight {
+        position: absolute;
+        right:    8px;
+        top:      33px;
+    }
+
+    &Iconed {
+        padding-left: 32px;
+
+        &Icon {
+            position: absolute;
+            top:      9px;
+            left:     8px;
+        }
+    }
+
+    &Clear {
+        padding-right: 32px;
+
+        &Btn {
+            position: absolute;
+            right:    8px;
+            top:      9px;
+        }
+    }
+
+    &Error {
+        border: 1px solid $error;
+
+        &Message {
+            position:  absolute;
+            bottom:    -19px;
+            left:      4px;
+            font-size: 12px;
+            color:     $error;
+        }
     }
 }
 

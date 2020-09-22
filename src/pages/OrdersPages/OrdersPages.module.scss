@@ -5,6 +5,7 @@
 .wrapper {
     padding-top: 138px;
     position:    relative;
+    padding-bottom: 150px;
 
     @include breakpoint($tablet_horizontal) {
         padding-top: 88px;
@@ -13,12 +14,26 @@
 
 .orders {
     width:          100%;
-    padding-bottom: 190px;
+    border-left: 1px solid $gray7;
+    padding-left: 40px;
+    padding-bottom: 40px;
+
+    @include breakpoint($tablet) {
+        border: none;
+        padding-left: 0;
+    }
 }
 
 .tests {
     width:          100%;
-    padding-bottom: 190px;
+    padding-bottom: 40px;
+    border-left: 1px solid $gray7;
+    padding-left: 40px;
+
+    @include breakpoint($tablet) {
+        border: none;
+        padding-left: 0;
+    }
 
     table {
         a {
@@ -29,6 +44,7 @@
 
 .containerFlex {
     display: flex;
+    margin-top: 50px;
 
     @include breakpoint($tablet_horizontal) {
         display: block;
@@ -510,6 +526,7 @@
     margin-left: 4px;
     position:    absolute;
     right:       -22px;
+    top:         3px;
 }
 
 .dangerIconLeft {

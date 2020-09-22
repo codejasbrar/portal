@@ -6,7 +6,7 @@ import {TestDetails} from "../interfaces/Test";
 
 export const authState = (store: Storage): AuthState => store.auth;
 export const userState = (store: Storage): User => store.user;
-export const isAdmin = (store: Storage): boolean => !store.user.physician;
+export const isAdmin = (store: Storage): boolean => !!Object.keys(store.user).length && !store.user.physician;
 
 export const ordersPendingState = (store: Storage): OrdersResponse => (store.orders.pending);
 export const ordersApprovedState = (store: Storage): OrdersResponse => (store.orders.approved);

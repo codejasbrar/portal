@@ -2,7 +2,8 @@ import React, {useRef, useEffect, ReactElement} from "react";
 
 type ClickOutsidePropsTypes = {
   children: ReactElement[] | ReactElement,
-  onClickOutside: () => void
+  onClickOutside: () => void,
+  className?: string
 };
 
 const ClickOutside = (props: ClickOutsidePropsTypes) => {
@@ -19,7 +20,7 @@ const ClickOutside = (props: ClickOutsidePropsTypes) => {
     };
   }, [props]);
 
-  return <div ref={ref}>{props.children}</div>;
+  return <div className={props.className} ref={ref}>{props.children}</div>;
 };
 
 export default ClickOutside;
