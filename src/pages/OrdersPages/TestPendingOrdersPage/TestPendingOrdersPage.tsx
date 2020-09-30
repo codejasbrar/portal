@@ -146,7 +146,7 @@ const TestsPage = () => {
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         {!admin &&
-        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
+        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
@@ -175,7 +175,9 @@ const TestsPage = () => {
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />}
+                text={"Approve"}
+                mobile
+              />}
             </div>
           ))}
         <Pagination mobile
