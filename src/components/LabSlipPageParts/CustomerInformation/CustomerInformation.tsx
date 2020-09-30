@@ -9,11 +9,9 @@ import {debounce} from "@material-ui/core";
 import {Order, OrderDetails} from "../../../interfaces/Order";
 import SingleSelect, {SelectOption} from "../../SingleSelect/SingleSelect";
 import {ReactComponent as CloseIcon} from "../../../icons/close.svg";
-import Input from "../../Input/Input";
 import Popup from "../../Popup/Popup";
 import AddCustomerForm, {FormField} from "./AddCustomerForm";
 import {LabSlipInfo} from "../../../pages/Labslip/LabSlipPage";
-import {on} from "cluster";
 import STATES_ABBRS from "../../../constants/statesAbbrs";
 
 type CustomerInformationPropsTypes = {
@@ -110,7 +108,11 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   const {customer, laboratory, order} = labSlipInfo;
 
   const onSearchChanged = (text: string) => {
-    if (customer && customer.id) onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: ''});
+    if (customer && customer.id) onSetLabSlipInfo({
+      ...labSlipInfo,
+      customer: {} as Customer,
+      order: {} as OrderDetails
+    });
     setSearchText(text);
   };
 
@@ -143,7 +145,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   });
 
   const removeCustomer = () => {
-    onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: ''})
+    onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: {} as OrderDetails});
     setResults([] as Customer[])
   };
 
@@ -163,12 +165,15 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   };
 
   const onOrderSelect = (option: SelectOption) => {
-    onSetLabSlipInfo({...labSlipInfo, order: option.value});
+    onSetLabSlipInfo({
+      ...labSlipInfo,
+      order: customer.orders.filter((order: OrderDetails) => order.id.toString() === option.value)[0]
+    });
   };
 
   const onLabSelect = (option: SelectOption) => {
     onSetLabSlipInfo({...labSlipInfo, laboratory: option.value});
-  }
+  };
 
   const autoCompleteValue = customer && customer.id ? `${customer.id} ${customer.firstName} ${customer.lastName}` : '';
 
@@ -200,14 +205,16 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
               </p> :
               <></>}
           </div>
-          {/*<SingleSelect className={styles.LabslipInfoItem}*/}
-          {/*  label="Select an order ID (optional)"*/}
-          {/*  placeholder="Order ID"*/}
-          {/*  value={labSlipInfo.order}*/}
-          {/*  onSelect={onOrderSelect}*/}
-          {/*  options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {return {name: order.id.toString(), value: order.id.toString()}}) : []}*/}
-          {/*  disabled={!customer.id || customer.orders && !customer.orders[0].id}*/}
-          {/*/>*/}
+          <SingleSelect className={styles.LabslipInfoItem}
+            label="Select an order ID (optional)"
+            placeholder="Order ID"
+            value={labSlipInfo.order.id ? labSlipInfo.order.id.toString() : ''}
+            onSelect={onOrderSelect}
+            options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {
+              return {name: order.id.toString(), value: order.id.toString()}
+            }) : []}
+            disabled={!customer.id || customer.orders && !customer.orders[0].id}
+          />
         </div>
       </div>
     </div>
@@ -216,7 +223,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
         <button type="button" onClick={closePopup} className={styles.LabslipCustomerPopupClose}><CloseIcon /></button>
         <h3 className={styles.heading20}>Add customer details</h3>
         <AddCustomerForm onSetCustomer={(customer: Customer) => {
-          onSetLabSlipInfo({...labSlipInfo, customer: customer})
+          onSetLabSlipInfo({...labSlipInfo, customer: customer});
           closePopup();
         }} fields={formFields} />
       </div>
