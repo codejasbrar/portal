@@ -75,6 +75,7 @@ const TestIncompletePage = () => {
           mode="result"
           onSaved={onSaved}
           selected={tests.content}
+          mobile
           text={"Approve all results"} />
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
@@ -99,7 +100,9 @@ const TestIncompletePage = () => {
                 type="pending"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />
+                text={"Approve"}
+                mobile
+              />
             </div>
           ))}
         <Pagination mobile

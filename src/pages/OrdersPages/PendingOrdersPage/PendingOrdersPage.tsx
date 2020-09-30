@@ -260,7 +260,7 @@ const PendingOrdersPage = () => {
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         {!admin &&
-        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
+        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -277,7 +277,9 @@ const PendingOrdersPage = () => {
                 mode="order"
                 onSaved={onSaved}
                 selected={[item]}
-                text={"Approve"} />}
+                text={"Approve"}
+                mobile
+              />}
             </div>
           ))}
         <Pagination mobile
