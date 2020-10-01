@@ -21,6 +21,7 @@ import {
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {useSelector} from "react-redux";
+import downloadPDF from "../../../helpers/downloadPDF";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -83,23 +84,9 @@ const options = (searchText: string, setSearchText: (searchText: string) => void
 }) as MUIDataTableOptions;
 
 const getLabSlip = async (hash: string, fileName: string) => {
-  // @ts-ignore
-  const isSafari = /constructor/i.test(window.HTMLElement) || ((p) => p.toString() === "[object SafariRemoteNotification]")(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
   try {
     const response = await LabSlipApiService.getLabSlip(hash);
-    const blob = new Blob([response.data], {type: "application/pdf"});
-    const link = window.URL.createObjectURL(blob);
-    // Open PDF in new Tab
-    window.open(link, isSafari ? '_self' : '_blank');
-    // Download PDF file without opening
-    if (!isSafari) {
-      const name = fileName;
-      const linkEl = document.createElement('a');
-      linkEl.href = link;
-      linkEl.download = name;
-      linkEl.target = '_blank';
-      linkEl.click();
-    }
+    downloadPDF(new Blob([response.data], {type: "application/pdf"}), fileName);
   } catch (e) {
     if (e.response) window.confirm(e.response.data.message || 'Exceeded the maximum number of downloads');
   }

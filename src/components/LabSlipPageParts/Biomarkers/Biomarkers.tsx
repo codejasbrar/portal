@@ -12,9 +12,10 @@ import {on} from "cluster";
 
 type BiomarkersPropsTypes = {
   onSetLoading: (state: boolean) => void,
-  onChangePanelsArray: (panels: number[]) => void,
-  onChangeBiomarkersArray: (markers: string[]) => void,
-  selectedPanels: number[] | undefined;
+  onChangePanelsIdsArray: (panelsIds: number[]) => void,
+  onChangeLabPanelsArray: (panels: Panel[]) => void,
+  selectedPanels: number[] | undefined,
+  preSelectedPanel: number;
 };
 
 const Biomarkers = (props: BiomarkersPropsTypes) => {
@@ -22,26 +23,23 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
   const [planPanels, setPlanPanels] = useState([] as Panel[]);
   const [selectedCodesArray, setSelectedCodes] = useState([] as number[]);
   const [searchText, setSearchText] = useState('');
-  const {onSetLoading, onChangePanelsArray, selectedPanels, onChangeBiomarkersArray} = props;
+  const {onSetLoading, onChangePanelsIdsArray, selectedPanels, onChangeLabPanelsArray, preSelectedPanel} = props;
 
   useEffect(() => {
-    onChangePanelsArray(selectedCodesArray);
-    onChangeBiomarkersArray(mapSelectedPanelsToBiomarkersArray());
+    onChangePanelsIdsArray(selectedCodesArray);
+    onChangeLabPanelsArray(labPanels.filter(panel => selectedCodesArray.includes(panel.code)));
   }, [selectedCodesArray]);
 
-  const mapSelectedPanelsToBiomarkersArray = () => {
-    const selectedBiomarkers = [] as string[];
-    labPanels.filter(panel => selectedCodesArray?.includes(panel.code)).forEach(panel => {
-      if (panel.biomarkers) panel.biomarkers.forEach(marker => {
-        selectedBiomarkers.push(marker.abbr)
-      })
-    })
-    return selectedBiomarkers;
-  };
+  useEffect(() => {
+    if (!selectedPanels) setSelectedCodes([]);
+  }, [selectedPanels]);
 
   useEffect(() => {
-    if(!selectedPanels) setSelectedCodes([]);
-  }, [selectedPanels])
+    const panel = planPanels.find(panel => panel.code === preSelectedPanel);
+    if (panel && panel.labPanels) {
+      setSelectedCodes([preSelectedPanel, ...panel.labPanels.map(panel => panel.code)])
+    }
+  }, [preSelectedPanel]);
 
   useEffect(() => {
     (async () => {
