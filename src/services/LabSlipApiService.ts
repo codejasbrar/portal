@@ -87,9 +87,11 @@ export default class LabSlipApiService {
     }
   }).then(response => response.data);
 
-  static createOrder = async (lab: string, postData: object) => await client.post(`/createOrder/${lab}`, {...postData}, {
+  static createOrder = async (lab: string, postData: object) => await client.post(`/generateCustomLabSlip/${lab}`, {...postData}, {
+    responseType: 'arraybuffer',
     headers: {
-      'Authorization': `Bearer ${Token.get().token}`
+      'Authorization': `Bearer ${Token.get().token}`,
+      'Accept': 'application/pdf'
     }
   })
 }
