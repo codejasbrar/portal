@@ -75,7 +75,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
       setSubmitted(true);
       setError('');
       setBlob(new Blob([response.data], {type: "application/pdf"}));
-      //clear();
+      window.scrollTo(0, 0);
     }).catch(error => {
       setLoading(false);
       setError(`ERROR: ${error.response.data.message}`);
