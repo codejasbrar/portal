@@ -57,7 +57,7 @@ const TestIncompletePage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content || []}
+          data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
           options={options(onSelect, onSaved, searchText, setSearchText)}
         />
@@ -75,7 +75,6 @@ const TestIncompletePage = () => {
           mode="result"
           onSaved={onSaved}
           selected={tests.content}
-          mobile
           text={"Approve all results"} />
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
@@ -101,7 +100,6 @@ const TestIncompletePage = () => {
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"}
-                mobile
               />
             </div>
           ))}

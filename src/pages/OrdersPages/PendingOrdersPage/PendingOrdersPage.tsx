@@ -168,6 +168,7 @@ export const useData = (selector: (store: Storage) => OrdersResponse) => {
 
   useEffect(() => {
     if (items.content) {
+      console.log(items.content);
       setData({
         ...items, content: items.content.map(reformatItem)
       })
@@ -245,7 +246,7 @@ const PendingOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={orders.content || []}
+          data={ordersToView}
           columns={columns(sort.param, onSort)}
           options={options(onSelect, onSaved, admin, searchText, setSearchText)}
         />
@@ -260,7 +261,7 @@ const PendingOrdersPage = () => {
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         {!admin &&
-        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} mobile />}
+        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -278,7 +279,6 @@ const PendingOrdersPage = () => {
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"}
-                mobile
               />}
             </div>
           ))}

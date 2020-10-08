@@ -18,7 +18,6 @@ type ApproveButtonPropsTypes = {
   mode: "order" | "result",
   type?: "approved" | "pending"
   className?: string
-  mobile?: boolean
 };
 
 const ApproveButton = (props: ApproveButtonPropsTypes) => {
@@ -47,10 +46,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
       props.type && props.type === 'pending' ? await dispatch(savePendingResults(hashes)) : await dispatch(saveApprovedResults(hashes));
     props.onSaved().finally(() => {
-      if (props.mobile) {
         setLoading(false);
         setShowPopup(false);
-      }
     });
   };
 
