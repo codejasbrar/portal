@@ -109,6 +109,12 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   selectableRows: isAdmin ? 'none' : 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const items = onSelect(selected.data);
+    try {
+      items.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
+      return <></>;
+    }
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}

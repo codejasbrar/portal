@@ -20,6 +20,12 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
   selectableRows: 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const selectedItems = onSelect(selected.data);
+    try {
+      selectedItems.map((item: Order) => item.id);
+    } catch (e) {
+      setSelectedRows([]);
+      return <></>;
+    }
     return <ApproveButton type="pending" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
