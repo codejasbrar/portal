@@ -96,15 +96,10 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   selectableRows: isAdmin ? 'none' : 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const selectedItems = onSelect(selected.data);
-    try {
-      selectedItems.map((item: Order) => item.id);
-    } catch (e) {
-      setSelectedRows([]);
-      return <></>;
-    }
     return <ApproveButton type="approved" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={selectedItems} />
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -146,7 +141,7 @@ const TestsPage = () => {
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         {!admin &&
-        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} />}
+        <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
@@ -176,6 +171,7 @@ const TestsPage = () => {
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"}
+                mobile
               />}
             </div>
           ))}

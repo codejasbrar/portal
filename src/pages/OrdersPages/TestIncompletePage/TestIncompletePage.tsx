@@ -20,15 +20,10 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
   selectableRows: 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const selectedItems = onSelect(selected.data);
-    try {
-      selectedItems.map((item: Order) => item.id);
-    } catch (e) {
-      setSelectedRows([]);
-      return <></>;
-    }
     return <ApproveButton type="pending" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={selectedItems} />
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -75,7 +70,9 @@ const TestIncompletePage = () => {
           mode="result"
           onSaved={onSaved}
           selected={tests.content}
-          text={"Approve all results"} />
+          text={"Approve all results"}
+          mobile
+        />
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
@@ -100,6 +97,7 @@ const TestIncompletePage = () => {
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"}
+                mobile
               />
             </div>
           ))}

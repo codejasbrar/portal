@@ -109,15 +109,10 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   selectableRows: isAdmin ? 'none' : 'multiple',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const items = onSelect(selected.data);
-    try {
-      items.map((item: Order) => item.id)
-    } catch (e) {
-      setSelectedRows([]);
-      return <></>;
-    }
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={items} />;
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -168,7 +163,6 @@ export const useData = (selector: (store: Storage) => OrdersResponse) => {
 
   useEffect(() => {
     if (items.content) {
-      console.log(items.content);
       setData({
         ...items, content: items.content.map(reformatItem)
       })
@@ -261,7 +255,7 @@ const PendingOrdersPage = () => {
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
         {!admin &&
-        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} />}
+        <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
           .map((item: any, i: any) => (
@@ -279,6 +273,7 @@ const PendingOrdersPage = () => {
                 onSaved={onSaved}
                 selected={[item]}
                 text={"Approve"}
+                mobile
               />}
             </div>
           ))}

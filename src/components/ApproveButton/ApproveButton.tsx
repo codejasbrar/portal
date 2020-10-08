@@ -15,9 +15,11 @@ type ApproveButtonPropsTypes = {
   text: string,
   selected: Order[],
   onSaved: () => Promise<any>,
+  onSelected?: (rows: []) => void,
   mode: "order" | "result",
   type?: "approved" | "pending"
-  className?: string
+  className?: string,
+  mobile?: boolean
 };
 
 const ApproveButton = (props: ApproveButtonPropsTypes) => {
@@ -45,10 +47,12 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
     const hashes = props.selected.map((item: any) => item.hash);
     props.mode === 'order' ? await dispatch(saveOrders(hashes)) :
       props.type && props.type === 'pending' ? await dispatch(savePendingResults(hashes)) : await dispatch(saveApprovedResults(hashes));
-    props.onSaved().finally(() => {
-        setLoading(false);
-        setShowPopup(false);
-    });
+    await props.onSaved();
+    if (props.onSelected) props.onSelected([]);
+    if (props.mobile) {
+      setLoading(false);
+      setShowPopup(false);
+    }
   };
 
   useEffect(() => () => {
