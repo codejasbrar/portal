@@ -110,7 +110,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const items = onSelect(selected.data);
     try {
-      items.map((item: Order) => item.id)
+      items.map((item: Order) => item.id);
     } catch (e) {
       setSelectedRows([]);
       return <></>;
@@ -118,6 +118,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
     return <ApproveButton mode="order"
       text={"Approve orders"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={items} />;
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -245,7 +246,7 @@ const PendingOrdersPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={orders.content || []}
+          data={ordersToView}
           columns={columns(sort.param, onSort)}
           options={options(onSelect, onSaved, admin, searchText, setSearchText)}
         />
