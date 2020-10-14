@@ -38,6 +38,8 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
     const panel = planPanels.find(panel => panel.code === preSelectedPanel);
     if (panel && panel.labPanels) {
       setSelectedCodes([preSelectedPanel, ...panel.labPanels.map(panel => panel.code)])
+    } else {
+      setSelectedCodes([]);
     }
   }, [preSelectedPanel]);
 

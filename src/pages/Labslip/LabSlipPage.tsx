@@ -91,7 +91,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   }, [error]);
 
 
-  const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanelsIds && labPanelsIds.length > 0;
+  const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanelsIds && labPanelsIds.length > 0 && labSlipInfo.order.status === 'APPROVED';
 
   return <section className={styles.LabslipSection}>
     {loading && <Spinner />}
