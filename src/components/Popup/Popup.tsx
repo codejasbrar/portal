@@ -5,7 +5,7 @@ import styles from "./Popup.module.scss";
 import BodyScroll from "../../helpers/bodyScrollLock";
 
 type PopupPropsTypes = {
-  children: ReactElement,
+  children: ReactElement | ReactElement[],
   show: boolean,
   classes?: string,
   onClose: () => void,
