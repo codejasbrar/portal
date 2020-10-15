@@ -103,6 +103,15 @@
                 background-color: $gray8;
                 outline:          none;
             }
+
+            &Disabled {
+                background-color: $gray7;
+                outline:          none;
+
+                &:hover, &:focus {
+                    background-color: $gray7;
+                }
+            }
         }
     }
 

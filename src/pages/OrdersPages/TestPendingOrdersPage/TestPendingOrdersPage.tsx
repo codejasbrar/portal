@@ -105,6 +105,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
     return <ApproveButton type="approved" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={selectedItems} />
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -131,7 +132,7 @@ const TestsPage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content || []}
+          data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
           options={options(onSelect, onSaved, admin, searchText, setSearchText)}
         />
@@ -166,8 +167,8 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Biomarkers out of
                 range: <span className={styles.mobileTestsText}>
                   {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
-                    <div className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any) => <><DangerIcon
-                      className={styles.dangerIconLeft} />{item}; </>)} </div>
+                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any) => <><DangerIcon
+                      className={styles.dangerIconLeft} />{item}; </>)} </span>
                     : "None"}
               </span>
               </p>

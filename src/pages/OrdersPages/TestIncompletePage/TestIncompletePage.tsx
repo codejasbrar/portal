@@ -29,6 +29,7 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
     return <ApproveButton type="pending" mode="result"
       text={"Approve results"}
       onSaved={onSaved}
+      onSelected={setSelectedRows}
       selected={selectedItems} />
   },
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
@@ -57,7 +58,7 @@ const TestIncompletePage = () => {
       <MuiThemeProvider theme={CommonTableTheme()}>
         <MUIDataTable
           title={''}
-          data={tests.content || []}
+          data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
           options={options(onSelect, onSaved, searchText, setSearchText)}
         />
@@ -75,8 +76,9 @@ const TestIncompletePage = () => {
           mode="result"
           onSaved={onSaved}
           selected={tests.content}
+          text={"Approve all results"}
           mobile
-          text={"Approve all results"} />
+        />
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {testsToView
           .map((item: any, i: number) => (
