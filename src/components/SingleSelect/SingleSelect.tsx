@@ -9,7 +9,8 @@ import {ReactComponent as ArrowIcon} from "../../icons/arrow_down.svg";
 
 export type SelectOption = {
   name: string,
-  value: string
+  value: string,
+  disabled?: boolean
 };
 
 type SingleSelectPropsTypes = {
@@ -29,6 +30,7 @@ type SingleSelectPropsTypes = {
 const SingleSelect = (props: SingleSelectPropsTypes) => {
   const [opened, setOpened] = useState(false);
   const [option, setOption] = useState({} as SelectOption);
+
 
   const closeList = () => {
     setOpened(false);
@@ -70,7 +72,7 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
         <ul className={styles.SelectDropdown} tabIndex={0}>
           {props.options.map((option: SelectOption) => <li tabIndex={1}
             key={`${option.name}`}
-            className={styles.SelectDropdownItem}
+            className={`${styles.SelectDropdownItem} ${option.disabled ? styles.SelectDropdownItemDisabled : ''}`}
             onClick={() => selectOption(option)}>{option.name}</li>)}
         </ul>
       </div>

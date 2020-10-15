@@ -155,7 +155,8 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     } else {
       onSetLabSlipInfo({
         ...labSlipInfo,
-        customer: results.filter(customer => customer.id === parseInt(option.value))[0]
+        customer: results.filter(customer => customer.id === parseInt(option.value))[0],
+        order: {} as OrderDetails
       });
     }
   };
@@ -175,6 +176,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     onSetLabSlipInfo({...labSlipInfo, laboratory: option.value});
   };
 
+  const pendingOrdersIds = customer && customer.orders ? customer.orders.filter(order => order.status === 'PENDING').map(order => order.id) : [];
   const autoCompleteValue = customer && customer.id ? `${customer.id} ${customer.firstName} ${customer.lastName}` : '';
 
   return <>
@@ -211,9 +213,17 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
             value={labSlipInfo.order.id ? labSlipInfo.order.id.toString() : ''}
             onSelect={onOrderSelect}
             options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {
-              return {name: order.id.toString(), value: order.id.toString()}
+              return {
+                name: order.id.toString(),
+                value: order.id.toString(),
+                disabled: pendingOrdersIds.includes(order.id)
+              }
             }) : []}
             disabled={!customer.id || customer.orders && !customer.orders[0].id}
+            error={{
+              valid: !pendingOrdersIds.includes(labSlipInfo.order.id),
+              message: 'Order needs to be approved by the physician first before a custom lab slip can be created'
+            }}
           />
         </div>
       </div>
