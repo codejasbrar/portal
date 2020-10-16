@@ -97,8 +97,8 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
     setDiscardPopupActive(false);
   };
 
-
-  const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanelsIds && labPanelsIds.length > 0 && labSlipInfo.order.status === 'APPROVED';
+  const isAllRequiredDataFilled = labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanelsIds && labPanelsIds.length > 0;
+  const enableCreation = (isAllRequiredDataFilled && !labSlipInfo.order.id) || (isAllRequiredDataFilled && labSlipInfo.order.status === 'APPROVED');
 
   return <section className={styles.LabslipSection}>
     {loading && <Spinner />}
@@ -130,7 +130,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
       />
       <SubmitPanel onDiscard={() => setDiscardPopupActive(true)}
         onSubmit={onApprove}
-        disabledSubmit={!isAllRequiredDataFilled()} />
+        disabledSubmit={!enableCreation} />
       <Popup show={!!error.length} onClose={() => setError('')}>
         <h4 className={styles.heading20}>{error}</h4>
       </Popup>
