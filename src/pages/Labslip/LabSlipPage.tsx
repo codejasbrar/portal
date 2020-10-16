@@ -143,8 +143,8 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
         </p>
         <div className={styles.discardPopupActions}>
           <Button secondary
-            onClick={() => setDiscardPopupActive(false)}><span>Continue <span className={styles.hideMobile}>editing</span></span></Button>
-          <Button onClick={onDiscardLabslip}><span className={styles.hideMobile}>Discard lab slip</span><span className={styles.showMobile}>Cancel</span></Button>
+            onClick={() => setDiscardPopupActive(false)}><span>Continue<span className={styles.hideMobile}> editing</span></span></Button>
+          <Button onClick={onDiscardLabslip}><span>Discard<span className={styles.hideMobile}> lab slip</span></span></Button>
         </div>
       </Popup>
     </>}
