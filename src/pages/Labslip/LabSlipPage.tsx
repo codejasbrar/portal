@@ -15,6 +15,7 @@ import {Link} from "react-router-dom";
 import {OrderDetails} from "../../interfaces/Order";
 import {Panel} from "../../interfaces/Test";
 import downloadPDF from "../../helpers/downloadPDF";
+import Button from "../../components/Button/Button";
 
 type LabSlipPagePropsTypes = {};
 
@@ -37,6 +38,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
   const [labPanelsIds, setLabPanelsIds] = useState([] as number[] | undefined);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [discardPopupActive, setDiscardPopupActive] = useState(false);
   const [blob, setBlob] = useState({} as Blob);
 
   const clear = () => {
@@ -90,6 +92,11 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
     }
   }, [error]);
 
+  const onDiscardLabslip = () => {
+    clear();
+    setDiscardPopupActive(false);
+  };
+
 
   const isAllRequiredDataFilled = () => labSlipInfo.customer && !!labSlipInfo.customer.id && !!labSlipInfo.customer.firstName && labSlipInfo.laboratory && labPanelsIds && labPanelsIds.length > 0 && labSlipInfo.order.status === 'APPROVED';
 
@@ -121,9 +128,24 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
         selectedPanels={labPanelsIds}
         preSelectedPanel={labSlipInfo.order.panelCode || 0}
       />
-      <SubmitPanel onDiscard={clear} onSubmit={onApprove} disabledSubmit={!isAllRequiredDataFilled()} />
+      <SubmitPanel onDiscard={() => setDiscardPopupActive(true)}
+        onSubmit={onApprove}
+        disabledSubmit={!isAllRequiredDataFilled()} />
       <Popup show={!!error.length} onClose={() => setError('')}>
         <h4 className={styles.heading20}>{error}</h4>
+      </Popup>
+      <Popup classes={styles.discardPopup} onClose={() => setDiscardPopupActive(false)} show={discardPopupActive}>
+        <h4 className={styles.discardPopupTitle}>
+          Are you sure you want to discard this lab slip?
+        </h4>
+        <p className={styles.discardPopupText}>
+          This lab slip will be deleted immediately. You cannot undo this action.
+        </p>
+        <div className={styles.discardPopupActions}>
+          <Button secondary
+            onClick={() => setDiscardPopupActive(false)}><span>Continue<span className={styles.hideMobile}> editing</span></span></Button>
+          <Button onClick={onDiscardLabslip}><span>Discard<span className={styles.hideMobile}> lab slip</span></span></Button>
+        </div>
       </Popup>
     </>}
   </section>
