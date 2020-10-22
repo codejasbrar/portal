@@ -1,12 +1,33 @@
 import {createMuiTheme} from "@material-ui/core/styles";
+import {ReactComponent as CheckboxUnchecked} from "../icons/checkbox_unckecked.svg";
+import {ReactComponent as CheckboxChecked} from "../icons/checkbox_checked.svg";
+import {ReactComponent as CheckboxDelete} from "../icons/checkbox_delete.svg";
+import React from "react";
 
 const tableStylesObject = {
+  props: {
+    MuiIconButton: {
+      disableRipple: true,
+    },
+    MuiCheckbox: {
+      icon: React.createElement(CheckboxUnchecked),
+      checkedIcon: React.createElement(CheckboxChecked),
+      indeterminateIcon: React.createElement(CheckboxDelete)
+    }
+  },
   palette: {
     primary: {
       main: '#00aaff',
     }
   },
   overrides: {
+    MuiIconButton: {
+      root: {
+        '&:hover': {
+          backgroundColor: 'transparent !important'
+        }
+      }
+    },
     MUIDataTable: {
       root: {
         backgroundColor: "#ffffff",
@@ -70,7 +91,9 @@ const tableStylesObject = {
       root: {
         color: '#c3c8cd',
       },
-
+      '&:hover': {
+        backgroundColor: 'transparent'
+      },
       '& .Mui-checked': {
         color: '#00aaff',
       }

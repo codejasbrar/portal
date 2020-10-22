@@ -4,8 +4,11 @@ import BodyScroll from "../../helpers/bodyScrollLock";
 
 import styles from "./Spinner.module.scss";
 
+type SpinnerPropsTypes = {
+  mini?: boolean
+}
 
-const Spinner = () => {
+const Spinner = (props: SpinnerPropsTypes) => {
 
   useEffect(() => {
     BodyScroll.disable();
@@ -13,7 +16,8 @@ const Spinner = () => {
       BodyScroll.enable();
     }
   }, []);
-  return (<div className={`${styles.spinnerWrapper} ${styles.spinnerWrapperShow}`}>
+  return (
+    <div className={`${styles.spinnerWrapper} ${styles.spinnerWrapperShow} ${props.mini ? styles.spinnerWrapperMini : ''}`}>
       <div className={styles.spinner}>
         <div className={styles.spinnerCircle}>
           <svg className={styles.circular} viewBox="25 25 50 50">
