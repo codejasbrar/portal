@@ -1,6 +1,6 @@
-import React, {useEffect} from "react";
+import React from "react";
 
-import BodyScroll from "../../helpers/bodyScrollLock";
+//import BodyScroll from "../../helpers/bodyScrollLock";
 
 import styles from "./Spinner.module.scss";
 
@@ -10,12 +10,12 @@ type SpinnerPropsTypes = {
 
 const Spinner = (props: SpinnerPropsTypes) => {
 
-  useEffect(() => {
-    BodyScroll.disable();
-    return () => {
-      BodyScroll.enable();
-    }
-  }, []);
+  // useEffect(() => {
+  //   BodyScroll.disable();
+  //   return () => {
+  //     BodyScroll.enable();
+  //   }
+  // }, []);
   return (
     <div className={`${styles.spinnerWrapper} ${styles.spinnerWrapperShow} ${props.mini ? styles.spinnerWrapperMini : ''}`}>
       <div className={styles.spinner}>
