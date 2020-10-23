@@ -42,38 +42,80 @@
     }
 
     &:after {
+        content:     '';
+        position:    absolute;
+        background:  $primary;
+        width:       3px;
+        height:      0;
+        top:         50%;
+        left:        0;
+        opacity:     1;
+        display:     inline-block;
+        animation:   lineOut 0.4s forwards;
+        will-change: height, opacity;
+
         @include breakpoint($tablet_horizontal) {
-            content:          '';
-            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14' viewBox='0 0 9 14'%3E%3Cg%3E%3Cg transform='rotate(-90 4.5 7)'%3E%3Cpath fill='%230af' d='M9.472 3L4.501 7.944-.472 3-2 4.522 4.5 11 11 4.522z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            width:            9px;
-            height:           14px;
-            right:            16px;
-            top:              50%;
-            transform:        translateY(-50%);
-            position:         absolute;
+            content:           '';
+            background-image:  url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14' viewBox='0 0 9 14'%3E%3Cg%3E%3Cg transform='rotate(-90 4.5 7)'%3E%3Cpath fill='%230af' d='M9.472 3L4.501 7.944-.472 3-2 4.522 4.5 11 11 4.522z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            width:             9px;
+            height:            14px;
+            right:             16px;
+            top:               50%;
+            left:              auto;
+            background-color:  transparent;
+            transform:         translateY(-50%);
+            position:          absolute;
+            background-repeat: no-repeat;
+            animation:         none;
+        }
+    }
+
+    &:before {
+        content:     '';
+        position:    absolute;
+        background:  $primary;
+        width:       3px;
+        height:      0;
+        bottom:      50%;
+        opacity:     1;
+        left:        0;
+        transition:  height 0.3s;
+        display:     inline-block;
+        animation:   lineOut 0.4s forwards;
+        will-change: height, opacity;
+
+        @include breakpoint($tablet_horizontal) {
+            content: none;
+        }
+    }
+
+    &:hover {
+        background-color: $gray8;
+
+        &:before, &:after {
+            animation: lineIn 0.4s forwards;
         }
     }
 
     &.active {
-
-        &:before {
+        &:before, &:after {
             content:    '';
             position:   absolute;
             background: $primary;
             width:      3px;
-            height:     100%;
+            height:     50%;
             bottom:     0;
             left:       0;
+            animation:  none;
 
             @include breakpoint($tablet_horizontal) {
                 content: none;
             }
         }
-    }
 
-    &:hover,
-    &:focus {
-        background-color: $gray8;
+        &:before {
+            bottom: 50%;
+        }
     }
 
     &Number {
@@ -104,5 +146,31 @@
         &:visited {
             color: #fff;
         }
+    }
+}
+
+@keyframes lineIn {
+    0% {
+        opacity: 0;
+        height:  0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        height: 50%;
+    }
+}
+
+@keyframes lineOut {
+    0% {
+        opacity: 1;
+        height:  50%;
+    }
+    90% {
+        height: 0;
+    }
+    100% {
+        opacity: 0;
     }
 }

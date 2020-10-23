@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+  <defs>
+    <clipPath id="p10da">
+      <path fill="transparent" d="M0 4a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4z" />
+    </clipPath>
+  </defs>
+  <g>
+    <g>
+      <path fill="#fff" fill-opacity="0" d="M0 4a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4z" />
+      <path fill="none" stroke="#c3c8cd" stroke-miterlimit="20" stroke-width="2"
+            d="M0 4a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4z"
+            clip-path="url(&quot;#p10da&quot;)" />
+    </g>
+  </g>
+</svg>
