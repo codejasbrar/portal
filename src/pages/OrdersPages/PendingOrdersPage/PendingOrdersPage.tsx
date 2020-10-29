@@ -20,6 +20,7 @@ import {isAdmin, ordersPendingState, resultsQuantity} from "../../../selectors/s
 import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
 import {loadTestsByStatus} from "../../../actions/testsActions";
 import {TestDetails} from "../../../interfaces/Test";
+import Checkbox from "@material-ui/core/Checkbox";
 
 export const getWidth = () => window.innerWidth
   || document.documentElement.clientWidth
@@ -79,6 +80,10 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
     }
   },
 ];
+
+export const tableComponents = {
+  Checkbox: Checkbox
+};
 
 export const tableBaseOptions = {
   filterType: 'checkbox',

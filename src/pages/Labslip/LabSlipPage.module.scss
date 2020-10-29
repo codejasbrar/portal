@@ -246,3 +246,52 @@ button span.hideMobile {
         }
     }
 }
+
+.discardPopup {
+    max-width:  402px;
+    padding:    34px 32px 40px 40px;
+    margin-top: -10%;
+
+    @include breakpoint($mobile) {
+        min-width:  auto;
+        margin-top: 0;
+        max-width:  288px;
+        padding:    18px 24px;
+    }
+
+    &Title {
+        font-size:      20px;
+        font-weight:    600;
+        letter-spacing: 0.4px;
+        line-height:    30px;
+        margin-bottom:  14px;
+        margin-top:     0;
+        color:          $text;
+    }
+
+    &Text {
+        font-size:      14px;
+        letter-spacing: 0.3px;
+        line-height:    20px;
+        margin-top:     0;
+        color:          $text;
+        margin-bottom:  24px;
+
+        @include breakpoint($mobile) {
+            margin-bottom: 20px;
+        }
+    }
+
+    &Actions {
+        display:         flex;
+        justify-content: space-between;
+
+        button {
+            max-width: 158px;
+
+            @include breakpoint($mobile) {
+                max-width: 110px;
+            }
+        }
+    }
+}

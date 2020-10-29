@@ -23,10 +23,24 @@
         transition: all 0.15s ease-out;
         display:    none;
 
+        &Mini {
+            position:         static;
+            height:           200px;
+            width:            100%;
+            background-color: transparent;
+
+            .spinner {
+                position: static;
+                height:   100%;
+                width:    100%;
+            }
+        }
+
         &Show {
             display: block;
         }
     }
+
 }
 
 .spinnerCircle {
