@@ -15,7 +15,7 @@ type PlanPanelPropsTypes = {
 };
 
 const PlanPanel = (props: PlanPanelPropsTypes) => {
-  const {id, code, name, labPanels} = props.panel;
+  const {id, code, name, labPanels, prettyName} = props.panel;
   const {selectable, onSelect, selectedPanels, onSelectLabPanel} = props;
   const [listOpened, setListOpened] = useState(false);
 
@@ -35,7 +35,7 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
         <button type={"button"} className={styles.PlanPanelAdd} onClick={() => onChecked()}>
           <span className={`${styles.PlanPanelAddDot} ${selectedPanels?.includes(props.panel.code) ? '' : styles.PlanPanelAddDotRed}`} />
         </button>
-        <span className={styles.PanelPlanText}>{name}</span>
+        <span className={styles.PanelPlanText}>{prettyName ?? name}</span>
       </p>
       {labPanels &&
       <button className={`${styles.PlanPanelBtn} ${listOpened && selectedNow ? styles.PlanPanelBtnOpened : ''}`}

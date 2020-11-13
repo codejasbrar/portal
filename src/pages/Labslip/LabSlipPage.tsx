@@ -50,7 +50,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
     setLoading(true);
     const data = {
       order: {
-        id: labSlipInfo.order.id || '',
+        id: labSlipInfo.order.id ?? null,
         customerId: labSlipInfo.customer.id,
         customerFirstName: labSlipInfo.customer.firstName,
         customerLastName: labSlipInfo.customer.lastName,
@@ -62,8 +62,10 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
         addrZipCode: labSlipInfo.customer.orders[0].addrZipCode,
         addressLine1: labSlipInfo.customer.orders[0].addressLine1,
         addressLine2: labSlipInfo.customer.orders[0].addressLine2,
-        panelCode: labSlipInfo.order.panelCode || '',
-        planName: labSlipInfo.order.planName || '',
+        planName: labSlipInfo.order.planName ?? '',
+        planVariantName: labSlipInfo.order.planVariantName ?? '',
+        planVariantPrettyName: labSlipInfo.order.planVariantPrettyName ?? '',
+        packageId: labSlipInfo.order.packageId ?? null,
         markers: [],
         fasting: true,
         status: 'PENDING',
@@ -91,6 +93,10 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
       }, 6000)
     }
   }, [error]);
+
+  useEffect(() => {
+    console.log(labSlipInfo);
+  }, [labSlipInfo])
 
   const onDiscardLabslip = () => {
     clear();
@@ -126,7 +132,7 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
         onChangeLabPanelsArray={setLabPanels}
         onChangePanelsIdsArray={setLabPanelsIds}
         selectedPanels={labPanelsIds}
-        preSelectedPanel={labSlipInfo.order.panelCode || 0}
+        preSelectedPanel={labSlipInfo.order.planVariantName || ''}
       />
       <SubmitPanel onDiscard={() => setDiscardPopupActive(true)}
         onSubmit={onApprove}

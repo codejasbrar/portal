@@ -8,14 +8,13 @@ import Input from "../../Input/Input";
 import {ReactComponent as SearchIcon} from "../../../icons/search.svg";
 import PanelsList from "./PanelsList";
 import {Panel} from "../../../interfaces/Test";
-import {on} from "cluster";
 
 type BiomarkersPropsTypes = {
   onSetLoading: (state: boolean) => void,
   onChangePanelsIdsArray: (panelsIds: number[]) => void,
   onChangeLabPanelsArray: (panels: Panel[]) => void,
   selectedPanels: number[] | undefined,
-  preSelectedPanel: number;
+  preSelectedPanel: string;
 };
 
 const Biomarkers = (props: BiomarkersPropsTypes) => {
@@ -34,10 +33,12 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
     if (!selectedPanels) setSelectedCodes([]);
   }, [selectedPanels]);
 
+  console.log(planPanels);
+
   useEffect(() => {
-    const panel = planPanels.find(panel => panel.code === preSelectedPanel);
+    const panel = planPanels.find(panel => panel.name === preSelectedPanel);
     if (panel && panel.labPanels) {
-      setSelectedCodes([preSelectedPanel, ...panel.labPanels.map(panel => panel.code)])
+      setSelectedCodes([panel.code, ...panel.labPanels.map(panel => panel.code)])
     } else {
       setSelectedCodes([]);
     }
@@ -74,7 +75,7 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
         <PanelsList selected={selectedCodesArray}
           setSelected={setSelectedCodes}
           mode='plan'
-          panels={planPanels.filter(panel => panel.name.toLowerCase().includes(searchText.toLowerCase()))} />
+          panels={planPanels.filter(panel => panel.prettyName && panel.prettyName.toLowerCase().includes(searchText.toLowerCase()))} />
       </div>
       <div className={styles.BiomarkersSelectedWrapper}>
         <h3 className={styles.heading20}>Lab panels added to lab slip</h3>
