@@ -63,7 +63,7 @@ export default class LabSlipApiService {
     }
   });
 
-  static getLabSlip = async (hash: string) => await client.get(`/getLabSlip/Quest/${hash}`, {
+  static getLabSlip = async (hash: string) => await client.get(`/getLabSlip/${hash}`, {
     responseType: 'arraybuffer',
     headers: {
       'Authorization': `Bearer ${Token.get().token}`,

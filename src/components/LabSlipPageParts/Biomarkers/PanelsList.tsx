@@ -53,7 +53,7 @@ const PanelsList = (props: PanelsListPropsTypes) => {
       return <>
         <h3 className={styles.heading20}>Lab panels:</h3>
         <ul className={styles.PanelsList}>
-          {!!panels.length ? panels.map(panel => <LabPanel onSelect={onSelectPanel}
+          {!!panels.length ? panels.map((panel: Panel) => <LabPanel onSelect={onSelectPanel}
             key={`${panel.code}-${panel.id}`}
             selectable
             selectedPanels={selected}
@@ -64,7 +64,7 @@ const PanelsList = (props: PanelsListPropsTypes) => {
       return <>
         <h3 className={styles.heading20}>Plan panels:</h3>
         <ul className={styles.PanelsList}>
-          {!!panels.length ? panels.map(panel => <PlanPanel key={`${panel.code}${panel.id}`}
+          {!!panels.length ? panels.map((panel: Panel) => <PlanPanel key={`${panel.code}${panel.id}`}
             onSelectLabPanel={onSelectPanel}
             onSelect={onSelectPanels}
             selectable

@@ -16,7 +16,9 @@ type ButtonPropsTypes = {
 const Button = (props: ButtonPropsTypes) =>
   <button disabled={props.disabled} type={props.type || "button"}
     className={`${styles.Button} ${props.secondary ? styles.ButtonSecondary : ''} ${props.glass ? styles.ButtonGlass : ''} ${props.className ? props.className : ''}`}
-    onClick={props.onClick}>
+    onClick={props.onClick}
+    name={typeof props.children === 'string' ? props.children.toLowerCase().replace(/\s/gmi, '_') : 'defaultButtonName'}
+  >
     {props.children}
   </button>;
 

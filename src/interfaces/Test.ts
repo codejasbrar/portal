@@ -46,6 +46,7 @@ export type Panel = {
   id: number,
   code: number,
   name: string,
-  biomarkers?: Biomarker[],
+  prettyName?: string,
   labPanels?: Panel[]
+  biomarkers?: Biomarker[],
 };
