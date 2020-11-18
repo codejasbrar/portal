@@ -25,9 +25,12 @@ export interface OrderDetails {
   addressLine2: string,
   panelCode: number,
   planName: string,
+  planVariantName: string,
+  planVariantPrettyName: string,
   markers: string[],
   fasting: boolean,
   status: TestStatus
+  packageId: number
 }
 
 interface Pageable {

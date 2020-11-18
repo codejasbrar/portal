@@ -52,9 +52,10 @@ const Input = (props: InputPropsTypes) => {
       value={props.value}
       autoFocus={props.autofocus}
       name={props.name}
+      id={props.name}
       placeholder={props.placeholder || props.label}
       onChange={handleChange}
-      tabIndex={1}
+      tabIndex={0}
       onFocus={props.onFocus}
       autoComplete={props.autoComplete || 'on'}
       required={props.required}
