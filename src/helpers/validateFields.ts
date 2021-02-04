@@ -36,7 +36,8 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
           }
           break;
         case "code":
-          if (field.value.length !== 6 && !(/\D/g).test(field.value)) {
+          console.log(field)
+          if (field.value.length !== 6 && (/\D/g).test(field.value)) {
             message = "Required 6 digit security code";
             valid = false;
           }
@@ -66,5 +67,5 @@ const isValidPassword = (pass: string): boolean => {
 };
 
 const isValidEmail = (email: string) => {
-  return (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email);
+  return (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email.trim());
 };

@@ -5,7 +5,7 @@ import {
   LOGOUT,
   CODE_REQUIRED,
   CODE_INCORRECT,
-  REFRESH_TOKEN_SUCCESS, REFRESH_TOKEN_ERROR, REFRESH_TOKEN_REQUEST, CLEAR_TEMP_DATA, FILL_TEMP
+  REFRESH_TOKEN_SUCCESS, REFRESH_TOKEN_ERROR, REFRESH_TOKEN_REQUEST, CLEAR_TEMP_DATA, FILL_TEMP, CLEAR_ERROR
 } from "../actions/authActions";
 import {AuthActionsTypes, AuthState} from "../interfaces/AuthState";
 import Token from "../helpers/localToken";
@@ -87,6 +87,11 @@ export default (state = initialState, action: AuthActionsTypes) => {
     case REFRESH_TOKEN_ERROR:
       Token.remove();
       return state;
+    case CLEAR_ERROR:
+      return {
+        ...state,
+        error: null
+      }
     default:
       return state;
   }

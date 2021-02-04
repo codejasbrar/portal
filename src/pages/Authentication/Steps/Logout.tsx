@@ -9,7 +9,7 @@ const Logout = () =>
   <div className={styles.FormWrapper}>
     <p className={styles.FormTitle}>Logout successful!</p>
     <p className={styles.FormSubtitle}>Enter your credentials to re-access your account.</p>
-    <LoginForm />
+    <LoginForm logout />
   </div>;
 
 export default Logout;

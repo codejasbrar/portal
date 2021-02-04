@@ -6,7 +6,7 @@ import styles from "./LoginForm.module.scss";
 //Components
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useHistory} from "react-router-dom";
-import {logIn} from "../../actions/authActions";
+import {clearError, logIn} from "../../actions/authActions";
 import Input from "../Input/Input";
 import Button from "../Button/Button";
 import Checkbox from "../Checbox/Checkbox";
@@ -15,7 +15,7 @@ import Spinner from "../Spinner/Spinner";
 import ValidateFields from "../../helpers/validateFields";
 
 
-const LoginForm = () => {
+const LoginForm = (props: { logout?: boolean }) => {
 
   const dispatch = useDispatch();
   const auth = useSelector(authState);
@@ -68,23 +68,57 @@ const LoginForm = () => {
     }
   }, [auth.tempData, history]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
+
+  const authErrorReplaced = auth.error && auth.error.message === 'Invalid credentials' ?
+    'Username and password combination is incorrect. Please try again.'
+    : auth.error?.message
+
   return <>
     {isLoading && <Spinner />}
-    <form onSubmit={handleSubmit} className={styles.Form}>
-      {!localError && auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
+    <form
+      onSubmit={handleSubmit}
+      className={styles.Form}>
+      {!localError && auth.error && <span className={styles.FormError}>{authErrorReplaced}</span>}
       {localError && <span className={styles.FormError}>{localError}</span>}
-      <Input placeholder="Email" autofocus name="username" value={username} onChange={setUsername} label="Email" />
-      <Input placeholder="Password"
+      <Input
+        placeholder="Email"
+        autofocus name="username"
+        value={username}
+        onChange={setUsername}
+        label="Email"
+        type="email"
+      />
+      <Input
+        placeholder="Password"
         name="password"
         type="password"
         value={password}
         onChange={setPassword}
-        label="Password" />
+        label="Password"
+      />
       <div className={styles.Bottom}>
-        <Checkbox name="remember" checked={remember} onChange={setRemember} label="Remember me" />
-        <Link to="/authentication/recovery" className={styles.BottomLink}>Forgot password</Link>
+        <Checkbox
+          name="remember"
+          checked={remember}
+          onChange={setRemember}
+          label="Remember me"
+        />
+        <Link
+          to="/authentication/recovery"
+          className={styles.BottomLink}>
+          Forgot password
+        </Link>
       </div>
-      <div className={styles.FormBtn}><Button type="submit">Log in now</Button></div>
+      <div className={styles.FormBtn}>
+        <Button type="submit">
+          {props.logout ? 'Log in now' : 'Log in'}
+        </Button>
+      </div>
     </form>
   </>
 };

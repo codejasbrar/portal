@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 
@@ -11,7 +11,7 @@ import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
 import {authState} from "../../../selectors/selectors";
 import AuthApiService from "../../../services/AuthApiService";
-import {clearTempDataAction} from "../../../actions/authActions";
+import {clearError, clearTempDataAction} from "../../../actions/authActions";
 
 const ResetPassword = () => {
   const dispatch = useDispatch();
@@ -34,14 +34,24 @@ const ResetPassword = () => {
       setLocalError("Passwords didn't match");
       return;
     }
-    if(!auth.tempData) return;
-    AuthApiService.resetPassword({username: auth.tempData?.username, securityCode: auth.tempData.securityCode, "password": password}).then(response => {
+    if (!auth.tempData) return;
+    AuthApiService.resetPassword({
+      username: auth.tempData?.username,
+      securityCode: auth.tempData.securityCode,
+      "password": password
+    }).then(response => {
       setSubmitted(true);
       dispatch(clearTempDataAction());
     }).catch(error => {
       setLocalError(error.response.data.message);
     })
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
 
   return <div className={`${styles.FormWrapper} ${styles.ResetPassword}`}>
     <p className={styles.FormTitle}>{submitted ? 'Your password was updated!' : 'Reset your password'}</p>
