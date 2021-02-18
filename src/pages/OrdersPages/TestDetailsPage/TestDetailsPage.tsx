@@ -168,30 +168,30 @@ const TestDetailsPage = () => {
     };
 
 
-    useEffect(() => {
-      loadTest();
-    }, []);
+  useEffect(() => {
+    loadTest();
+  }, []);
 
-    const customerAge = (dateOfBirth: string) => new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
+  const customerAge = (dateOfBirth: string) => new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
 
-    const biomarkerFormat = (biomarker: Biomarker) => {
-      console.log(biomarker)
-      return {
-        ...biomarker,
-        normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-        panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value <= biomarker.minPanicValue)
-      }
-    };
+  const biomarkerFormat = (biomarker: Biomarker) => ({
+    ...biomarker,
+    normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value <= biomarker.minPanicValue)
+  });
 
-    const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
+  const panicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => marker.panic).sort(sortByName);
+  const notPanicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => !marker.panic).sort(sortByName);
 
-    return <>
-      {loading && <Spinner />}
-      <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
-        <div className={styles.container}>
-          {history.action === 'POP' ? <Link to={'/orders/tests'}
-            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
-            Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
+  const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
+
+  return <>
+    {loading && <Spinner />}
+    <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
+      <div className={styles.container}>
+        {history.action === 'POP' ? <Link to={'/orders/tests'}
+          className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
+          Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
           </Link> : <button type="button"
             onClick={() => history.goBack()}
             className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
@@ -282,7 +282,7 @@ const TestDetailsPage = () => {
                 <MuiThemeProvider theme={detailsTableTheme()}>
                   <MUIDataTable
                     title={''}
-                    data={test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic)}
+                    data={[...panicMarkers, ...notPanicMarkers]}
                     columns={columns}
                     options={options}
                   />
@@ -290,7 +290,7 @@ const TestDetailsPage = () => {
                 :
                 <div className={styles.mobileOrders}>
                   <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                  {test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic).map(biomarker =>
+                  {[...panicMarkers, ...notPanicMarkers].map(biomarker =>
                     <div key={biomarker.id}
                       className={`${styles.mobileOrdersItem} ${biomarker.addOn ? styles.tableRowHighlighted : ''}`}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
