@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 //Styles
 import styles from "../../../components/LoginForm/LoginForm.module.scss";
@@ -8,6 +8,8 @@ import Input from "../../../components/Input/Input";
 import {Link} from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
+import {clearError} from "../../../actions/authActions";
+import {useDispatch} from "react-redux";
 
 const SmsVerification = () => {
   const history = useHistory();
@@ -15,6 +17,7 @@ const SmsVerification = () => {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const dispatch = useDispatch();
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +41,12 @@ const SmsVerification = () => {
     if ((/[A-Za-z$,&_`~=!"';@§±:#<>%^*./?|}{[\]]/).test(num)) return;
     setPhone(num);
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
 
   return <div className={`${styles.FormWrapper} ${styles.Verification}`}>
     <p className={styles.FormTitle}>SMS Verification</p>

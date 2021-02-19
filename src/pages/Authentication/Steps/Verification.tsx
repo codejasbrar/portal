@@ -10,7 +10,7 @@ import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
 import {useDispatch, useSelector} from "react-redux";
 import {authState, loading} from "../../../selectors/selectors";
-import {clearTempDataAction, fillAuthTempDataAction, logIn} from "../../../actions/authActions";
+import {clearError, clearTempDataAction, fillAuthTempDataAction, logIn} from "../../../actions/authActions";
 import Spinner from "../../../components/Spinner/Spinner";
 
 const Verification = () => {
@@ -38,12 +38,19 @@ const Verification = () => {
     }
   }, [auth.loggedIn, history]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
+
   const submitCode = (): void => {
     const validation = ValidateFields([{name: 'Security code', type: "code", value: code}]);
+    console.log(validation);
     setLocalError(validation.message);
     if (!validation.valid) return;
     const userData = typeof auth.tempData === 'string' ? JSON.parse(`${auth.tempData}`) : auth.tempData;
-    if(auth.tempData && !userData.password) {
+    if (auth.tempData && !userData.password) {
       dispatch(fillAuthTempDataAction({...userData, securityCode: code}))
       history.push('/authentication/reset-password');
       return;

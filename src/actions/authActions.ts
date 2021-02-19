@@ -5,6 +5,7 @@ import {userLogoutAction} from "./userActions";
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
+export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const LOGOUT = 'LOGOUT';
 export const CODE_REQUIRED = 'CODE_REQUIRED';
 export const CODE_INCORRECT = 'CODE_INCORRECT';
@@ -58,3 +59,5 @@ export const logOut = () => (dispatch: Dispatch<object>): void => {
   dispatch(logoutAction());
   dispatch(userLogoutAction());
 };
+
+export const clearError = () => ({type: CLEAR_ERROR});

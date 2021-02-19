@@ -48,7 +48,7 @@ const columns = [
       sort: false,
       customBodyRender: (value: any, tableMeta: any) => {
         const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-        const panic = markersRange ? value <= parseInt(markersRange[0]) || value >= parseInt(markersRange[1]) : false;
+        const panic = markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
         return <span className={styles.dotWrapper}>{value}{panic && value ?
           <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
@@ -103,10 +103,12 @@ const options: MUIDataTableOptions = {
 
   customRowRender(data, dataIndex, rowIndex) {
     const isAddedOn = data[3];
-    return <tr className={`MuiTableRow-root MUIDataTableBodyRow-root-46 ${styles.tableRow} ${isAddedOn ? styles.tableRowHighlighted : ''}`}
+    return <tr key={btoa(`${dataIndex}-${rowIndex}`)}
+      className={`MuiTableRow-root MUIDataTableBodyRow-root-46 ${styles.tableRow} ${isAddedOn ? styles.tableRowHighlighted : ''}`}
       data-testid={`MUIDataTableBodyRow-${rowIndex}`}
       id={`MUIDataTableBodyRow-${rowIndex}`}>
-      {data.map(item => <td className="MuiTableCell-root MuiTableCell-body MUIDataTableBodyCell-root-50"
+      {data.map(item => <td key={`key${dataIndex}-${rowIndex}-${item}`}
+        className="MuiTableCell-root MuiTableCell-body MUIDataTableBodyCell-root-50"
         data-colindex={dataIndex}
         data-testid={`MuiDataTableBodyCell-${dataIndex}-${rowIndex}`}>
         <div className={`MUIDataTableBodyCell-root-50 ${styles.tableRowText}`}
@@ -131,39 +133,39 @@ const commentSentDateFormat = (dateString: string) => {
 const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) > new Date(b.sent) ? -1 : 1;
 
 const TestDetailsPage = () => {
-  const width = useResizeListener();
-  const [loading, setLoading] = useState(true);
-  const admin = useSelector(isAdmin);
-  const {hash} = useParams();
-  const testSelected = useSelector(testDetails);
-  const [test, setTest] = useState({} as TestDetails);
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const [comment, setComment] = useState('');
+    const width = useResizeListener();
+    const [loading, setLoading] = useState(true);
+    const admin = useSelector(isAdmin);
+    const {hash} = useParams();
+    const testSelected = useSelector(testDetails);
+    const [test, setTest] = useState({} as TestDetails);
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const [comment, setComment] = useState('');
 
-  useEffect(() => {
-    if (testSelected) {
-      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
-    }
-  }, [testSelected, admin, history]);
+    useEffect(() => {
+      if (testSelected) {
+        !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
+      }
+    }, [testSelected, admin, history]);
 
-  const addComment = async () => {
-    if (comment.length && comment.trim().length > 0) {
-      await LabSlipApiService.saveMessage(hash, comment);
-      setComment('');
-      await loadTest();
-    }
-  };
+    const addComment = async () => {
+      if (comment.length && comment.trim().length > 0) {
+        await LabSlipApiService.saveMessage(hash, comment);
+        setComment('');
+        await loadTest();
+      }
+    };
 
-  const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
-  };
+    const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
+    };
 
-  const loadTest = async () => {
-    setLoading(true);
-    await dispatch(getResult(hash));
-    setLoading(false);
-  };
+    const loadTest = async () => {
+      setLoading(true);
+      await dispatch(getResult(hash));
+      setLoading(false);
+    };
 
 
   useEffect(() => {
@@ -175,8 +177,11 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value < biomarker.minPanicValue)
+    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value <= biomarker.minPanicValue)
   });
+
+  const panicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => marker.panic).sort(sortByName);
+  const notPanicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => !marker.panic).sort(sortByName);
 
   const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
 
@@ -187,8 +192,8 @@ const TestDetailsPage = () => {
         {history.action === 'POP' ? <Link to={'/orders/tests'}
           className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-        </Link> : <button type="button"
-          onClick={() => history.goBack()}
+          </Link> : <button type="button"
+            onClick={() => history.goBack()}
             className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
             Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
           {test.order &&
@@ -277,7 +282,7 @@ const TestDetailsPage = () => {
                 <MuiThemeProvider theme={detailsTableTheme()}>
                   <MUIDataTable
                     title={''}
-                    data={test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic)}
+                    data={[...panicMarkers, ...notPanicMarkers]}
                     columns={columns}
                     options={options}
                   />
@@ -285,7 +290,7 @@ const TestDetailsPage = () => {
                 :
                 <div className={styles.mobileOrders}>
                   <h2 className={`${styles.heading20} ${styles.mobileOrdersName}`}>Results</h2>
-                  {test.biomarkers?.map(biomarkerFormat).sort(sortByName).sort(sortByPanic).map(biomarker =>
+                  {[...panicMarkers, ...notPanicMarkers].map(biomarker =>
                     <div key={biomarker.id}
                       className={`${styles.mobileOrdersItem} ${biomarker.addOn ? styles.tableRowHighlighted : ''}`}>
                       <p className={styles.mobileOrdersTitle}>Biomarker:&nbsp;
@@ -311,7 +316,8 @@ const TestDetailsPage = () => {
           </div>
           }
         </div>
-    </section>
-  </>
-};
+      </section>
+    </>
+  }
+;
 export default TestDetailsPage;
