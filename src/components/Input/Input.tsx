@@ -10,7 +10,7 @@ type InputPropsTypes = {
   name: string,
   label?: string,
   placeholder?: string
-  type?: "text" | "password" | "date",
+  type?: "text" | "password" | "date" | "email",
   autofocus?: boolean,
   valid?: boolean,
   error?: {
