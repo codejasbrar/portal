@@ -51,7 +51,7 @@ const ResetPassword = () => {
     return () => {
       dispatch(clearError());
     };
-  }, []);
+  }, [dispatch]);
 
   return <div className={`${styles.FormWrapper} ${styles.ResetPassword}`}>
     <p className={styles.FormTitle}>{submitted ? 'Your password was updated!' : 'Reset your password'}</p>

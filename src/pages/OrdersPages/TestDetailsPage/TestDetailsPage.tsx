@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
 //Styles
 import styles from "../OrdersPages.module.scss";
@@ -13,12 +13,13 @@ import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import {isAdmin, testDetails} from "../../../selectors/selectors";
 import {getResult} from "../../../actions/testsActions";
-import {reformatItem, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import useResizeListener from "../../../hooks/useResizeListener";
+import reformatItem from "../../../helpers/reformatItem";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -47,8 +48,9 @@ const columns = [
       filter: true,
       sort: false,
       customBodyRender: (value: any, tableMeta: any) => {
-        const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-        const panic = markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
+        //const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
+        const panic = Boolean(tableMeta.rowData[2]);
+        // markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
         return <span className={styles.dotWrapper}>{value}{panic && value ?
           <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
@@ -56,7 +58,7 @@ const columns = [
   },
   {
     //check the CommonTableTheme.ts str:132
-    name: "normalRange",
+    name: "panic",
     label: "Normal range",
     options: {
       filter: true,
@@ -107,7 +109,7 @@ const options: MUIDataTableOptions = {
       className={`MuiTableRow-root MUIDataTableBodyRow-root-46 ${styles.tableRow} ${isAddedOn ? styles.tableRowHighlighted : ''}`}
       data-testid={`MUIDataTableBodyRow-${rowIndex}`}
       id={`MUIDataTableBodyRow-${rowIndex}`}>
-      {data.map(item => <td key={`key${dataIndex}-${rowIndex}-${item}`}
+      {data.map((item, idx) => <td key={btoa(`${dataIndex}-${rowIndex}-${item}-${idx}`)}
         className="MuiTableCell-root MuiTableCell-body MUIDataTableBodyCell-root-50"
         data-colindex={dataIndex}
         data-testid={`MuiDataTableBodyCell-${dataIndex}-${rowIndex}`}>
@@ -116,8 +118,6 @@ const options: MUIDataTableOptions = {
       </td>)}
     </tr>
   }
-
-
 } as MUIDataTableOptions;
 
 const sortByName = (a: BiomarkerDetails, b: BiomarkerDetails) => a.name > b.name ? 1 : -1;
@@ -133,9 +133,9 @@ const commentSentDateFormat = (dateString: string) => {
 const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) > new Date(b.sent) ? -1 : 1;
 
 const TestDetailsPage = () => {
-    const width = useResizeListener();
-    const [loading, setLoading] = useState(true);
-    const admin = useSelector(isAdmin);
+  const width = useResizeListener();
+  const [loading, setLoading] = useState(false);
+  const admin = useSelector(isAdmin);
     const {hash} = useParams();
     const testSelected = useSelector(testDetails);
     const [test, setTest] = useState({} as TestDetails);
@@ -143,11 +143,11 @@ const TestDetailsPage = () => {
     const history = useHistory();
     const [comment, setComment] = useState('');
 
-    useEffect(() => {
-      if (testSelected) {
-        !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
-      }
-    }, [testSelected, admin, history]);
+  useEffect(() => {
+    if (testSelected) {
+      !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
+    }
+  }, [testSelected]);
 
     const addComment = async () => {
       if (comment.length && comment.trim().length > 0) {
@@ -158,15 +158,15 @@ const TestDetailsPage = () => {
     };
 
     const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      // eslint-disable-next-line
       setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
     };
 
-    const loadTest = async () => {
-      setLoading(true);
-      await dispatch(getResult(hash));
-      setLoading(false);
-    };
-
+  const loadTest = useCallback(async () => {
+    setLoading(true);
+    await dispatch(getResult(hash));
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     loadTest();
@@ -177,7 +177,7 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value <= biomarker.minPanicValue)
+    panic: (biomarker.maxPanicValue && biomarker.value >= biomarker.maxPanicValue) || (biomarker.minPanicValue && biomarker.value <= biomarker.minPanicValue),
   });
 
   const panicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => marker.panic).sort(sortByName);
@@ -185,27 +185,38 @@ const TestDetailsPage = () => {
 
   const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
 
+  const backLink = useMemo(() => {
+      switch (test.status) {
+        case 'INCOMPLETE':
+          return 'tests-incomplete';
+        case 'APPROVED':
+          return 'tests-approved';
+        case 'PENDING':
+          return 'tests';
+        default:
+          return 'tests';
+      }
+    },
+    [test]);
+
   return <>
     {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       <div className={styles.container}>
-        {history.action === 'POP' ? <Link to={'/orders/tests'}
+        <Link to={`/orders/${backLink}`}
           className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-          </Link> : <button type="button"
-            onClick={() => history.goBack()}
-            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
-            Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
-          {test.order &&
-          <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
-            <section className={styles.adminSection}>
-              <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
+        </Link>
+        {test.order &&
+        <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
+          <section className={styles.adminSection}>
+            <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
 
-              <aside className={styles.testInfo}>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Received: </span>
-                  {test.received?.replace('T', ' ')}
-                </p>
+            <aside className={styles.testInfo}>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Received: </span>
+                {test.received?.replace('T', ' ')}
+              </p>
                 <p className={styles.testInfoString}>
                   <span className={styles.testInfoBold}>Order ID: </span>
                   {test.order?.id}

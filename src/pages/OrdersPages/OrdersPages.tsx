@@ -1,7 +1,7 @@
 import styles from "./OrdersPages.module.scss";
 import Navigation from "../../components/Navigation/Navigation";
 import {Route, Redirect} from "react-router-dom";
-import PendingOrdersPage, {useResizeListener} from "./PendingOrdersPage/PendingOrdersPage";
+import PendingOrdersPage from "./PendingOrdersPage/PendingOrdersPage";
 import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
 import React, {useEffect} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
@@ -11,6 +11,7 @@ import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
 import {isAdmin} from "../../selectors/selectors";
 import {loadCounters} from "../../actions/countersActions";
+import useResizeListener from "../../hooks/useResizeListener";
 
 const OrdersPage = () => {
   const admin = useSelector(isAdmin);

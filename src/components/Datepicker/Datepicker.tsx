@@ -20,7 +20,7 @@ type DatepickerPropsTypes = {
 };
 
 const Datepicker = (props: DatepickerPropsTypes) => {
-  const {selected, onSelect} = props;
+  const {onSelect} = props;
   const [date, setDate] = useState();
   const dateFormat = 'MM/dd/yyyy';
 

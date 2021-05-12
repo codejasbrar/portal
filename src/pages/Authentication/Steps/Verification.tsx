@@ -5,7 +5,6 @@ import styles from "../../../components/LoginForm/LoginForm.module.scss";
 
 import {useHistory} from "react-router-dom";
 import Input from "../../../components/Input/Input";
-import {Link} from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
 import {useDispatch, useSelector} from "react-redux";
@@ -30,7 +29,7 @@ const Verification = () => {
     if (!auth.tempData) {
       history.replace("/authentication")
     }
-  }, [history]);
+  }, [history, auth.tempData]);
 
   useEffect(() => {
     if (auth.loggedIn) {
@@ -42,11 +41,10 @@ const Verification = () => {
     return () => {
       dispatch(clearError());
     };
-  }, []);
+  }, [dispatch]);
 
   const submitCode = (): void => {
     const validation = ValidateFields([{name: 'Security code', type: "code", value: code}]);
-    console.log(validation);
     setLocalError(validation.message);
     if (!validation.valid) return;
     const userData = typeof auth.tempData === 'string' ? JSON.parse(`${auth.tempData}`) : auth.tempData;
@@ -59,8 +57,7 @@ const Verification = () => {
     dispatch(clearTempDataAction());
   };
 
-  const backToLogin = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
+  const backToLogin = () => {
     dispatch(clearTempDataAction());
     history.push('/authentication/login');
   };
@@ -72,14 +69,14 @@ const Verification = () => {
         <p className={styles.FormTitle}>Security Code Verification</p>
         <p className={`${styles.FormSubtitle} ${styles.VerificationSubtitle}`}>{auth.message ? auth.message : 'Enter the security code sent to your email or SMS'}</p>
         <span className={styles.FormText}>Your code is valid for 30 minutes. If you didn't receive the code or need a new one,
-          <a className={styles.FormTextLink} href="#" onClick={backToLogin}> login again</a>.
+          <button className={styles.FormTextLink} onClick={backToLogin}>&nbsp;login again</button>.
         </span>
         <form className={styles.Form} onSubmit={onFormSubmit}>
           {!localError && auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
           {localError && <span className={styles.FormError}>{localError}</span>}
           <Input value={code} onChange={setCode} name={"code"} label={"Security code"} placeholder={"Security code"} />
           <div className={`${styles.Bottom} ${styles.PasswordRecoveryBottom}`}>
-            <a href="#" onClick={backToLogin} className={styles.BottomLink}>Back to Log In</a>
+            <button type="button" onClick={backToLogin} className={styles.BottomLink}>Back to Log In</button>
             <div className={`${styles.FormBtn} ${styles.PasswordRecoveryBtn}`}><Button type="submit">Submit</Button>
             </div>
           </div>

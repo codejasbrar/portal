@@ -9,14 +9,15 @@ import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMob
 import {resultsQuantity, testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, tableBaseOptions, usePageState,
-  useResizeListener
+  NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {Order} from "../../../interfaces/Order";
 import {useSelector} from "react-redux";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
 
 
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [

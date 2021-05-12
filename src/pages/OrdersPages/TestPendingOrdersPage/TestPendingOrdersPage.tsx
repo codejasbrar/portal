@@ -12,14 +12,15 @@ import {useSelector} from "react-redux";
 import {isAdmin, resultsQuantity, testsPendingState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, tableBaseOptions, usePageState,
-  useResizeListener,
+  NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
 import {Order} from "../../../interfaces/Order";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {

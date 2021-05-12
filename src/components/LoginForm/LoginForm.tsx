@@ -72,7 +72,7 @@ const LoginForm = (props: { logout?: boolean }) => {
     return () => {
       dispatch(clearError());
     };
-  }, []);
+  }, [dispatch]);
 
   const authErrorReplaced = auth.error && auth.error.message === 'Invalid credentials' ?
     'Username and password combination is incorrect. Please try again.'
