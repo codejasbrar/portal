@@ -3,8 +3,8 @@
 @import "../../styles/common";
 
 .wrapper {
-    padding-top: 138px;
-    position:    relative;
+    padding-top:    138px;
+    position:       relative;
     padding-bottom: 150px;
 
     @include breakpoint($tablet_horizontal) {
@@ -14,12 +14,12 @@
 
 .orders {
     width:          100%;
-    border-left: 1px solid $gray7;
-    padding-left: 40px;
+    border-left:    1px solid $gray7;
+    padding-left:   40px;
     padding-bottom: 40px;
 
     @include breakpoint($tablet) {
-        border: none;
+        border:       none;
         padding-left: 0;
     }
 }
@@ -27,11 +27,11 @@
 .tests {
     width:          100%;
     padding-bottom: 40px;
-    border-left: 1px solid $gray7;
-    padding-left: 40px;
+    border-left:    1px solid $gray7;
+    padding-left:   40px;
 
     @include breakpoint($tablet) {
-        border: none;
+        border:       none;
         padding-left: 0;
     }
 
@@ -43,7 +43,7 @@
 }
 
 .containerFlex {
-    display: flex;
+    display:    flex;
     margin-top: 50px;
 
     @include breakpoint($tablet_horizontal) {
@@ -129,7 +129,7 @@
         line-height:      1.5rem;
         letter-spacing:   0.3px;
         display:          table-cell;
-        padding:          16px;
+        padding:          16px 0 16px 14px;
         text-align:       left;
         box-sizing:       border-box;
         width:            100%;
@@ -204,6 +204,7 @@
         border-top: 1px solid $gray7;
         width:      100%;
         padding:    12px 0 17px;
+        position:   relative;
 
         &:last-child {
             border-bottom: 1px solid $gray7;
@@ -212,6 +213,12 @@
         .btnPrimary {
             margin-top: 13px;
         }
+    }
+
+    &Comments {
+        position: absolute;
+        right:    16px;
+        top:      16px;
     }
 
     &Title,
@@ -530,20 +537,26 @@
 }
 
 .dangerIconLeft {
-    width:         16px;
     height:        13px;
-    margin-right:  4px;
     margin-bottom: -1px;
 }
 
-.markersWrapper {
-    max-width:    293px;
-    padding-left: 0;
-    list-style:   none;
-    display:      block;
+.markers {
+    &Wrapper {
+        max-width:    293px;
+        padding-left: 0;
+        list-style:   none;
+        display:      inline-block;
 
-    li {
-        white-space: nowrap;
+        li {
+            white-space: nowrap;
+        }
+    }
+
+    &Item {
+        display:      inline-block;
+        margin-right: 3px;
+        margin-top:   2px;
     }
 }
 
@@ -559,6 +572,16 @@
     &Highlighted {
         background-color: $gray8;
     }
+}
+
+.panicValueName {
+    display:      inline-block;
+    margin-right: 3px;
+}
+
+.legend {
+    margin-bottom: 16px;
+    font-size:     12px;
 }
 
 

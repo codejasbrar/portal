@@ -18,6 +18,7 @@ import {
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
 import {Order} from "../../../interfaces/Order";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
@@ -78,16 +79,25 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any) => {
+      customBodyRender: (value: string[]) => {
         const markers = value;
         if (!markers) {
-          return <div className={styles.markersWrapper}>None</div>;
+          return " ";
         }
-        const renderedMarkers = markers.map((marker: string, idx: number) => <li key={marker + idx}>
-          <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
-        return <ul className={styles.markersWrapper}>{renderedMarkers}</ul>;
+        return markers.map((marker: string, idx: number) => <span className={styles.panicValueName} key={marker + idx}>
+          <DangerIcon title={`${marker} have panic value`}
+            className={styles.dangerIconLeft} />&nbsp;{marker}{idx === markers.length - 1 ? "" : ";"} </span>);
       }
     },
+  },
+  {
+    name: "commentsExist",
+    label: " ",
+    options: {
+      filter: false,
+      sort: false,
+      customBodyRender: (value: boolean) => value && <CommentIcon title="This test result has comments" />
+    }
   }
 ];
 
@@ -118,6 +128,8 @@ const TestsPage = () => {
   const count = useSelector(resultsQuantity).pendingResults;
   const testsToView = tests.content || [];
 
+  const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
+
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
@@ -141,7 +153,9 @@ const TestsPage = () => {
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={tests.totalElements} />
+          totalItems={tests.totalElements}
+          legend={havePanic}
+        />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
@@ -149,9 +163,13 @@ const TestsPage = () => {
         {!admin &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
+        {havePanic && <div className={styles.legend}>
+          <DangerIcon className={styles.dangerIconLeft} /> Results with panic value
+        </div>}
         {testsToView
-          .map((item: any, i: number) => (
+          .map((item: Order, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
+              {item.commentsExist && <CommentIcon className={styles.mobileTestsComments} />}
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
@@ -167,8 +185,9 @@ const TestsPage = () => {
               <p className={styles.mobileTestsTitle}>Biomarkers out of
                 range: <span className={styles.mobileTestsText}>
                   {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
-                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any) => <><DangerIcon
-                      className={styles.dangerIconLeft} />{item}; </>)} </span>
+                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: string) => <span
+                      className={styles.markersItem}><DangerIcon
+                      className={styles.dangerIconLeft} />{item};</span>)} </span>
                     : "None"}
               </span>
               </p>

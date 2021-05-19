@@ -55,4 +55,13 @@
         display:    block;
         text-align: center;
     }
+
+    &Legend {
+        margin-left: 32px;
+
+        &Icon {
+            height:        13px;
+            margin-bottom: -1px;
+        }
+    }
 }
