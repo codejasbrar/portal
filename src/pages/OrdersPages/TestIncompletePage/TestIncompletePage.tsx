@@ -107,8 +107,8 @@ const TestIncompletePage = () => {
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
-              <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>
+              <p className={styles.mobileTestsTitle}>Panic
+                values: <span className={styles.mobileTestsText}>
                   {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
                     <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: string) => <span
                       className={styles.markersItem}><DangerIcon
