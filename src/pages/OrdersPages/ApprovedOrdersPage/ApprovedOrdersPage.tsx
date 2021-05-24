@@ -15,13 +15,14 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, tableBaseOptions, usePageState,
-  useResizeListener
+  NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {useSelector} from "react-redux";
 import downloadPDF from "../../../helpers/downloadPDF";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {

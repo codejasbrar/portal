@@ -36,10 +36,6 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
     setOpened(false);
   };
 
-  const openList = () => {
-    setOpened(true);
-  };
-
   const toggleList = () => {
     setOpened(!opened);
   };

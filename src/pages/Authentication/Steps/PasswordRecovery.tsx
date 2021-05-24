@@ -31,14 +31,14 @@ const PasswordRecovery = () => {
       }).catch(error => {
       setError(error.response.data.message);
     })
-    //setSubmitted(true);
+    setSubmitted(true);
   };
 
   useEffect(() => {
     return () => {
       dispatch(clearError());
     };
-  }, []);
+  }, [dispatch]);
 
   return <div className={`${styles.FormWrapper} ${styles.PasswordRecovery}`}>
     <p className={styles.FormTitle}>

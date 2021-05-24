@@ -94,10 +94,6 @@ const LabSlipPage = (props: LabSlipPagePropsTypes) => {
     }
   }, [error]);
 
-  useEffect(() => {
-    console.log(labSlipInfo);
-  }, [labSlipInfo])
-
   const onDiscardLabslip = () => {
     clear();
     setDiscardPopupActive(false);

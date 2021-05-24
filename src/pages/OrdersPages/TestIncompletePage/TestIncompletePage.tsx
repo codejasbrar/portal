@@ -8,12 +8,17 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {resultsQuantity, testsIncompleteState} from "../../../selectors/selectors";
-import {usePageState, useResizeListener, NoMatches, tableBaseOptions} from "../PendingOrdersPage/PendingOrdersPage";
+import {NoMatches, tableBaseOptions} from "../PendingOrdersPage/PendingOrdersPage";
 import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
 import {Order} from "../../../interfaces/Order";
 import {useSelector} from "react-redux";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
+import {Test} from "../../../interfaces/Test";
 
 const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
   ...tableBaseOptions,
@@ -42,6 +47,8 @@ const TestIncompletePage = () => {
 
   const testsToView = tests.content || [];
 
+  const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
+
   const count = useSelector(resultsQuantity).incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
@@ -67,7 +74,9 @@ const TestIncompletePage = () => {
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={tests.totalElements} />
+          totalItems={tests.totalElements}
+          legend={havePanic}
+        />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
@@ -80,9 +89,13 @@ const TestIncompletePage = () => {
           mobile
         />
         <SearchBarMobile value={searchText} onChange={setSearchText} />
+        {havePanic && <div className={styles.legend}>
+          <DangerIcon className={styles.dangerIconLeft} /> Results with panic value
+        </div>}
         {testsToView
-          .map((item: any, i: number) => (
+          .map((item: Order, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
+              {item.commentsExist && <CommentIcon className={styles.mobileTestsComments} />}
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}>{item.id}</Link></span></p>
@@ -94,8 +107,14 @@ const TestIncompletePage = () => {
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
-              <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>{item.panicValueBiomarkers && item.panicValueBiomarkers.length ? item.panicValueBiomarkers.join(", ") : "None"}</span>
+              <p className={styles.mobileTestsTitle}>Panic
+                values: <span className={styles.mobileTestsText}>
+                  {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
+                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: string) => <span
+                      className={styles.markersItem}><DangerIcon
+                      className={styles.dangerIconLeft} />{item};</span>)} </span>
+                    : "None"}
+              </span>
               </p>
               <ApproveButton className={styles.btnApproveMobile}
                 mode="result"

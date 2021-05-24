@@ -16,7 +16,7 @@ type PlanPanelPropsTypes = {
 
 const PlanPanel = (props: PlanPanelPropsTypes) => {
   const {id, code, name, labPanels, prettyName} = props.panel;
-  const {selectable, onSelect, selectedPanels, onSelectLabPanel} = props;
+  const {onSelect, selectedPanels, onSelectLabPanel} = props;
   const [listOpened, setListOpened] = useState(false);
 
   const selectedNow = selectedPanels?.includes(props.panel.code);

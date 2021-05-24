@@ -27,13 +27,11 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
   useEffect(() => {
     onChangePanelsIdsArray(selectedCodesArray);
     onChangeLabPanelsArray(labPanels.filter(panel => selectedCodesArray.includes(panel.code)));
-  }, [selectedCodesArray]);
+  }, [selectedCodesArray, labPanels, onChangeLabPanelsArray, onChangePanelsIdsArray]);
 
   useEffect(() => {
     if (!selectedPanels) setSelectedCodes([]);
   }, [selectedPanels]);
-
-  console.log(planPanels);
 
   useEffect(() => {
     const panel = planPanels.find(panel => panel.name === preSelectedPanel);
@@ -42,7 +40,7 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
     } else {
       setSelectedCodes([]);
     }
-  }, [preSelectedPanel]);
+  }, [preSelectedPanel, planPanels]);
 
   useEffect(() => {
     (async () => {
@@ -53,7 +51,7 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
         onSetLoading(false);
       })
     })();
-  }, []);
+  }, [onSetLoading]);
 
   const compareSelectedPanels = () => labPanels.filter(panel => selectedCodesArray.includes(panel.code));
 
