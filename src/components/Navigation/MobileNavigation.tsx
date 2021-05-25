@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {resultsQuantity, userState} from "../../selectors/selectors";
 import {loadCounters} from "../../actions/countersActions";
 import {OrdersQuantity} from "../../interfaces/Order";
-import {observer} from "mobx-react-lite";
+import {observer} from "mobx-react";
 import CountersStore from "../../storage/CountersStore";
 
 const MobileNavigation = observer(() => {

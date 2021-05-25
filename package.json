@@ -59,9 +59,9 @@
     ]
   },
   "devDependencies": {
-    "mobx": "^6.3.2",
-    "mobx-react-lite": "^3.2.0",
-    "react-app-polyfill": "^2.0.0",
+    "core-js": "^3.12.1",
+    "mobx": "^4.15.7",
+    "mobx-react": "^6.3.1",
     "redux-devtools": "^3.5.0"
   },
   "proxy": "https://test-api-physician.insidetracker.com"

@@ -19,7 +19,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import usePageState from "../../../hooks/usePageState";
 import useResizeListener from "../../../hooks/useResizeListener";
 import CountersStore from "../../../storage/CountersStore";
-import {observer} from "mobx-react-lite";
+import {observer} from "mobx-react";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));

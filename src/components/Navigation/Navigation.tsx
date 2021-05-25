@@ -7,7 +7,7 @@ import {Link, NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {userState} from "../../selectors/selectors";
 import CountersStore from "../../storage/CountersStore";
-import {observer} from "mobx-react-lite";
+import {observer} from "mobx-react";
 
 type NavigationPropsTypes = {
   desktop?: boolean

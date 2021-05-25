@@ -1,23 +1,19 @@
-import {makeAutoObservable} from "mobx"
+import {observable, action} from "mobx"
 import LabSlipApiService from "../services/LabSlipApiService";
 import {OrdersQuantity} from "../interfaces/Order";
 
 class CountersStore {
-  counters: OrdersQuantity = {
+  @observable counters: OrdersQuantity = {
     pendingResults: 0,
     pendingOrders: 0,
     approvedResults: 0,
     approvedOrders: 0,
     incompleteResults: 0,
   };
-  loaded = false;
-  isLoading = false;
+  @observable loaded = false;
+  @observable isLoading = false;
 
-  constructor() {
-    makeAutoObservable(this);
-  }
-
-  getCounters = async () => {
+  @action getCounters = async () => {
     this.isLoading = true;
     const counters = await LabSlipApiService.getQuantity();
     this.counters = counters.data;

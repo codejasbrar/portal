@@ -11,7 +11,7 @@ import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
 import {isAdmin} from "../../selectors/selectors";
 import useResizeListener from "../../hooks/useResizeListener";
-import {observer} from "mobx-react-lite";
+import {observer} from "mobx-react";
 import CountersStore from "../../storage/CountersStore";
 
 const OrdersPage = observer(() => {
