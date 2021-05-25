@@ -50,7 +50,8 @@ export const logIn = (authData: AuthData) => async (dispatch: Dispatch<object>):
       console.log(errorData.response.config.data);
       errorData.response.data.error === "CODE_INCORRECT" ? dispatch(codeIncorrectAction(errorData.response.data)) : dispatch(codeRequiredAction(errorData.response.config.data, errorData.response.data.message));
     } else {
-      dispatch(errorLoginAction(errorData.response.data));
+      const error = errorData?.response?.data || {message: 'Something went wrong'};
+      dispatch(errorLoginAction(error));
     }
   });
 };

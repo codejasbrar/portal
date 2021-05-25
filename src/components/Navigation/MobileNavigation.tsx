@@ -7,22 +7,16 @@ import {useDispatch, useSelector} from "react-redux";
 import {resultsQuantity, userState} from "../../selectors/selectors";
 import {loadCounters} from "../../actions/countersActions";
 import {OrdersQuantity} from "../../interfaces/Order";
+import {observer} from "mobx-react-lite";
+import CountersStore from "../../storage/CountersStore";
 
-const MobileNavigation = () => {
+const MobileNavigation = observer(() => {
   const user = useSelector(userState);
-  const quantity = useSelector(resultsQuantity);
-  const [counters, setCounters] = useState({} as OrdersQuantity);
-  const dispatch = useDispatch();
+  const {counters, getCounters, loaded} = CountersStore;
 
   useEffect(() => {
-    if (quantity) setCounters(quantity);
-  }, [quantity]);
-
-  useEffect(() => {
-    (async () => {
-      await dispatch(loadCounters());
-    })();
-  }, [dispatch]);
+    if (!loaded) getCounters();
+  }, []);
 
   return <div className={styles.mobileNavigation}>
     <h1 className={styles.heading30}>Physician portal</h1>
@@ -62,6 +56,6 @@ const MobileNavigation = () => {
       </NavLink>
     </nav>
   </div>
-}
+});
 
 export default MobileNavigation;

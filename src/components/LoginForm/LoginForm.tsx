@@ -25,6 +25,7 @@ const LoginForm = (props: { logout?: boolean }) => {
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
   const [password, setPassword] = useState(storedPassword ? secret.decode(storedPassword) : '');
   const [remember, setRemember] = useState(!!localStorage.getItem('remember'));
+  const {error} = auth;
   const [localError, setLocalError] = useState('');
 
   const handleSubmit = (e: SyntheticEvent) => {
@@ -74,16 +75,16 @@ const LoginForm = (props: { logout?: boolean }) => {
     };
   }, [dispatch]);
 
-  const authErrorReplaced = auth.error && auth.error.message === 'Invalid credentials' ?
+  const authErrorReplaced = error && error.message === 'Invalid credentials' ?
     'Username and password combination is incorrect. Please try again.'
-    : auth.error?.message
+    : error?.message
 
   return <>
     {isLoading && <Spinner />}
     <form
       onSubmit={handleSubmit}
       className={styles.Form}>
-      {!localError && auth.error && <span className={styles.FormError}>{authErrorReplaced}</span>}
+      {!localError && error && <span className={styles.FormError}>{authErrorReplaced}</span>}
       {localError && <span className={styles.FormError}>{localError}</span>}
       <Input
         placeholder="Email"

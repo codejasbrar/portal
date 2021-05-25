@@ -5,15 +5,17 @@ import styles from "./Navigation.module.scss";
 
 import {Link, NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
-import {resultsQuantity, userState} from "../../selectors/selectors";
+import {userState} from "../../selectors/selectors";
+import CountersStore from "../../storage/CountersStore";
+import {observer} from "mobx-react-lite";
 
 type NavigationPropsTypes = {
   desktop?: boolean
 };
 
-const Navigation = (props: NavigationPropsTypes) => {
+const Navigation = observer((props: NavigationPropsTypes) => {
   const user = useSelector(userState);
-  const counters = useSelector(resultsQuantity);
+  const {counters} = CountersStore;
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
     <h1 className={`${styles.heading30} ${styles.showTabletHorizontal}`}>Physician portal</h1>
@@ -57,6 +59,6 @@ const Navigation = (props: NavigationPropsTypes) => {
       <Link className={styles.navButton} to='/labslip'>Create lab slip</Link>
     </div>}
   </div>
-};
+});
 
 export default Navigation;

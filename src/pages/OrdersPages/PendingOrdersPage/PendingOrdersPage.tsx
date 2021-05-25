@@ -18,6 +18,8 @@ import {isAdmin, ordersPendingState, resultsQuantity} from "../../../selectors/s
 import Checkbox from "@material-ui/core/Checkbox";
 import usePageState from "../../../hooks/usePageState";
 import useResizeListener from "../../../hooks/useResizeListener";
+import CountersStore from "../../../storage/CountersStore";
+import {observer} from "mobx-react-lite";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
@@ -130,11 +132,11 @@ export const NoMatches = () => (
   </div>
 );
 
-const PendingOrdersPage = () => {
+const PendingOrdersPage = observer(() => {
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
   const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
-  const count = useSelector(resultsQuantity).pendingOrders;
+  const count = CountersStore.counters.pendingOrders;
 
   const ordersToView = orders.content || [];
 
@@ -198,6 +200,6 @@ const PendingOrdersPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default PendingOrdersPage;

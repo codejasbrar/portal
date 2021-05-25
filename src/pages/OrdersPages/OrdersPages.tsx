@@ -10,18 +10,21 @@ import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
 import {isAdmin} from "../../selectors/selectors";
-import {loadCounters} from "../../actions/countersActions";
 import useResizeListener from "../../hooks/useResizeListener";
+import {observer} from "mobx-react-lite";
+import CountersStore from "../../storage/CountersStore";
 
-const OrdersPage = () => {
+const OrdersPage = observer(() => {
   const admin = useSelector(isAdmin);
   const width = useResizeListener();
   const dispatch = useDispatch();
+  const {getCounters} = CountersStore;
 
   useEffect(() => {
-    (async () => {
-      await dispatch(loadCounters());
-    })();
+    // (async () => {
+    //   await dispatch(loadCounters());
+    // })();
+    getCounters();
   }, [dispatch]);
 
   return <>
@@ -49,15 +52,16 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            {admin ? <Route path="/orders/tests-incomplete" component={TestIncompletePage} /> : <Route path="/orders/tests-incomplete">
-              <Redirect to="/orders/pending" />
-            </Route>}
+            {admin ? <Route path="/orders/tests-incomplete" component={TestIncompletePage} /> :
+              <Route path="/orders/tests-incomplete">
+                <Redirect to="/orders/pending" />
+              </Route>}
           </div>
         </div>
       </section>
     </Route>
     <Route path="/orders/test/:hash" component={TestDetailsPage} />
   </>
-};
+});
 
 export default OrdersPage;

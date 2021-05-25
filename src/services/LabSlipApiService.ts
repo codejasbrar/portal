@@ -1,5 +1,6 @@
 import client from "./client";
 import Token from "../helpers/localToken";
+import {OrdersQuantity} from "../interfaces/Order";
 
 export type OrderStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED";
 
