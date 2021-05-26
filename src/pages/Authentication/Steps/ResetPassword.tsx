@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 
 //Styles
@@ -9,17 +8,16 @@ import styles from "../../../components/LoginForm/LoginForm.module.scss";
 import ValidateFields from "../../../helpers/validateFields";
 import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
-import {authState} from "../../../selectors/selectors";
 import AuthApiService from "../../../services/AuthApiService";
-import {clearError, clearTempDataAction} from "../../../actions/authActions";
+import AuthStore from "../../../stores/AuthStore";
+import {observer} from "mobx-react";
 
-const ResetPassword = () => {
-  const dispatch = useDispatch();
-  const auth = useSelector(authState);
+const ResetPassword = observer(() => {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [localError, setLocalError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const {tempData, clearError, clearTempData} = AuthStore;
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,30 +32,28 @@ const ResetPassword = () => {
       setLocalError("Passwords didn't match");
       return;
     }
-    if (!auth.tempData) return;
+    if (!tempData) return;
     AuthApiService.resetPassword({
-      username: auth.tempData?.username,
-      securityCode: auth.tempData.securityCode,
+      username: tempData?.username,
+      securityCode: tempData.securityCode,
       "password": password
     }).then(response => {
       setSubmitted(true);
-      dispatch(clearTempDataAction());
+      clearTempData();
     }).catch(error => {
       setLocalError(error.response.data.message);
     })
   };
 
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+    clearError();
+  }, [clearError]);
 
   return <div className={`${styles.FormWrapper} ${styles.ResetPassword}`}>
     <p className={styles.FormTitle}>{submitted ? 'Your password was updated!' : 'Reset your password'}</p>
     <p className={`${styles.FormSubtitle} ${styles.ResetPasswordSubtitle}`}>{submitted ? 'You can now log in to your account with your new password.' : 'Must be a minimum of 8 characters, and must contain at least one number.'}</p>
     {!submitted && <form className={`${styles.Form} ${styles.ResetPasswordForm}`} onSubmit={onFormSubmit}>
-      {/*{!localError && auth.error && <span className={styles.FormError}>{auth.error.message}</span>}*/}
+      {/*{!localError && error && <span className={styles.FormError}>{error.message}</span>}*/}
       {localError && <span className={styles.FormError}>{localError}</span>}
       <Input value={password}
         onChange={setPassword}
@@ -80,7 +76,6 @@ const ResetPassword = () => {
     <Link to="/authentication/login" className={`${styles.BottomLink} ${styles.ResetPasswordBottomLink}`}>Return to Log
       In</Link>}
   </div>
-
-};
+});
 
 export default ResetPassword;

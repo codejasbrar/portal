@@ -3,15 +3,12 @@ import React, {useEffect, useState} from "react";
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {resultsQuantity, userState} from "../../selectors/selectors";
-import {loadCounters} from "../../actions/countersActions";
-import {OrdersQuantity} from "../../interfaces/Order";
 import {observer} from "mobx-react";
-import CountersStore from "../../storage/CountersStore";
+import CountersStore from "../../stores/CountersStore";
+import UserStore from "../../stores/UserStore";
 
 const MobileNavigation = observer(() => {
-  const user = useSelector(userState);
+  const {physician} = UserStore;
   const {counters, getCounters, loaded} = CountersStore;
 
   useEffect(() => {
@@ -36,7 +33,7 @@ const MobileNavigation = observer(() => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {!user.physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
+      {!physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete

@@ -8,19 +8,20 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {useSelector} from "react-redux";
-import {isAdmin, resultsQuantity, testsPendingState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
   NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
-import {Order} from "../../../interfaces/Order";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import useResizeListener from "../../../hooks/useResizeListener";
 import usePageState from "../../../hooks/usePageState";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import UserStore from "../../../stores/UserStore";
+import TestsStore from "../../../stores/TestsStore";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -122,11 +123,12 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
-const TestsPage = () => {
-  const admin = useSelector(isAdmin);
+const TestsPage = observer(() => {
+  const {isAdmin} = UserStore;
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', testsPendingState);
-  const count = useSelector(resultsQuantity).pendingResults;
+  const {pending} = TestsStore;
+  const [tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', pending as OrdersResponse);
+  const count = CountersStore.counters.pendingResults;
   const testsToView = tests.content || [];
 
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
@@ -136,7 +138,6 @@ const TestsPage = () => {
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
   return <section className={styles.tests}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -147,7 +148,7 @@ const TestsPage = () => {
           title={''}
           data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, admin, searchText, setSearchText)}
+          options={options(onSelect, onSaved, isAdmin, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
@@ -161,7 +162,7 @@ const TestsPage = () => {
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
-        {!admin &&
+        {!isAdmin &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {havePanic && <div className={styles.legend}>
@@ -191,7 +192,7 @@ const TestsPage = () => {
                     : "None"}
               </span>
               </p>
-              {!admin && <ApproveButton className={styles.btnApproveMobile}
+              {!isAdmin && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
@@ -211,6 +212,6 @@ const TestsPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default TestsPage;

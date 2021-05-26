@@ -4,17 +4,16 @@ import React from "react";
 import styles from "./Navigation.module.scss";
 
 import {Link, NavLink} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {userState} from "../../selectors/selectors";
-import CountersStore from "../../storage/CountersStore";
+import CountersStore from "../../stores/CountersStore";
 import {observer} from "mobx-react";
+import UserStore from "../../stores/UserStore";
 
 type NavigationPropsTypes = {
   desktop?: boolean
 };
 
 const Navigation = observer((props: NavigationPropsTypes) => {
-  const user = useSelector(userState);
+  const {isAdmin} = UserStore;
   const {counters} = CountersStore;
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
@@ -36,7 +35,7 @@ const Navigation = observer((props: NavigationPropsTypes) => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {!user.physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
+      {isAdmin && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete
@@ -55,7 +54,7 @@ const Navigation = observer((props: NavigationPropsTypes) => {
         <span className={styles.navlinkNumber}>{counters.approvedResults ? `(${counters.approvedResults})` : ''}</span>
       </NavLink>
     </nav>
-    {!user.physician && <div className={styles.navButtonBlock}>
+    {isAdmin && <div className={styles.navButtonBlock}>
       <Link className={styles.navButton} to='/labslip'>Create lab slip</Link>
     </div>}
   </div>

@@ -6,7 +6,6 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {resultsQuantity, testsApprovedState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
   NoMatches, tableBaseOptions,
@@ -14,11 +13,12 @@ import {
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import Spinner from "../../../components/Spinner/Spinner";
-import {Order} from "../../../interfaces/Order";
-import {useSelector} from "react-redux";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import useResizeListener from "../../../hooks/useResizeListener";
 import usePageState from "../../../hooks/usePageState";
-
+import {observer} from "mobx-react";
+import CountersStore from "../../../stores/CountersStore";
+import TestsStore from "../../../stores/TestsStore";
 
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -92,18 +92,16 @@ const options = (searchText: string, setSearchText: (searchText: string) => void
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
-const TestApprovedPage = () => {
+const TestApprovedPage = observer(() => {
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', testsApprovedState);
-
-  const count = useSelector(resultsQuantity).approvedResults;
-
+  const {approved} = TestsStore;
+  const [tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', approved as OrdersResponse);
+  const count = CountersStore.counters.approvedResults;
   const testsToView = tests.content || [];
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   return <section className={styles.tests}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -160,7 +158,7 @@ const TestApprovedPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default TestApprovedPage;
 

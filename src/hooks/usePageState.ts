@@ -1,22 +1,22 @@
 import {OrdersResponse} from "../interfaces/Order";
-import {useDispatch} from "react-redux";
 import {useEffect, useMemo, useState} from "react";
 import {OrderStatus, SortDirection, TestStatus} from "../services/LabSlipApiService";
-import useData from "./useData";
 import {debounce} from "@material-ui/core";
-import {loadOrdersByStatus} from "../actions/ordersActions";
-import {loadTestsByStatus} from "../actions/testsActions";
+import OrdersStore from "../stores/OrdersStore";
+import TestsStore from "../stores/TestsStore";
+import reformatItem from "../helpers/reformatItem";
 
-const usePageState = (type: "order" | "test", status: string, selector: (store: Storage) => OrdersResponse) => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
+const usePageState = (type: "order" | "test", status: string, data: OrdersResponse) => {
   const [searchText, setSearchText] = useState('');
+  const {loadOrdersByStatus} = OrdersStore;
+  const {loadResultsByStatus} = TestsStore;
   const [searchParams, setSearchParams] = useState({
     page: 0,
     sort: {param: 'received', direction: 'desc' as SortDirection},
     searchString: ''
   });
-  const items = useData(selector);
+
+  const items = {...data, content: data.content ? data.content.map(reformatItem) : []};
 
   const onSearch = (value: string) => {
     setSearchParams({...searchParams, page: 0, searchString: value});
@@ -32,11 +32,9 @@ const usePageState = (type: "order" | "test", status: string, selector: (store: 
     debouncedSearch(searchText && searchText.length > 1 ? searchText : '');
   }, [searchText]);
 
-  const onSaved = async () => {
-    setLoading(true);
-    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
-    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
-    setLoading(false);
+  const onSaved = () => {
+    if (type === 'order') loadOrdersByStatus(status as OrderStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString);
+    if (type === 'test') loadResultsByStatus(status as TestStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString);
   };
 
   useEffect(() => {
@@ -52,7 +50,7 @@ const usePageState = (type: "order" | "test", status: string, selector: (store: 
     })
   };
 
-  return [loading, items as OrdersResponse, searchParams.page as number, searchParams.sort as any, onSort, onSetPage, searchText, setSearchText, onSaved]
+  return [items as OrdersResponse, searchParams.page as number, searchParams.sort as any, onSort, onSetPage, searchText, setSearchText, onSaved]
 };
 
 export default usePageState;

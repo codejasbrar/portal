@@ -6,26 +6,21 @@ import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
 import React, {useEffect} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
-import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
-import {isAdmin} from "../../selectors/selectors";
 import useResizeListener from "../../hooks/useResizeListener";
 import {observer} from "mobx-react";
-import CountersStore from "../../storage/CountersStore";
+import CountersStore from "../../stores/CountersStore";
+import UserStore from "../../stores/UserStore";
 
 const OrdersPage = observer(() => {
-  const admin = useSelector(isAdmin);
+  const admin = UserStore.isAdmin;
   const width = useResizeListener();
-  const dispatch = useDispatch();
   const {getCounters} = CountersStore;
 
   useEffect(() => {
-    // (async () => {
-    //   await dispatch(loadCounters());
-    // })();
     getCounters();
-  }, [dispatch]);
+  }, []);
 
   return <>
     <Route exact path={[

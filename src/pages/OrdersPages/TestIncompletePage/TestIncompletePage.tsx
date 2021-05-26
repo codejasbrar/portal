@@ -7,18 +7,17 @@ import MUIDataTable, {MUIDataTableOptions} from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {resultsQuantity, testsIncompleteState} from "../../../selectors/selectors";
 import {NoMatches, tableBaseOptions} from "../PendingOrdersPage/PendingOrdersPage";
-import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
 import {testsNotApprovedColumns} from "../TestPendingOrdersPage/TestPendingOrdersPage";
-import {Order} from "../../../interfaces/Order";
-import {useSelector} from "react-redux";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import useResizeListener from "../../../hooks/useResizeListener";
 import usePageState from "../../../hooks/usePageState";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
-import {Test} from "../../../interfaces/Test";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import TestsStore from "../../../stores/TestsStore";
 
 const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
   ...tableBaseOptions,
@@ -41,22 +40,24 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
 } as MUIDataTableOptions);
 
 
-const TestIncompletePage = () => {
+const TestIncompletePage = observer(() => {
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', testsIncompleteState);
+
+  const {incomplete} = TestsStore;
+
+  const [tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', incomplete as OrdersResponse);
 
   const testsToView = tests.content || [];
 
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
 
-  const count = useSelector(resultsQuantity).incompleteResults;
+  const count = CountersStore.counters.incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
   return <section className={styles.tests}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -137,6 +138,6 @@ const TestIncompletePage = () => {
       </div>
     }
   </section>
-};
+});
 
 export default TestIncompletePage;

@@ -17,8 +17,6 @@ import {Panel} from "../../interfaces/Test";
 import downloadPDF from "../../helpers/downloadPDF";
 import Button from "../../components/Button/Button";
 
-type LabSlipPagePropsTypes = {};
-
 export type LabSlipInfo = {
   laboratory: string,
   customer: Customer,
@@ -31,7 +29,7 @@ const defaultLabSlipInfo: LabSlipInfo = {
   order: {} as OrderDetails
 };
 
-const LabSlipPage = (props: LabSlipPagePropsTypes) => {
+const LabSlipPage = () => {
   const [loading, setLoading] = useState(false);
   const [labSlipInfo, setLabSlipInfo] = useState(defaultLabSlipInfo);
   const [labPanels, setLabPanels] = useState([] as Panel[]);

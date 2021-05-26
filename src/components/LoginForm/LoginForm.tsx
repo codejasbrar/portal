@@ -4,28 +4,22 @@ import React, {SyntheticEvent, useEffect, useState} from "react";
 import styles from "./LoginForm.module.scss";
 
 //Components
-import {useDispatch, useSelector} from "react-redux";
 import {Link, useHistory} from "react-router-dom";
-import {clearError, logIn} from "../../actions/authActions";
 import Input from "../Input/Input";
 import Button from "../Button/Button";
 import Checkbox from "../Checbox/Checkbox";
-import {authState, loading} from "../../selectors/selectors";
 import Spinner from "../Spinner/Spinner";
 import ValidateFields from "../../helpers/validateFields";
+import AuthStore from "../../stores/AuthStore";
 
 
 const LoginForm = (props: { logout?: boolean }) => {
-
-  const dispatch = useDispatch();
-  const auth = useSelector(authState);
-  const isLoading = useSelector(loading);
+  const {error, isLoading, loggedIn, tempData, login, clearError} = AuthStore;
   const history = useHistory();
   const storedPassword = localStorage.getItem('password');
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
   const [password, setPassword] = useState(storedPassword ? secret.decode(storedPassword) : '');
   const [remember, setRemember] = useState(!!localStorage.getItem('remember'));
-  const {error} = auth;
   const [localError, setLocalError] = useState('');
 
   const handleSubmit = (e: SyntheticEvent) => {
@@ -41,7 +35,7 @@ const LoginForm = (props: { logout?: boolean }) => {
     }]);
     setLocalError(validation.message);
     if (!validation.valid) return;
-    dispatch(logIn({username, password}));
+    login({username, password});
     remember ? rememberCredentials() : removeCredentials();
   };
 
@@ -58,22 +52,21 @@ const LoginForm = (props: { logout?: boolean }) => {
   };
 
   useEffect(() => {
-    if (auth.loggedIn) {
+    if (loggedIn) {
       history.replace("/");
     }
-  }, [auth.loggedIn, history]);
+  }, [loggedIn, history]);
+
 
   useEffect(() => {
-    if (auth.tempData) {
+    if (tempData) {
       history.replace("/authentication/security-code")
     }
-  }, [auth.tempData, history]);
+  }, [tempData, history]);
 
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+    clearError();
+  }, [clearError]);
 
   const authErrorReplaced = error && error.message === 'Invalid credentials' ?
     'Username and password combination is incorrect. Please try again.'
@@ -136,4 +129,3 @@ const secret = {
     return decodedPass.slice(0, decodedPass.indexOf(this.passphrase));
   }
 };
-
