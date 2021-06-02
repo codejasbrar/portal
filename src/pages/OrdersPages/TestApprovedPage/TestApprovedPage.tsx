@@ -12,7 +12,6 @@ import {
 } from "../PendingOrdersPage/PendingOrdersPage";
 import {Test} from "../../../interfaces/Test";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import Spinner from "../../../components/Spinner/Spinner";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import useResizeListener from "../../../hooks/useResizeListener";
 import usePageState from "../../../hooks/usePageState";

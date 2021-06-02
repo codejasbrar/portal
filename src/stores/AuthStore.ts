@@ -11,7 +11,6 @@ class AuthStore {
   @observable message: string | null = null;
   @observable tokenRefreshTried: boolean = false;
 
-
   @action refreshToken = (refreshToken: string) => {
     (async () => {
       this.isLoading = true;
