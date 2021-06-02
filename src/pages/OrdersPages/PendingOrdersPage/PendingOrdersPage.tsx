@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import styles from "../OrdersPages.module.scss";
 
@@ -9,22 +9,23 @@ import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from 
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {Order} from "../../../interfaces/Order";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import {useSelector} from "react-redux";
-import {isAdmin, ordersPendingState, resultsQuantity} from "../../../selectors/selectors";
 import Checkbox from "@material-ui/core/Checkbox";
 import usePageState from "../../../hooks/usePageState";
 import useResizeListener from "../../../hooks/useResizeListener";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import UserStore from "../../../stores/UserStore";
+import OrdersStore from "../../../stores/OrdersStore";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
-  const time = value.slice(value.indexOf('T') + 1, value.length);
+  const time = value.slice(value.indexOf('T') + 1, value.lastIndexOf('.') || value.length);
   return <>
-    <div>{date}</div>
-    <div>{time}</div>
+    <p style={{whiteSpace: 'nowrap'}}>{date}</p>
+    <p style={{whiteSpace: 'nowrap'}}>{time}</p>
   </>
 };
 
@@ -130,18 +131,17 @@ export const NoMatches = () => (
   </div>
 );
 
-const PendingOrdersPage = () => {
-  const admin = useSelector(isAdmin);
+const PendingOrdersPage = observer(() => {
+  const admin = UserStore.isAdmin;
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
-  const count = useSelector(resultsQuantity).pendingOrders;
-
+  const {pending} = OrdersStore;
+  const [orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', pending as OrdersResponse);
+  const count = CountersStore.counters.pendingOrders;
   const ordersToView = orders.content || [];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
 
   return <section className={styles.orders}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -198,6 +198,6 @@ const PendingOrdersPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default PendingOrdersPage;

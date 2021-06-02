@@ -6,23 +6,21 @@ import ApprovedOrdersPage from "./ApprovedOrdersPage/ApprovedOrdersPage";
 import React, {useEffect} from "react";
 import TestPendingOrdersPage from "./TestPendingOrdersPage/TestPendingOrdersPage";
 import TestApprovedPage from "./TestApprovedPage/TestApprovedPage";
-import {useDispatch, useSelector} from "react-redux";
 import TestDetailsPage from "./TestDetailsPage/TestDetailsPage";
 import TestIncompletePage from "./TestIncompletePage/TestIncompletePage";
-import {isAdmin} from "../../selectors/selectors";
-import {loadCounters} from "../../actions/countersActions";
 import useResizeListener from "../../hooks/useResizeListener";
+import {observer} from "mobx-react";
+import CountersStore from "../../stores/CountersStore";
+import UserStore from "../../stores/UserStore";
 
-const OrdersPage = () => {
-  const admin = useSelector(isAdmin);
+const OrdersPage = observer(() => {
+  const admin = UserStore.isAdmin;
   const width = useResizeListener();
-  const dispatch = useDispatch();
+  const {getCounters} = CountersStore;
 
   useEffect(() => {
-    (async () => {
-      await dispatch(loadCounters());
-    })();
-  }, [dispatch]);
+    getCounters();
+  }, []);
 
   return <>
     <Route exact path={[
@@ -49,15 +47,16 @@ const OrdersPage = () => {
             <Route path="/orders/approved" component={ApprovedOrdersPage} />
             <Route path="/orders/tests" component={TestPendingOrdersPage} />
             <Route path="/orders/tests-approved" component={TestApprovedPage} />
-            {admin ? <Route path="/orders/tests-incomplete" component={TestIncompletePage} /> : <Route path="/orders/tests-incomplete">
-              <Redirect to="/orders/pending" />
-            </Route>}
+            {admin ? <Route path="/orders/tests-incomplete" component={TestIncompletePage} /> :
+              <Route path="/orders/tests-incomplete">
+                <Redirect to="/orders/pending" />
+              </Route>}
           </div>
         </div>
       </section>
     </Route>
     <Route path="/orders/test/:hash" component={TestDetailsPage} />
   </>
-};
+});
 
 export default OrdersPage;

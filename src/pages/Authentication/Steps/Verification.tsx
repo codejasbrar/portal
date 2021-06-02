@@ -7,15 +7,12 @@ import {useHistory} from "react-router-dom";
 import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
-import {useDispatch, useSelector} from "react-redux";
-import {authState, loading} from "../../../selectors/selectors";
-import {clearError, clearTempDataAction, fillAuthTempDataAction, logIn} from "../../../actions/authActions";
 import Spinner from "../../../components/Spinner/Spinner";
+import AuthStore from "../../../stores/AuthStore";
+import {observer} from "mobx-react";
 
-const Verification = () => {
-  const dispatch = useDispatch();
-  const auth = useSelector(authState);
-  const isLoading = useSelector(loading);
+const Verification = observer(() => {
+  const {tempData, loggedIn, isLoading, clearError, storeTempData, clearTempData, login, message, error} = AuthStore;
   const history = useHistory();
   const [localError, setLocalError] = useState('');
   const [code, setCode] = useState('');
@@ -26,39 +23,37 @@ const Verification = () => {
   };
 
   useEffect(() => {
-    if (!auth.tempData) {
+    if (!tempData) {
       history.replace("/authentication")
     }
-  }, [history, auth.tempData]);
+  }, [history, tempData]);
 
   useEffect(() => {
-    if (auth.loggedIn) {
+    if (loggedIn) {
       history.replace("/");
     }
-  }, [auth.loggedIn, history]);
+  }, [loggedIn, history]);
 
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+    clearError();
+  }, []);
 
   const submitCode = (): void => {
     const validation = ValidateFields([{name: 'Security code', type: "code", value: code}]);
     setLocalError(validation.message);
     if (!validation.valid) return;
-    const userData = typeof auth.tempData === 'string' ? JSON.parse(`${auth.tempData}`) : auth.tempData;
-    if (auth.tempData && !userData.password) {
-      dispatch(fillAuthTempDataAction({...userData, securityCode: code}))
+    const userData = typeof tempData === 'string' ? JSON.parse(`${tempData}`) : tempData;
+    if (tempData && !userData.password) {
+      storeTempData({...userData, securityCode: code});
       history.push('/authentication/reset-password');
       return;
     }
-    dispatch(logIn({...userData, securityCode: code}));
-    dispatch(clearTempDataAction());
+
+    login({...userData, securityCode: code});
   };
 
   const backToLogin = () => {
-    dispatch(clearTempDataAction());
+    clearTempData();
     history.push('/authentication/login');
   };
 
@@ -67,12 +62,12 @@ const Verification = () => {
       {isLoading && <Spinner />}
       <div className={`${styles.FormWrapper} ${styles.Verification}`}>
         <p className={styles.FormTitle}>Security Code Verification</p>
-        <p className={`${styles.FormSubtitle} ${styles.VerificationSubtitle}`}>{auth.message ? auth.message : 'Enter the security code sent to your email or SMS'}</p>
+        <p className={`${styles.FormSubtitle} ${styles.VerificationSubtitle}`}>{message ? message : 'Enter the security code sent to your email or SMS'}</p>
         <span className={styles.FormText}>Your code is valid for 30 minutes. If you didn't receive the code or need a new one,
           <button className={styles.FormTextLink} onClick={backToLogin}>&nbsp;login again</button>.
         </span>
         <form className={styles.Form} onSubmit={onFormSubmit}>
-          {!localError && auth.error && <span className={styles.FormError}>{auth.error.message}</span>}
+          {!localError && error && <span className={styles.FormError}>{error.message}</span>}
           {localError && <span className={styles.FormError}>{localError}</span>}
           <Input value={code} onChange={setCode} name={"code"} label={"Security code"} placeholder={"Security code"} />
           <div className={`${styles.Bottom} ${styles.PasswordRecoveryBottom}`}>
@@ -83,6 +78,6 @@ const Verification = () => {
         </form>
       </div>
     </>)
-};
+});
 
 export default Verification;

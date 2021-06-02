@@ -3,26 +3,17 @@ import React, {useEffect, useState} from "react";
 //Styles
 import styles from "./Navigation.module.scss";
 import {NavLink} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {resultsQuantity, userState} from "../../selectors/selectors";
-import {loadCounters} from "../../actions/countersActions";
-import {OrdersQuantity} from "../../interfaces/Order";
+import {observer} from "mobx-react";
+import CountersStore from "../../stores/CountersStore";
+import UserStore from "../../stores/UserStore";
 
-const MobileNavigation = () => {
-  const user = useSelector(userState);
-  const quantity = useSelector(resultsQuantity);
-  const [counters, setCounters] = useState({} as OrdersQuantity);
-  const dispatch = useDispatch();
+const MobileNavigation = observer(() => {
+  const {physician} = UserStore;
+  const {counters, getCounters, loaded} = CountersStore;
 
   useEffect(() => {
-    if (quantity) setCounters(quantity);
-  }, [quantity]);
-
-  useEffect(() => {
-    (async () => {
-      await dispatch(loadCounters());
-    })();
-  }, [dispatch]);
+    if (!loaded) getCounters();
+  }, []);
 
   return <div className={styles.mobileNavigation}>
     <h1 className={styles.heading30}>Physician portal</h1>
@@ -42,7 +33,7 @@ const MobileNavigation = () => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {!user.physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
+      {!physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete
@@ -62,6 +53,6 @@ const MobileNavigation = () => {
       </NavLink>
     </nav>
   </div>
-}
+});
 
 export default MobileNavigation;
