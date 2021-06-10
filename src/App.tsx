@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 
 //Styles
 import "normalize.css/normalize.css";
@@ -7,38 +7,40 @@ import "./styles/global.scss";
 //Components
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import Header from "./components/Header/Header";
-import {useDispatch, useSelector} from "react-redux";
-import {loggedIn} from "./selectors/selectors";
-import {loadUserByToken} from "./actions/userActions";
 import Footer from "./components/Footer/Footer";
 import Authentication from "./pages/Authentication/Authentication";
 import Spinner from "./components/Spinner/Spinner";
 import OrdersPage from "./pages/OrdersPages/OrdersPages";
 import Token from "./helpers/localToken";
-import {refreshTokenAction} from "./actions/authActions";
 import LabSlipPage from "./pages/Labslip/LabSlipPage";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import {observer} from "mobx-react";
+import UserStore from "./stores/UserStore";
+import AuthStore from "./stores/AuthStore";
+import LoadingStore from "./stores/LoadingStore";
 
-const App = () => {
-  const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
-  const isLoggedIn = useSelector(loggedIn);
+
+const App = observer(() => {
+  const {loggedIn, refreshToken, setLoggedIn, tokenRefreshTried, setRefreshTried} = AuthStore;
+  const {loadUserByToken} = UserStore;
+  const {loading, entrypoint} = LoadingStore;
 
   useEffect(() => {
-    (async () => {
-      const tokenData = Token.get();
-      if (tokenData.token) {
-        if (Token.isTokenExpired()) {
-          await dispatch(refreshTokenAction(tokenData.refreshToken as string));
-          await dispatch(loadUserByToken());
-        } else {
-          await dispatch(loadUserByToken());
-        }
+    const tokenData = Token.get();
+    if (tokenData.token) {
+      if (Token.isTokenExpired()) {
+        refreshToken(tokenData.refreshToken as string);
+        loadUserByToken();
+      } else {
+        setLoggedIn();
+        loadUserByToken();
       }
-      setLoading(false);
-    })();
-  }, [dispatch, isLoggedIn]);
+    } else {
+      setRefreshTried();
+    }
+  }, [loggedIn]);
 
+  if (!tokenRefreshTried) return <Spinner />
 
   return <Router>
     <Header />
@@ -48,12 +50,12 @@ const App = () => {
         <Redirect to="/orders/pending" />
       </Route>
       <Route path="/authentication"
-        render={() => (isLoggedIn ? <Redirect to="/orders/pending" /> : <Authentication />)} />
+        render={() => (loggedIn ? <Redirect to={entrypoint ?? "/"} /> : <Authentication />)} />
       <PrivateRoute path='/orders' component={OrdersPage} />
       <PrivateRoute path='/labslip' component={LabSlipPage} adminOnly />
     </Switch>
     <Footer />
   </Router>
-};
+});
 
 export default App;

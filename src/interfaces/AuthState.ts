@@ -1,4 +1,3 @@
-import {LOGIN_ERROR, LOGIN_REQUEST, LOGIN_SUCCESS} from "../actions/authActions";
 import {AuthData, IAuth, LoginError} from "../services/AuthApiService";
 
 export interface AuthState {
@@ -8,24 +7,3 @@ export interface AuthState {
   tempData?: AuthData,
   message?: string
 }
-
-interface AuthRequest {
-  type: typeof LOGIN_REQUEST,
-  payload: AuthData,
-  loading: boolean
-}
-
-interface AuthSuccess {
-  type: typeof LOGIN_SUCCESS,
-  payload: IAuth,
-  loading: boolean,
-  message?: string
-}
-
-interface AuthError {
-  type: typeof LOGIN_ERROR,
-  payload: LoginError,
-  loading: boolean
-}
-
-export type AuthActionsTypes = AuthRequest & AuthSuccess & AuthError;

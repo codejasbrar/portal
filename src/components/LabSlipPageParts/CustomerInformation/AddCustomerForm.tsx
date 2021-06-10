@@ -76,8 +76,9 @@ const mapFormFields = (fields: FormField[]) => fields.map((field: FormField) => 
 
 
 const AddCustomerForm = (props: AddCustomerFormPropsTypes) => {
+  const {fields} = props;
   const [error, setError] = useState(false);
-  const formFieldsEnchanced = useMemo(() => mapFormFields(props.fields), []);
+  const formFieldsEnchanced = useMemo(() => mapFormFields(fields), [fields]);
 
 
   const mapFormValuesToCustomerObject = () => {

@@ -9,15 +9,15 @@ import {Link} from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
 import AuthApiService from "../../../services/AuthApiService";
-import {useDispatch} from "react-redux";
-import {clearError, fillAuthTempDataAction} from "../../../actions/authActions";
+import AuthStore from "../../../stores/AuthStore";
+import {observer} from "mobx-react";
 
-const PasswordRecovery = () => {
+const PasswordRecovery = observer(() => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const dispatch = useDispatch();
   const history = useHistory();
+  const {storeTempData, clearError} = AuthStore;
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,19 +26,17 @@ const PasswordRecovery = () => {
     if (!validation.valid) return;
     AuthApiService.requestPasswordReset(email)
       .then(response => {
-        dispatch(fillAuthTempDataAction({username: email}, response.data.status as string))
+        storeTempData({username: email}, response.data.status as string);
         history.push('/authentication/security-code')
       }).catch(error => {
       setError(error.response.data.message);
     })
-    //setSubmitted(true);
+    setSubmitted(true);
   };
 
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, []);
+    clearError();
+  }, [clearError]);
 
   return <div className={`${styles.FormWrapper} ${styles.PasswordRecovery}`}>
     <p className={styles.FormTitle}>
@@ -97,6 +95,6 @@ const PasswordRecovery = () => {
       Return to Log In
     </Link>}
   </div>;
-};
+});
 
 export default PasswordRecovery;

@@ -9,7 +9,8 @@ export interface Test {
   customerId: number,
   orderId: number,
   panicValueBiomarkers: string[],
-  hash: string
+  hash: string,
+  commentsExist?: boolean
 }
 
 export interface TestComment {

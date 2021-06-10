@@ -68,3 +68,9 @@ export interface OrdersQuantity {
   pendingResults: number,
   approvedResults: number
 }
+
+export interface ICountersStore {
+  getCounters: void,
+  counters: OrdersQuantity,
+  isLoading: boolean,
+}

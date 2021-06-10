@@ -36,7 +36,6 @@ const ValidateFields = (fieldsArray: FieldObject[]): ValidationResult => {
           }
           break;
         case "code":
-          console.log(field)
           if (field.value.length !== 6 && (/\D/g).test(field.value)) {
             message = "Required 6 digit security code";
             valid = false;

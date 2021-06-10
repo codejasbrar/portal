@@ -8,8 +8,7 @@ import Input from "../../../components/Input/Input";
 import {Link} from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import ValidateFields from "../../../helpers/validateFields";
-import {clearError} from "../../../actions/authActions";
-import {useDispatch} from "react-redux";
+import AuthStore from "../../../stores/AuthStore";
 
 const SmsVerification = () => {
   const history = useHistory();
@@ -17,7 +16,7 @@ const SmsVerification = () => {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const dispatch = useDispatch();
+  const {clearError} = AuthStore;
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +43,7 @@ const SmsVerification = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearError());
+      clearError();
     };
   }, []);
 

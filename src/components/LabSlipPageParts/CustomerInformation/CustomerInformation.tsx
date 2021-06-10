@@ -1,12 +1,11 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 
 //Styles
 import styles from "../../../pages/Labslip/LabSlipPage.module.scss";
 import Autocomplete, {Option} from "../../Autocomplete/Autocomplete";
-import {TestDetails} from "../../../interfaces/Test";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {debounce} from "@material-ui/core";
-import {Order, OrderDetails} from "../../../interfaces/Order";
+import {OrderDetails} from "../../../interfaces/Order";
 import SingleSelect, {SelectOption} from "../../SingleSelect/SingleSelect";
 import {ReactComponent as CloseIcon} from "../../../icons/close.svg";
 import Popup from "../../Popup/Popup";
@@ -104,8 +103,8 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   const [results, setResults] = useState([] as Customer[]);
   const [searchText, setSearchText] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
-  const {onSetLoading, onSetLabSlipInfo, labSlipInfo} = props;
-  const {customer, laboratory, order} = labSlipInfo;
+  const {onSetLabSlipInfo, labSlipInfo} = props;
+  const {customer, laboratory} = labSlipInfo;
 
   const onSearchChanged = (text: string) => {
     if (customer && customer.id) onSetLabSlipInfo({
@@ -116,11 +115,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     setSearchText(text);
   };
 
-  useEffect(() => {
-    debouncedSearch(searchText);
-  }, [searchText]);
-
-  const onSearch = async (text: string) => {
+  const onSearch = useCallback(async (text: string) => {
     try {
       if (text.length <= 1) {
         setResults([]);
@@ -131,14 +126,17 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
     } catch (e) {
       console.log(e)
     }
-  };
+  }, []);
 
-  const openPopup = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
+  const debouncedSearch = useMemo(() => debounce(onSearch, 700), [onSearch]);
+
+  useEffect(() => {
+    debouncedSearch(searchText);
+  }, [searchText, debouncedSearch]);
+
+  const openPopup = () => {
     setPopupOpen(true);
   };
-
-  const debouncedSearch = useMemo(() => debounce(onSearch, 700), []);
 
   const mapResponseToOptions = (customers: Customer[]) => customers.map((customer: Customer) => {
     return {text: `${customer.id} ${customer.firstName} ${customer.lastName}`, value: customer.id.toString()} as Option
@@ -202,8 +200,8 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
               value={autoCompleteValue}
             />
             {customer && !customer.id ? <p className={styles.LabslipInfoCustomerAdd}>
-                Customer does not exist? <a className={styles.linkPrimary} onClick={openPopup} href="#">Add customer
-                details</a>
+                Customer does not exist? <button className={styles.linkPrimary} onClick={openPopup}>Add customer
+                details</button>
               </p> :
               <></>}
           </div>
@@ -219,7 +217,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
                 disabled: pendingOrdersIds.includes(order.id)
               }
             }) : []}
-            disabled={!customer.id || customer.orders && !customer.orders[0].id}
+            disabled={!customer.id || (customer.orders && !customer.orders[0].id)}
             error={{
               valid: !pendingOrdersIds.includes(labSlipInfo.order.id),
               message: 'Order needs to be approved by the physician first before a custom lab slip can be created'

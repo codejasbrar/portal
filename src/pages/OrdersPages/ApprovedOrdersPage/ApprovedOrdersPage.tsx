@@ -10,18 +10,20 @@ import MUIDataTable, {
 } from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
-import {ordersApprovedState, resultsQuantity} from "../../../selectors/selectors";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import Spinner from "../../../components/Spinner/Spinner";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, tableBaseOptions, usePageState,
-  useResizeListener
+  NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 
 import LabSlipApiService from "../../../services/LabSlipApiService";
-import {useSelector} from "react-redux";
 import downloadPDF from "../../../helpers/downloadPDF";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import OrdersStore from "../../../stores/OrdersStore";
+import {OrdersResponse} from "../../../interfaces/Order";
 
 const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -92,14 +94,14 @@ const getLabSlip = async (hash: string, fileName: string) => {
   }
 };
 
-const ApprovedOrdersPage = () => {
+const ApprovedOrdersPage = observer(() => {
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', ordersApprovedState);
+  const {approved} = OrdersStore;
+  const [orders, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('order', 'APPROVED', approved as OrdersResponse);
   const ordersToView = orders.content || [];
-  const count = useSelector(resultsQuantity).approvedOrders;
+  const count = CountersStore.counters.approvedOrders;
 
   return <section className={styles.orders}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -153,6 +155,6 @@ const ApprovedOrdersPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default ApprovedOrdersPage;
