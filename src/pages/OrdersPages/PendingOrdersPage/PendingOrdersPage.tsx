@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect} from 'react';
 
 import styles from "../OrdersPages.module.scss";
 
@@ -6,32 +6,26 @@ import {Link} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {debounce} from "@material-ui/core";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import Spinner from "../../../components/Spinner/Spinner";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import {loadOrdersByStatus} from "../../../actions/ordersActions";
-import {useDispatch, useSelector} from "react-redux";
-import {isAdmin, ordersPendingState, resultsQuantity} from "../../../selectors/selectors";
-import {OrderStatus, SortDirection, TestStatus} from "../../../services/LabSlipApiService";
-import {loadTestsByStatus} from "../../../actions/testsActions";
-import {TestDetails} from "../../../interfaces/Test";
 import Checkbox from "@material-ui/core/Checkbox";
-
-export const getWidth = () => window.innerWidth
-  || document.documentElement.clientWidth
-  || document.body.clientWidth;
+import usePageState from "../../../hooks/usePageState";
+import useResizeListener from "../../../hooks/useResizeListener";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import UserStore from "../../../stores/UserStore";
+import OrdersStore from "../../../stores/OrdersStore";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
-  const time = value.slice(value.indexOf('T') + 1, value.length);
+  const time = value.slice(value.indexOf('T') + 1, value.lastIndexOf('.') || value.length);
   return <>
-    <div>{date}</div>
-    <div>{time}</div>
+    <p style={{whiteSpace: 'nowrap'}}>{date}</p>
+    <p style={{whiteSpace: 'nowrap'}}>{time}</p>
   </>
 };
 
@@ -137,112 +131,17 @@ export const NoMatches = () => (
   </div>
 );
 
-export const reformatItem = (order: Order | TestDetails): any => {
-  const offsetHours = new Date().getTimezoneOffset() / 60;
-  const dateReceived = new Date(order.received);
-  const dateApproved = order.approved ? new Date(order.approved) : '';
-  const dateObserved = order.observed ? new Date(order.observed) : '';
-  dateReceived.setHours(dateReceived.getHours() - offsetHours);
-  if (dateApproved) dateApproved.setHours(dateApproved.getHours() - offsetHours);
-  if (dateObserved) dateObserved.setHours(dateObserved.getHours() - offsetHours);
-  return {
-    ...order,
-    criteriaMet: order.criteriaMet ? "Yes" : 'No',
-    received: `${dateReceived.getMonth() + 1}/${dateReceived.getDate()}/${dateReceived.getFullYear()}T${dateReceived.toLocaleTimeString()}`,
-    approved: dateApproved ? `${dateApproved.getMonth() + 1}/${dateApproved.getDate()}/${dateApproved.getFullYear()}T${dateApproved.toLocaleTimeString()}` : '',
-    observed: dateObserved ? `${dateObserved.getMonth() + 1}/${dateObserved.getDate()}/${dateObserved.getFullYear()}T${dateObserved.toLocaleTimeString()}` : ''
-  }
-};
-
-export const useResizeListener = () => {
-  const [width, setWidth] = useState(getWidth());
-  useEffect(() => {
-    const resizeListener = () => {
-      setWidth(getWidth())
-    };
-    window.addEventListener('resize', resizeListener);
-    return () => {
-      window.removeEventListener('resize', resizeListener);
-    }
-  });
-  return width;
-};
-
-export const useData = (selector: (store: Storage) => OrdersResponse) => {
-  const [data, setData] = useState({} as OrdersResponse);
-  const items: OrdersResponse = useSelector(selector);
-
-  useEffect(() => {
-    if (items.content) {
-      setData({
-        ...items, content: items.content.map(reformatItem)
-      })
-    }
-  }, [items]);
-
-  return data;
-};
-
-export const usePageState = (type: "order" | "test", status: string, selector: (store: Storage) => OrdersResponse) => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState('');
-  const [searchParams, setSearchParams] = useState({
-    page: 0,
-    sort: {param: 'received', direction: 'desc' as SortDirection},
-    searchString: ''
-  });
-  const items = useData(selector);
-
-  const onSearch = (value: string) => {
-    setSearchParams({...searchParams, page: 0, searchString: value});
-  };
-
-  const onSetPage = (page: number) => {
-    setSearchParams({...searchParams, page: page})
-  };
-
-  const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchParams.searchString]);
-
-  useEffect(() => {
-    debouncedSearch(searchText && searchText.length > 1 ? searchText : '');
-  }, [searchText]);
-
-  const onSaved = async () => {
-    setLoading(true);
-    if (type === 'order') await dispatch(loadOrdersByStatus(status as OrderStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
-    if (type === 'test') await dispatch(loadTestsByStatus(status as TestStatus, searchParams.page, searchParams.sort.param, searchParams.sort.direction, searchParams.searchString));
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    onSaved();
-  }, [searchParams.page, searchParams.sort, searchParams.searchString]);
-
-
-  const onSort = (sortParam: string = 'received') => {
-    setSearchParams({
-      ...searchParams,
-      page: 0,
-      sort: {param: sortParam, direction: searchParams.sort.direction === 'desc' ? 'asc' : 'desc'}
-    })
-  };
-
-  return [loading, items as OrdersResponse, searchParams.page as number, searchParams.sort as any, onSort, onSetPage, searchText, setSearchText, onSaved]
-};
-
-const PendingOrdersPage = () => {
-  const admin = useSelector(isAdmin);
+const PendingOrdersPage = observer(() => {
+  const admin = UserStore.isAdmin;
   const width = useResizeListener();
-  const [loading, orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', ordersPendingState);
-  const count = useSelector(resultsQuantity).pendingOrders;
-
+  const {pending} = OrdersStore;
+  const [orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', pending as OrdersResponse);
+  const count = CountersStore.counters.pendingOrders;
   const ordersToView = orders.content || [];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
 
   return <section className={styles.orders}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -299,6 +198,6 @@ const PendingOrdersPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default PendingOrdersPage;

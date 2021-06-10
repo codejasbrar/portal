@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 
 //Styles
 import styles from "./Biomarkers.module.scss";

@@ -8,17 +8,20 @@ import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
 import {Test} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
-import {useSelector} from "react-redux";
-import {isAdmin, resultsQuantity, testsPendingState} from "../../../selectors/selectors";
 import {
   customDateColumnRender, customHeadSortRender,
-  NoMatches, tableBaseOptions, usePageState,
-  useResizeListener,
+  NoMatches, tableBaseOptions,
 } from "../PendingOrdersPage/PendingOrdersPage";
 import Pagination from "../../../components/Table/Pagination/Pagination";
-import Spinner from "../../../components/Spinner/Spinner";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
-import {Order} from "../../../interfaces/Order";
+import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
+import {Order, OrdersResponse} from "../../../interfaces/Order";
+import useResizeListener from "../../../hooks/useResizeListener";
+import usePageState from "../../../hooks/usePageState";
+import CountersStore from "../../../stores/CountersStore";
+import {observer} from "mobx-react";
+import UserStore from "../../../stores/UserStore";
+import TestsStore from "../../../stores/TestsStore";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -74,20 +77,29 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
   },
   {
     name: "panicValueBiomarkers",
-    label: "Biomarkers out of range",
+    label: "Panic values",
     options: {
       filter: true,
       sort: false,
-      customBodyRender: (value: any) => {
+      customBodyRender: (value: string[]) => {
         const markers = value;
         if (!markers) {
-          return <div className={styles.markersWrapper}>None</div>;
+          return " ";
         }
-        const renderedMarkers = markers.map((marker: string, idx: number) => <li key={marker + idx}>
-          <DangerIcon className={styles.dangerIconLeft} /> {marker} </li>);
-        return <ul className={styles.markersWrapper}>{renderedMarkers}</ul>;
+        return markers.map((marker: string, idx: number) => <span className={styles.panicValueName} key={marker + idx}>
+          <DangerIcon title={`${marker} have panic value`}
+            className={styles.dangerIconLeft} />&nbsp;{marker}{idx === markers.length - 1 ? "" : ";"} </span>);
       }
     },
+  },
+  {
+    name: "commentsExist",
+    label: " ",
+    options: {
+      filter: false,
+      sort: false,
+      customBodyRender: (value: boolean) => value && <CommentIcon title="This test result has comments" />
+    }
   }
 ];
 
@@ -111,19 +123,21 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
   customSearchRender: () => SearchBar(searchText, setSearchText, false, undefined),
 } as MUIDataTableOptions);
 
-const TestsPage = () => {
-  const admin = useSelector(isAdmin);
+const TestsPage = observer(() => {
+  const {isAdmin} = UserStore;
   const width = useResizeListener();
-  const [loading, tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', testsPendingState);
-  const count = useSelector(resultsQuantity).pendingResults;
+  const {pending} = TestsStore;
+  const [tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', pending as OrdersResponse);
+  const count = CountersStore.counters.pendingResults;
   const testsToView = tests.content || [];
+
+  const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
   return <section className={styles.tests}>
-    {loading && <Spinner />}
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
     </Link>
@@ -134,24 +148,30 @@ const TestsPage = () => {
           title={''}
           data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, admin, searchText, setSearchText)}
+          options={options(onSelect, onSaved, isAdmin, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={tests.totalElements} />
+          totalItems={tests.totalElements}
+          legend={havePanic}
+        />
       </MuiThemeProvider>
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
-        {!admin &&
+        {!isAdmin &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
+        {havePanic && <div className={styles.legend}>
+          <DangerIcon className={styles.dangerIconLeft} /> Results with panic value
+        </div>}
         {testsToView
-          .map((item: any, i: number) => (
+          .map((item: Order, i: number) => (
             <div key={i} className={styles.mobileTestsItem}>
+              {item.commentsExist && <CommentIcon className={styles.mobileTestsComments} />}
               <p className={styles.mobileTestsTitle}>Test result
                 ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
@@ -164,15 +184,15 @@ const TestsPage = () => {
                 ID: <span className={styles.mobileTestsText}>{item.orderId}</span></p>
               <p className={styles.mobileTestsTitle}>Customer
                 ID: <span className={styles.mobileTestsText}>{item.customerId}</span></p>
-              <p className={styles.mobileTestsTitle}>Biomarkers out of
-                range: <span className={styles.mobileTestsText}>
+              <p className={styles.mobileTestsTitle}>Panic values: <span className={styles.mobileTestsText}>
                   {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
-                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: any) => <><DangerIcon
-                      className={styles.dangerIconLeft} />{item}; </>)} </span>
+                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: string) => <span
+                      className={styles.markersItem}><DangerIcon
+                      className={styles.dangerIconLeft} />{item};</span>)} </span>
                     : "None"}
               </span>
               </p>
-              {!admin && <ApproveButton className={styles.btnApproveMobile}
+              {!isAdmin && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
@@ -192,6 +212,6 @@ const TestsPage = () => {
       </div>
     }
   </section>
-}
+});
 
 export default TestsPage;

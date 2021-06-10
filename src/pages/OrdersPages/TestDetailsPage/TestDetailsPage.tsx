@@ -1,24 +1,24 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
 //Styles
 import styles from "../OrdersPages.module.scss";
 
 //Components
-import {useDispatch, useSelector} from "react-redux";
-import Spinner from "../../../components/Spinner/Spinner";
 import {Link, useParams} from "react-router-dom";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import {detailsTableTheme} from "../../../themes/CommonTableTheme";
 import {ReactComponent as SortIcon} from "../../../icons/sort.svg";
 import MUIDataTable, {MUIDataTableCustomHeadRenderer, MUIDataTableOptions} from "mui-datatables";
-import {isAdmin, testDetails} from "../../../selectors/selectors";
-import {getResult} from "../../../actions/testsActions";
-import {reformatItem, useResizeListener} from "../PendingOrdersPage/PendingOrdersPage";
 import {Biomarker, TestComment, TestDetails} from "../../../interfaces/Test";
 import ApproveButton from "../../../components/ApproveButton/ApproveButton";
 import {useHistory} from "react-router-dom";
 import LabSlipApiService from "../../../services/LabSlipApiService";
 import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
+import useResizeListener from "../../../hooks/useResizeListener";
+import reformatItem from "../../../helpers/reformatItem";
+import UserStore from "../../../stores/UserStore";
+import {observer} from "mobx-react";
+import TestsStore from "../../../stores/TestsStore";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -47,16 +47,17 @@ const columns = [
       filter: true,
       sort: false,
       customBodyRender: (value: any, tableMeta: any) => {
-        const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
-        const panic = markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{value}{panic && value ?
+        //const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
+        const panic = Boolean(tableMeta.rowData[2]);
+        // markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
+        return <span className={styles.dotWrapper}>{Number(value)}{panic && value ?
           <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
     }
   },
   {
     //check the CommonTableTheme.ts str:132
-    name: "normalRange",
+    name: "panic",
     label: "Normal range",
     options: {
       filter: true,
@@ -107,7 +108,7 @@ const options: MUIDataTableOptions = {
       className={`MuiTableRow-root MUIDataTableBodyRow-root-46 ${styles.tableRow} ${isAddedOn ? styles.tableRowHighlighted : ''}`}
       data-testid={`MUIDataTableBodyRow-${rowIndex}`}
       id={`MUIDataTableBodyRow-${rowIndex}`}>
-      {data.map(item => <td key={`key${dataIndex}-${rowIndex}-${item}`}
+      {data.map((item, idx) => <td key={btoa(`${dataIndex}-${rowIndex}-${item}-${idx}`)}
         className="MuiTableCell-root MuiTableCell-body MUIDataTableBodyCell-root-50"
         data-colindex={dataIndex}
         data-testid={`MuiDataTableBodyCell-${dataIndex}-${rowIndex}`}>
@@ -116,8 +117,6 @@ const options: MUIDataTableOptions = {
       </td>)}
     </tr>
   }
-
-
 } as MUIDataTableOptions;
 
 const sortByName = (a: BiomarkerDetails, b: BiomarkerDetails) => a.name > b.name ? 1 : -1;
@@ -132,41 +131,37 @@ const commentSentDateFormat = (dateString: string) => {
 
 const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) > new Date(b.sent) ? -1 : 1;
 
-const TestDetailsPage = () => {
-    const width = useResizeListener();
-    const [loading, setLoading] = useState(true);
-    const admin = useSelector(isAdmin);
-    const {hash} = useParams();
-    const testSelected = useSelector(testDetails);
-    const [test, setTest] = useState({} as TestDetails);
-    const dispatch = useDispatch();
-    const history = useHistory();
-    const [comment, setComment] = useState('');
+const TestDetailsPage = observer(() => {
+  const width = useResizeListener();
+  const {isAdmin} = UserStore;
+  const {hash} = useParams();
+  const {getResult, details} = TestsStore;
+  const [test, setTest] = useState({} as TestDetails);
+  const history = useHistory();
+  const [comment, setComment] = useState('');
 
-    useEffect(() => {
-      if (testSelected) {
-        !admin && testSelected.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(testSelected) as TestDetails);
-      }
-    }, [testSelected, admin, history]);
+  useEffect(() => {
+    if (details) {
+      !isAdmin && details.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(details) as TestDetails);
+    }
+  }, [details]);
 
-    const addComment = async () => {
-      if (comment.length && comment.trim().length > 0) {
-        await LabSlipApiService.saveMessage(hash, comment);
-        setComment('');
-        await loadTest();
-      }
-    };
+  const addComment = async () => {
+    if (comment.length && comment.trim().length > 0) {
+      await LabSlipApiService.saveMessage(hash, comment);
+      setComment('');
+      await loadTest();
+    }
+  };
 
-    const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
-      setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
-    };
+  const onChangeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    // eslint-disable-next-line
+    setComment(e.target.value.replace(/[^\x00-\x7F]+/ig, ''))
+  };
 
-    const loadTest = async () => {
-      setLoading(true);
-      await dispatch(getResult(hash));
-      setLoading(false);
-    };
-
+  const loadTest = useCallback(async () => {
+    await getResult(hash);
+  }, []);
 
   useEffect(() => {
     loadTest();
@@ -177,45 +172,56 @@ const TestDetailsPage = () => {
   const biomarkerFormat = (biomarker: Biomarker) => ({
     ...biomarker,
     normalRange: biomarker.maxPanicValue && biomarker.minPanicValue ? `${biomarker.minPanicValue} - ${biomarker.maxPanicValue}` : 'N/A',
-    panic: biomarker.maxPanicValue && biomarker.minPanicValue && biomarker.value && (biomarker.value >= biomarker.maxPanicValue || biomarker.value <= biomarker.minPanicValue)
+    panic: (biomarker.maxPanicValue && biomarker.value >= biomarker.maxPanicValue) || (biomarker.minPanicValue && biomarker.value <= biomarker.minPanicValue),
   });
+
 
   const panicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => marker.panic).sort(sortByName);
   const notPanicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => !marker.panic).sort(sortByName);
 
-  const enableApprove = (admin && test.status === 'INCOMPLETE') || (!admin && !test.approved && test.status !== 'INCOMPLETE');
+  const enableApprove = (isAdmin && test.status === 'INCOMPLETE') || (!isAdmin && !test.approved && test.status !== 'INCOMPLETE');
+
+  const backLink = useMemo(() => {
+      switch (test.status) {
+        case 'INCOMPLETE':
+          return 'tests-incomplete';
+        case 'APPROVED':
+          return 'tests-approved';
+        case 'PENDING':
+          return 'tests';
+        default:
+          return 'tests';
+      }
+    },
+    [test]);
 
   return <>
-    {loading && <Spinner />}
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
       <div className={styles.container}>
-        {history.action === 'POP' ? <Link to={'/orders/tests'}
+        <Link to={`/orders/${backLink}`}
           className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
           Back <span className={styles.menuLinkBackMobile}>to physician portal</span>
-          </Link> : <button type="button"
-            onClick={() => history.goBack()}
-            className={`${styles.menuLink} ${styles.menuLinkBack} ${styles.showTabletHorizontal}`}>
-            Back <span className={styles.menuLinkBackMobile}>to physician portal</span></button>}
-          {test.order &&
-          <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
-            <section className={styles.adminSection}>
-              <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
+        </Link>
+        {test.order &&
+        <div className={`${styles.containerFlex} ${styles.contentWrapper}`}>
+          <section className={styles.adminSection}>
+            <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test result ID: {test.id}</h2>
 
-              <aside className={styles.testInfo}>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Received: </span>
-                  {test.received?.replace('T', ' ')}
-                </p>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Order ID: </span>
-                  {test.order?.id}
-                </p>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Customer ID: </span>
-                  {test.order?.customerId}
-                </p>
-                <p className={styles.testInfoString}>
-                  <span className={styles.testInfoBold}>Gender: </span>
+            <aside className={styles.testInfo}>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Received: </span>
+                {test.received?.replace('T', ' ')}
+              </p>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Order ID: </span>
+                {test.order?.id}
+              </p>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Customer ID: </span>
+                {test.order?.customerId}
+              </p>
+              <p className={styles.testInfoString}>
+                <span className={styles.testInfoBold}>Gender: </span>
                   {test.order?.customerGender === "F" ? 'Female' : 'Male'}
                 </p>
                 <p className={styles.testInfoString}>
@@ -313,11 +319,10 @@ const TestDetailsPage = () => {
               }
             </section>
 
-          </div>
-          }
         </div>
-      </section>
-    </>
-  }
-;
+        }
+      </div>
+    </section>
+  </>
+});
 export default TestDetailsPage;
