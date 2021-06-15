@@ -7,13 +7,14 @@ import {Link, NavLink} from "react-router-dom";
 import CountersStore from "../../stores/CountersStore";
 import {observer} from "mobx-react";
 import UserStore from "../../stores/UserStore";
+import rolesPermissions from "../../constants/roles";
 
 type NavigationPropsTypes = {
   desktop?: boolean
 };
 
 const Navigation = observer((props: NavigationPropsTypes) => {
-  const {isAdmin} = UserStore;
+  const {viewIncomplete, createLabslip} = rolesPermissions[UserStore.role];
   const {counters} = CountersStore;
 
   return <div className={`${styles.navigation} ${props.desktop ? '' : styles.mobileNavigation}`}>
@@ -35,7 +36,7 @@ const Navigation = observer((props: NavigationPropsTypes) => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {isAdmin && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
+      {viewIncomplete && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete
@@ -54,7 +55,7 @@ const Navigation = observer((props: NavigationPropsTypes) => {
         <span className={styles.navlinkNumber}>{counters.approvedResults ? `(${counters.approvedResults})` : ''}</span>
       </NavLink>
     </nav>
-    {isAdmin && <div className={styles.navButtonBlock}>
+    {createLabslip && <div className={styles.navButtonBlock}>
       <Link className={styles.navButton} to='/labslip'>Create lab slip</Link>
     </div>}
   </div>

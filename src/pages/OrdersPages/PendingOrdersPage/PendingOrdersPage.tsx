@@ -19,6 +19,8 @@ import CountersStore from "../../../stores/CountersStore";
 import {observer} from "mobx-react";
 import UserStore from "../../../stores/UserStore";
 import OrdersStore from "../../../stores/OrdersStore";
+import rolesPermissions from "../../../constants/roles";
+import {Role} from "../../../interfaces/User";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
@@ -103,9 +105,9 @@ export const tableBaseOptions = {
   customFooter: () => <></>
 };
 
-const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
+const options = (onSelect: any, onSaved: any, approveAvailable: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
   ...tableBaseOptions,
-  selectableRows: isAdmin ? 'none' : 'multiple',
+  selectableRows: approveAvailable ? 'multiple' : 'none',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const items = onSelect(selected.data);
     try {
@@ -132,12 +134,13 @@ export const NoMatches = () => (
 );
 
 const PendingOrdersPage = observer(() => {
-  const admin = UserStore.isAdmin;
+  const role = UserStore.role;
   const width = useResizeListener();
   const {pending} = OrdersStore;
   const [orders, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('order', 'PENDING', pending as OrdersResponse);
   const count = CountersStore.counters.pendingOrders;
   const ordersToView = orders.content || [];
+  const canApprove: boolean = rolesPermissions[role].approvePending;
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => orders.content[row.index]);
 
@@ -152,7 +155,7 @@ const PendingOrdersPage = observer(() => {
           title={''}
           data={ordersToView}
           columns={columns(sort.param, onSort)}
-          options={options(onSelect, onSaved, admin, searchText, setSearchText)}
+          options={options(onSelect, onSaved, canApprove, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
@@ -164,7 +167,7 @@ const PendingOrdersPage = observer(() => {
       :
       <div className={styles.mobileOrders}>
         <p className={styles.ordersResultsInfo}>({count || 0} results)</p>
-        {!admin &&
+        {canApprove &&
         <ApproveButton mode="order" onSaved={onSaved} selected={orders.content} text={"Approve all orders"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {ordersToView
@@ -178,7 +181,7 @@ const PendingOrdersPage = observer(() => {
                 ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
               <p className={styles.mobileOrdersTitle}>Criteria
                 met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>
-              {!admin && <ApproveButton className={styles.btnApproveMobile}
+              {canApprove && <ApproveButton className={styles.btnApproveMobile}
                 mode="order"
                 onSaved={onSaved}
                 selected={[item]}

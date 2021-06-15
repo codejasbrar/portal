@@ -6,9 +6,10 @@ import {NavLink} from "react-router-dom";
 import {observer} from "mobx-react";
 import CountersStore from "../../stores/CountersStore";
 import UserStore from "../../stores/UserStore";
+import rolesPermissions from "../../constants/roles";
 
 const MobileNavigation = observer(() => {
-  const {physician} = UserStore;
+  const {viewIncomplete} = rolesPermissions[UserStore.role];
   const {counters, getCounters, loaded} = CountersStore;
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const MobileNavigation = observer(() => {
     </nav>
     <h2 className={`${styles.heading20} ${styles.navigationTitle}`}>Test results</h2>
     <nav className={styles.navList}>
-      {!physician && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
+      {viewIncomplete && <NavLink to={'/orders/tests-incomplete'} className={styles.navlink}
         exact={true}
         activeClassName={styles.active}>
         Incomplete
