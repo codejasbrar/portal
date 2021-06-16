@@ -47,10 +47,8 @@ const columns = [
       filter: true,
       sort: false,
       customBodyRender: (value: any, tableMeta: any) => {
-        //const markersRange = tableMeta.rowData[2] === "N/A" ? null : tableMeta.rowData[2].split(' - ');
         const panic = Boolean(tableMeta.rowData[2]);
-        // markersRange ? value <= parseFloat(markersRange[0]) || value >= parseFloat(markersRange[1]) : false;
-        return <span className={styles.dotWrapper}>{Number(value)}{panic && value ?
+        return <span className={styles.dotWrapper}>{value}{panic && value ?
           <DangerIcon className={styles.dangerIcon} /> : <></>}</span>;
       },
     }
