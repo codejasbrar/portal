@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import styles from "../OrdersPages.module.scss";
 
@@ -20,11 +20,18 @@ import {observer} from "mobx-react";
 import UserStore from "../../../stores/UserStore";
 import OrdersStore from "../../../stores/OrdersStore";
 import rolesPermissions from "../../../constants/roles";
-import {Role} from "../../../interfaces/User";
 
 export const customDateColumnRender = (value: string) => {
   const date = value.slice(0, value.indexOf('T'));
-  const time = value.slice(value.indexOf('T') + 1, value.lastIndexOf('.') || value.length);
+  let time = value.slice(value.indexOf('T') + 1,  value.length + 1);
+  if(time.includes('M')) {
+    const secondsStart = time.lastIndexOf(':');
+    time = `${time.slice(0, secondsStart)} ${time.slice(secondsStart + 3, time.length + 1)}`
+  }
+  if(time.includes('.')) {
+    time = time.slice(0, time.lastIndexOf('.'));
+  }
+
   return <>
     <p style={{whiteSpace: 'nowrap'}}>{date}</p>
     <p style={{whiteSpace: 'nowrap'}}>{time}</p>
