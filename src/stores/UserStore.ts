@@ -1,5 +1,5 @@
 import {observable, action, computed} from "mobx";
-import {Physician, User} from "../interfaces/User";
+import {Physician, Role, User} from "../interfaces/User";
 import ProfileService from "../services/ProfileService";
 import LoadingStore from "./LoadingStore";
 
@@ -36,6 +36,11 @@ class UserStore {
   @computed
   get physician(): Physician {
     return this.user.physician;
+  }
+
+  @computed
+  get role(): Role {
+    return this.user.roles && !!this.user.roles.length ? this.user.roles[0] : 'USER';
   }
 
   @computed

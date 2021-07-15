@@ -22,7 +22,7 @@ import LoadingStore from "./stores/LoadingStore";
 
 const App = observer(() => {
   const {loggedIn, refreshToken, setLoggedIn, tokenRefreshTried, setRefreshTried} = AuthStore;
-  const {loadUserByToken} = UserStore;
+  const {loadUserByToken, isLoading} = UserStore;
   const {loading, entrypoint} = LoadingStore;
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const App = observer(() => {
     }
   }, [loggedIn]);
 
-  if (!tokenRefreshTried) return <Spinner />
+  if (!tokenRefreshTried || isLoading) return <Spinner />
 
   return <Router>
     <Header />
@@ -52,7 +52,7 @@ const App = observer(() => {
       <Route path="/authentication"
         render={() => (loggedIn ? <Redirect to={entrypoint ?? "/"} /> : <Authentication />)} />
       <PrivateRoute path='/orders' component={OrdersPage} />
-      <PrivateRoute path='/labslip' component={LabSlipPage} adminOnly />
+      <PrivateRoute path='/labslip' component={LabSlipPage} availableFor={['CUSTOMER_SUCCESS', 'ADMIN']} />
     </Switch>
     <Footer />
   </Router>
