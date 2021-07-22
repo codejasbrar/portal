@@ -40,7 +40,9 @@ class UserStore {
 
   @computed
   get role(): Role {
-    return this.user.roles && !!this.user.roles.length ? this.user.roles[0] : 'USER';
+    let role: Role | string = this.user.roles && !!this.user.roles.length ? this.user.roles[0] : 'USER';
+    if (role === 'SERVICE') role = 'USER';
+    return role as Role;
   }
 
   @computed
