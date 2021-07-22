@@ -42,15 +42,10 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
 
 const TestIncompletePage = observer(() => {
   const width = useResizeListener();
-
   const {incomplete} = TestsStore;
-
   const [tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'INCOMPLETE', incomplete as OrdersResponse);
-
   const testsToView = tests.content || [];
-
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
-
   const count = CountersStore.counters.incompleteResults;
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];

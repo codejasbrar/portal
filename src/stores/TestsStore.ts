@@ -46,9 +46,7 @@ class TestsStore {
     this.isLoading = true;
     try {
       const response = await LabSlipApiService.getResult(hash);
-      console.log(response.data);
       this.details = response.data;
-      console.log(this.details?.status)
       this.isLoading = false;
     } catch (e) {
       await AuthStore.catchBlock(e);

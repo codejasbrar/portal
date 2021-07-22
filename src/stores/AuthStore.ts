@@ -95,11 +95,16 @@ class AuthStore {
 
   @action catchBlock = async (error: any) => {
     const errorData = error.response;
-    if (errorData && (errorData.status === 403 || errorData.message === "Unauthorized" || errorData.status === 401)) {
-      try {
-        this.refreshToken(Token.get().refreshToken as string);
-      } catch (e) {
-        this.logout();
+    if (errorData) {
+      if (errorData.status === 403) {
+        window.alert('Forbidden');
+      }
+      if (errorData.message === "Unauthorized" || errorData.status === 401) {
+        try {
+          this.refreshToken(Token.get().refreshToken as string);
+        } catch (e) {
+          this.logout();
+        }
       }
     }
   };

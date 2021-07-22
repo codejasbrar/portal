@@ -19,6 +19,7 @@ import reformatItem from "../../../helpers/reformatItem";
 import UserStore from "../../../stores/UserStore";
 import {observer} from "mobx-react";
 import TestsStore from "../../../stores/TestsStore";
+import rolesPermissions from "../../../constants/roles";
 
 interface BiomarkerDetails extends Biomarker {
   normalRange: string,
@@ -131,7 +132,7 @@ const sortCommentsByDate = (a: TestComment, b: TestComment) => new Date(a.sent) 
 
 const TestDetailsPage = observer(() => {
   const width = useResizeListener();
-  const {isAdmin} = UserStore;
+  const hasAccess = rolesPermissions[UserStore.role].viewIncomplete;
   const {hash} = useParams();
   const {getResult, details} = TestsStore;
   const [test, setTest] = useState({} as TestDetails);
@@ -140,7 +141,7 @@ const TestDetailsPage = observer(() => {
 
   useEffect(() => {
     if (details) {
-      !isAdmin && details.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(details) as TestDetails);
+      !hasAccess && details.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(details) as TestDetails);
     }
   }, [details]);
 
@@ -177,7 +178,7 @@ const TestDetailsPage = observer(() => {
   const panicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => marker.panic).sort(sortByName);
   const notPanicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => !marker.panic).sort(sortByName);
 
-  const enableApprove = (isAdmin && test.status === 'INCOMPLETE') || (!isAdmin && !test.approved && test.status !== 'INCOMPLETE');
+  const enableApprove = (hasAccess && test.status === 'INCOMPLETE') || (!hasAccess && !test.approved && test.status !== 'INCOMPLETE');
 
   const backLink = useMemo(() => {
       switch (test.status) {
