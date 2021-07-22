@@ -22,6 +22,7 @@ import CountersStore from "../../../stores/CountersStore";
 import {observer} from "mobx-react";
 import UserStore from "../../../stores/UserStore";
 import TestsStore from "../../../stores/TestsStore";
+import rolesPermissions from "../../../constants/roles";
 
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
@@ -103,9 +104,9 @@ export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortP
   }
 ];
 
-const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
+const options = (onSelect: any, onSaved: any, approveAvailable: boolean, searchText: string, setSearchText: (searchText: string) => void) => ({
   ...tableBaseOptions,
-  selectableRows: isAdmin ? 'none' : 'multiple',
+  selectableRows: approveAvailable ? 'multiple' : 'none',
   customToolbarSelect: (selected, data, setSelectedRows) => {
     const selectedItems = onSelect(selected.data);
     try {
@@ -124,7 +125,7 @@ const options = (onSelect: any, onSaved: any, isAdmin: boolean, searchText: stri
 } as MUIDataTableOptions);
 
 const TestsPage = observer(() => {
-  const {isAdmin} = UserStore;
+  const {approvePending} = rolesPermissions[UserStore.role];
   const width = useResizeListener();
   const {pending} = TestsStore;
   const [tests, page, sort, onSort, setPage, searchText, setSearchText, onSaved] = usePageState('test', 'PENDING', pending as OrdersResponse);
@@ -148,7 +149,7 @@ const TestsPage = observer(() => {
           title={''}
           data={testsToView}
           columns={testsNotApprovedColumns(onClickLink, sort.param, onSort)}
-          options={options(onSelect, onSaved, isAdmin, searchText, setSearchText)}
+          options={options(onSelect, onSaved, approvePending, searchText, setSearchText)}
         />
         <Pagination page={page}
           setPage={setPage}
@@ -162,7 +163,7 @@ const TestsPage = observer(() => {
       :
       <div className={styles.mobileTests}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
-        {!isAdmin &&
+        {approvePending &&
         <ApproveButton mode="result" onSaved={onSaved} selected={tests.content} text={"Approve all results"} mobile />}
         <SearchBarMobile value={searchText} onChange={setSearchText} />
         {havePanic && <div className={styles.legend}>
@@ -192,7 +193,7 @@ const TestsPage = observer(() => {
                     : "None"}
               </span>
               </p>
-              {!isAdmin && <ApproveButton className={styles.btnApproveMobile}
+              {approvePending && <ApproveButton className={styles.btnApproveMobile}
                 mode="result"
                 onSaved={onSaved}
                 selected={[item]}
