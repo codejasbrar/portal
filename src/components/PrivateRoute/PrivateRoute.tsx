@@ -20,7 +20,7 @@ const PrivateRoute: React.FC<PrivateRoutePropsTypes> = (props) => {
   const condition = availableFor ? loggedIn && isAvailable : loggedIn;
 
   useEffect(() => {
-    saveEntrypoint(window.location.pathname);
+    saveEntrypoint(window.location.pathname === '/authentication' ? '/' : window.location.pathname);
   }, []);
 
   return loggedIn ? condition ? (<Route path={path} exact={exact || false} component={component} />) : (
