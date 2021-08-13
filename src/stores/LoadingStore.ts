@@ -9,7 +9,7 @@ class LoadingStore {
   @observable entrypoint: string = '';
 
   @action saveEntrypoint = (path: string) => {
-    if (!this.entrypoint.length) this.entrypoint = path;
+    if (!this.entrypoint.length && !path.includes('authentication')) this.entrypoint = path;
   };
 
   @action clearEntrypoint = () => {

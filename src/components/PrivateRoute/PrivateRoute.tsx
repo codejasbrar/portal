@@ -1,8 +1,7 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Route, Redirect} from "react-router-dom";
 import UserStore from "../../stores/UserStore";
 import AuthStore from "../../stores/AuthStore";
-import LoadingStore from "../../stores/LoadingStore";
 import {Role} from "../../interfaces/User";
 
 type PrivateRoutePropsTypes = {
@@ -14,18 +13,13 @@ type PrivateRoutePropsTypes = {
 
 const PrivateRoute: React.FC<PrivateRoutePropsTypes> = (props) => {
   const {loggedIn} = AuthStore;
-  const {saveEntrypoint} = LoadingStore;
   const {availableFor, path, exact, component} = props;
   const isAvailable = availableFor?.includes(UserStore.role);
   const condition = availableFor ? loggedIn && isAvailable : loggedIn;
 
-  useEffect(() => {
-    saveEntrypoint(window.location.pathname);
-  }, []);
-
   return loggedIn ? condition ? (<Route path={path} exact={exact || false} component={component} />) : (
       <Redirect to={"/"} />) :
-    (<Redirect to="/authentication" />);
+    (<Redirect to="/authentication/login" />);
 };
 
 export default PrivateRoute;

@@ -50,6 +50,12 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
     props.onChange(text);
   };
 
+  const clearValue = () => {
+    setSelected({} as Option);
+    if(props.onClear) props.onClear();
+    setValue('');
+  };
+
   useEffect(() => {
     if(props.value) {
       selectOption({
@@ -59,13 +65,7 @@ const Autocomplete = (props: AutocompletePropsTypes) => {
     } else {
       clearValue();
     }
-  }, [props.value])
-
-  const clearValue = () => {
-    setSelected({} as Option);
-    if(props.onClear) props.onClear();
-    setValue('');
-  };
+  }, [props.value]);
 
   return <div className={`${styles.Autocomplete} ${props.classes ? props.classes.wrapper : ''}`}>
     <ClickOutside onClickOutside={() => setOpened(false)}>

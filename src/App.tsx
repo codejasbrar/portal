@@ -23,9 +23,10 @@ import LoadingStore from "./stores/LoadingStore";
 const App = observer(() => {
   const {loggedIn, refreshToken, setLoggedIn, tokenRefreshTried, setRefreshTried} = AuthStore;
   const {loadUserByToken, isLoading} = UserStore;
-  const {loading, entrypoint} = LoadingStore;
+  const {loading, entrypoint, saveEntrypoint} = LoadingStore;
 
   useEffect(() => {
+    saveEntrypoint(window.location.pathname);
     const tokenData = Token.get();
     if (tokenData.token) {
       if (Token.isTokenExpired()) {
@@ -38,7 +39,7 @@ const App = observer(() => {
     } else {
       setRefreshTried();
     }
-  }, [loggedIn]);
+  }, [loggedIn, loadUserByToken, refreshToken, saveEntrypoint, setLoggedIn, setRefreshTried]);
 
   if (!tokenRefreshTried || isLoading) return <Spinner />
 

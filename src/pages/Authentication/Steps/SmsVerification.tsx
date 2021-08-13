@@ -45,7 +45,7 @@ const SmsVerification = () => {
     return () => {
       clearError();
     };
-  }, []);
+  }, [clearError]);
 
   return <div className={`${styles.FormWrapper} ${styles.Verification}`}>
     <p className={styles.FormTitle}>SMS Verification</p>

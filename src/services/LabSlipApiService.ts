@@ -1,5 +1,4 @@
 import client from "./client";
-import Token from "../helpers/localToken";
 
 export type OrderStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED";
 
