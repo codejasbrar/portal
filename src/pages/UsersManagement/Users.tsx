@@ -110,7 +110,7 @@ const Users = () => {
   return <section className={styles.wrapper}>
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={`${styles.heading30} ${styles.hideTabletHorizontal}`}>User management</h1>
+        <h1 className={`${styles.heading30}`}>User management</h1>
         <div>
           <Button onClick={() => {
             setShowPopup(true);

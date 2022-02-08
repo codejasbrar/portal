@@ -27,6 +27,7 @@
     border-radius:    3px;
     background-color: $primary;
     color:            #fff;
+    white-space:      nowrap;
 
     &:hover {
         background-color: lighten($primary, 8);
