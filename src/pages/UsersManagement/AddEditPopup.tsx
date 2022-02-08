@@ -15,11 +15,11 @@ import {
 import State from "../../interfaces/State";
 import {mergeState} from "../../helpers/setState";
 import styles from './Users.module.scss';
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import {FormControlLabel, Switch, TextField} from "@material-ui/core";
 import {roles} from "../../constants/roles";
 import Button from "../../components/Button/Button";
 import Spinner from "../../components/Spinner/Spinner";
+import MaterialAutocomplete from "../../components/MaterialAutocomplete/MaterialAutocomplete";
 
 interface Props {
   show: boolean;
@@ -30,12 +30,12 @@ interface Props {
 }
 
 const AddEditPopup = ({
-                        show,
-                        onClose,
-                        userId,
-                        statesList,
-                        onSave
-                      }: Props) => {
+  show,
+  onClose,
+  userId,
+  statesList,
+  onSave
+}: Props) => {
   const [userForm, setUserForm] = useState(getInitialUserForm);
   const [errors, setErrors] = useState(getInitialErrors);
   const [physicianForm, setPhysicianForm] = useState(getInitialPhysicianForm);
@@ -163,27 +163,24 @@ const AddEditPopup = ({
           name="confirmPassword"
           errorMessage={passwordError}
         />
-        <div>
-          <Autocomplete
-            value={userForm.roles}
-            onChange={(e, val) => mergeUserInput('roles')(val)}
-            filterSelectedOptions
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label="Roles"
-              />
-            )}
-            multiple
-            id="roles"
-            options={roles}
-            getOptionLabel={(option) => option}
-          />
-          <span className={styles.error}>
-            {errors.roles}
-          </span>
-        </div>
+        <MaterialAutocomplete
+          value={userForm.roles}
+          onChange={(e, val) => mergeUserInput('roles')(val)}
+          filterSelectedOptions
+          name="user-roles-arr"
+          label="Roles"
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              size="small"
+            />
+          )}
+          multiple
+          id="user-roles-arr"
+          options={roles}
+          getOptionLabel={(option) => option}
+        />
         <div>
           <FormControlLabel
             control={<Switch
@@ -216,31 +213,27 @@ const AddEditPopup = ({
             //@ts-ignore
             errorMessage={errors[`physician.${field}`]}
           />)}
-          <div>
-            <Autocomplete
-              value={physicianStates}
-              onChange={(e, val) => {
-                setPhysicianStates(val);
-                mergeState(setErrors, {"physician.states": ''})
-              }}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="States"
-                  size="small"
-                />
-              )}
-              multiple
-              id="states"
-              options={statesList}
-              getOptionLabel={(option) => option.name}
-            />
-            <span className={styles.error}>
-              {errors["physician.states"]}
-            </span>
-          </div>
+          <MaterialAutocomplete
+            label="States"
+            value={physicianStates}
+            onChange={(e, val) => {
+              setPhysicianStates(val);
+              mergeState(setErrors, {"physician.states": ''})
+            }}
+            filterSelectedOptions
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                size="small"
+              />
+            )}
+            multiple
+            id="states"
+            options={statesList}
+            getOptionLabel={(option) => option.name}
+            error={errors["physician.states"]}
+          />
         </>}
       </div>
 

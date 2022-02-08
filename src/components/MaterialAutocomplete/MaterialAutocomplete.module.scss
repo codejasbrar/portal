@@ -1,0 +1,77 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.Field {
+    height: 36px;
+}
+
+.inputRoot {
+    border-radius: 0 !important;
+    height:        36px !important;
+}
+
+.Autocomplete {
+    &Wrapper {
+        margin-bottom: 12px;
+        position:      relative;
+
+        @include breakpoint($tablet) {
+            margin-bottom: 20px;
+        }
+    }
+
+    &Label {
+        display:        block;
+        margin:         0 0 3px 0;
+        color:          $text;
+        letter-spacing: 0.2px;
+        line-height:    1.7;
+        font-weight:    600;
+        text-align:     left;
+    }
+
+    &Disabled {
+        pointer-events:   none;
+        background-color: #fff;
+        opacity:          0.5;
+    }
+
+    &IconRight {
+        position: absolute;
+        right:    8px;
+        top:      33px;
+    }
+
+    &Iconed {
+        padding-left: 32px;
+
+        &Icon {
+            position: absolute;
+            top:      9px;
+            left:     8px;
+        }
+    }
+
+    &Clear {
+        padding-right: 32px;
+
+        &Btn {
+            position: absolute;
+            right:    8px;
+            top:      9px;
+        }
+    }
+
+    &Error {
+        border: 1px solid $error;
+
+        &Message {
+            position:  absolute;
+            bottom:    -19px;
+            left:      4px;
+            font-size: 12px;
+            color:     $error;
+        }
+    }
+}
+
