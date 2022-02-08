@@ -23,5 +23,15 @@
             justify-content: center;
         }
     }
-}
 
+    &Link {
+        color: #fff !important;
+        margin: 0 16px;
+
+        &Last {
+            margin-right: auto;
+        }
+    }
+
+
+}

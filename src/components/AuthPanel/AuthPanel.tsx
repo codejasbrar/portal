@@ -60,7 +60,9 @@ const AuthPanel = observer(() => {
     closeAside();
   };
 
-  const physicainFullName = () => `${physician.prefix ? physician.prefix + ' ' : ''}${physician.firstName} ${physician.secondName}${physician.postfix ? ' ' + physician.postfix : ''}`;
+  const physicainFullName = () => physician ?
+    `${physician.prefix ? physician.prefix + ' ' : ''}${physician.firstName} ${physician.secondName}${physician.postfix ? ' ' + physician.postfix : ''}`
+    : '';
 
   const UserLogo = () => <div className={styles.UserLogo}>
     <span className={styles.UserLogoChar}>{physician ? physician.firstName.slice(0, 1) : user.email.slice(0, 1)}</span>

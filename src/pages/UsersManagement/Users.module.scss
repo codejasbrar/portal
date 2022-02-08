@@ -1,0 +1,40 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+@import "../../styles/common";
+
+.container {
+    padding-top: 68px;
+}
+
+.grid {
+    display:     flex;
+    flex-wrap:   wrap;
+    align-items: end;
+    margin:      -12px;
+    max-width:   700px;
+
+    > * {
+        margin: 12px;
+        width:  45%;
+    }
+}
+
+.buttonRow {
+    display:         flex;
+    margin-top:      24px;
+    justify-content: flex-end;
+
+    > * {
+        margin-left: 12px;
+    }
+}
+
+.error {
+    font-size: 12px;
+    color:     $error;
+}
+
+.header {
+    display:         flex;
+    justify-content: space-between;
+}
