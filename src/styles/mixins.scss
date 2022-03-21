@@ -19,7 +19,7 @@
 }
 
 @mixin buttonBaseStyles {
-    width:            100%;
+    padding:          0 16px;
     height:           36px;
     font-family:      "Open Sans", sans-serif;
     font-weight:      600;
@@ -27,6 +27,7 @@
     border-radius:    3px;
     background-color: $primary;
     color:            #fff;
+    white-space:      nowrap;
 
     &:hover {
         background-color: lighten($primary, 8);

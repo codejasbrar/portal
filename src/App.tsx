@@ -18,6 +18,7 @@ import {observer} from "mobx-react";
 import UserStore from "./stores/UserStore";
 import AuthStore from "./stores/AuthStore";
 import LoadingStore from "./stores/LoadingStore";
+import Users from "./pages/UsersManagement/Users";
 
 
 const App = observer(() => {
@@ -54,6 +55,7 @@ const App = observer(() => {
         render={() => (loggedIn ? <Redirect to={entrypoint ?? "/"} /> : <Authentication />)} />
       <PrivateRoute path='/orders' component={OrdersPage} />
       <PrivateRoute path='/labslip' component={LabSlipPage} availableFor={['CUSTOMER_SUCCESS', 'ADMIN']} />
+      <PrivateRoute component={Users} path="/users" availableFor={['SERVICE']}/>
     </Switch>
     <Footer />
   </Router>

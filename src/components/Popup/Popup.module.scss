@@ -3,7 +3,8 @@
 
 
 .modal {
-
+    max-height:       calc(100vh - 100px);
+    overflow:         auto;
     min-width:        400px;
     padding:          32px 40px;
     background-color: #fff;
