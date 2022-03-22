@@ -9,6 +9,27 @@ class UserStore {
   @observable error: Error | null = null;
   @observable isLoading = false;
 
+  @computed
+  get isUserLoaded() {
+    return !!Object.keys(this.user).length;
+  }
+
+  @computed
+  get physician(): Physician | null {
+    return this.user.physician;
+  }
+
+  @computed
+  get role(): Role {
+    let role: Role | string = this.user.roles && !!this.user.roles.length ? this.user.roles[0] : 'USER';
+    return role as Role;
+  }
+
+  @computed
+  get isAdmin(): boolean {
+    return Boolean(this.user.id) && !this.user.physician;
+  }
+
   @action loadUserByToken = () => {
     (async () => {
       this.isLoading = true;
@@ -26,26 +47,6 @@ class UserStore {
   @action logout = () => {
     this.user = {} as User;
     LoadingStore.clearEntrypoint();
-  }
-
-  @computed
-  get isUserLoaded() {
-    return !!Object.keys(this.user).length;
-  }
-
-  @computed
-  get physician(): Physician {
-    return this.user.physician;
-  }
-
-  @computed
-  get role(): Role {
-    return this.user.roles && !!this.user.roles.length ? this.user.roles[0] : 'USER';
-  }
-
-  @computed
-  get isAdmin(): boolean {
-    return Boolean(this.user.id) && !this.user.physician;
   }
 }
 

@@ -1,4 +1,6 @@
-import {RolesPermissions} from "../interfaces/User";
+import {Role, RolesPermissions} from "../interfaces/User";
+
+export const roles: Role[] = ['USER', 'ADMIN', 'PHYSICIAN', 'CUSTOMER_SUCCESS', 'SERVICE'];
 
 const rolesPermissions: RolesPermissions = {
   'ADMIN': {
@@ -24,6 +26,12 @@ const rolesPermissions: RolesPermissions = {
     approveIncomplete: false,
     viewIncomplete: false,
     createLabslip: false,
+  },
+  'SERVICE': {
+    approvePending: false,
+    approveIncomplete: false,
+    viewIncomplete: true,
+    createLabslip: true,
   }
 };
 

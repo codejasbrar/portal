@@ -48,7 +48,7 @@ const Datepicker = (props: DatepickerPropsTypes) => {
       calendarIcon={<CalendarIcon />}
       dayPlaceholder={'DD'}
       monthPlaceholder={'MM'}
-      yearPlaceholder={'YY'}
+      yearPlaceholder={'YYYY'}
       maxDate={maxDate}
       format={dateFormat}
       value={date}

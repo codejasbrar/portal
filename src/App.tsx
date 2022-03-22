@@ -18,14 +18,16 @@ import {observer} from "mobx-react";
 import UserStore from "./stores/UserStore";
 import AuthStore from "./stores/AuthStore";
 import LoadingStore from "./stores/LoadingStore";
+import Users from "./pages/UsersManagement/Users";
 
 
 const App = observer(() => {
   const {loggedIn, refreshToken, setLoggedIn, tokenRefreshTried, setRefreshTried} = AuthStore;
   const {loadUserByToken, isLoading} = UserStore;
-  const {loading, entrypoint} = LoadingStore;
+  const {loading, entrypoint, saveEntrypoint} = LoadingStore;
 
   useEffect(() => {
+    saveEntrypoint(window.location.pathname);
     const tokenData = Token.get();
     if (tokenData.token) {
       if (Token.isTokenExpired()) {
@@ -38,7 +40,7 @@ const App = observer(() => {
     } else {
       setRefreshTried();
     }
-  }, [loggedIn]);
+  }, [loggedIn, loadUserByToken, refreshToken, saveEntrypoint, setLoggedIn, setRefreshTried]);
 
   if (!tokenRefreshTried || isLoading) return <Spinner />
 
@@ -53,6 +55,7 @@ const App = observer(() => {
         render={() => (loggedIn ? <Redirect to={entrypoint ?? "/"} /> : <Authentication />)} />
       <PrivateRoute path='/orders' component={OrdersPage} />
       <PrivateRoute path='/labslip' component={LabSlipPage} availableFor={['CUSTOMER_SUCCESS', 'ADMIN']} />
+      <PrivateRoute component={Users} path="/users" availableFor={['SERVICE']}/>
     </Switch>
     <Footer />
   </Router>

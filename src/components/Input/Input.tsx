@@ -64,7 +64,10 @@ const Input = (props: InputPropsTypes) => {
     {props.icon && renderIcon(props.icon)}
     {props.clear && !!props.value &&
     <button type='button' onClick={() => clearValue()} className={styles.InputClearBtn}><CloseIcon /></button>}
-    {props.error && !props.error.valid && <span className={styles.InputErrorMessage}>{props.error?.message}</span>}
+    {props.errorMessage ?
+      <span className={styles.InputErrorMessage}>{props.errorMessage}</span> :
+      (props.error && !props.error.valid && <span className={styles.InputErrorMessage}>{props.error?.message}</span>)
+    }
   </div>
 }
 

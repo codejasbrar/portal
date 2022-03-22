@@ -143,7 +143,7 @@ const TestDetailsPage = observer(() => {
     if (details) {
       !hasAccess && details.status === 'INCOMPLETE' ? history.push('/') : setTest(reformatItem(details) as TestDetails);
     }
-  }, [details]);
+  }, [details, hasAccess, history]);
 
   const addComment = async () => {
     if (comment.length && comment.trim().length > 0) {
@@ -160,11 +160,11 @@ const TestDetailsPage = observer(() => {
 
   const loadTest = useCallback(async () => {
     await getResult(hash);
-  }, []);
+  }, [getResult, hash]);
 
   useEffect(() => {
     loadTest();
-  }, []);
+  }, [loadTest]);
 
   const customerAge = (dateOfBirth: string) => new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
 

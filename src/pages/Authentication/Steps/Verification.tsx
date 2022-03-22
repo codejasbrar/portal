@@ -36,7 +36,7 @@ const Verification = observer(() => {
 
   useEffect(() => {
     clearError();
-  }, []);
+  }, [clearError]);
 
   const submitCode = (): void => {
     const validation = ValidateFields([{name: 'Security code', type: "code", value: code}]);

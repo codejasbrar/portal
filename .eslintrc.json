@@ -1,7 +1,0 @@
-{
-  "extends": "eslint:recommended",
-  "rules": {
-    "no-control-regex": "off",
-    "no-restricted-globals": "warn"
-  }
-}
