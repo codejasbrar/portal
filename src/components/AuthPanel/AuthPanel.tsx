@@ -17,6 +17,7 @@ import BodyScroll from "../../helpers/bodyScrollLock";
 import UserStore from "../../stores/UserStore";
 import AuthStore from "../../stores/AuthStore";
 import {observer} from "mobx-react";
+import {Menu} from "../Header/Header";
 
 
 const AuthPanel = observer(() => {
@@ -60,7 +61,9 @@ const AuthPanel = observer(() => {
     closeAside();
   };
 
-  const physicainFullName = () => `${physician.prefix ? physician.prefix + ' ' : ''}${physician.firstName} ${physician.secondName}${physician.postfix ? ' ' + physician.postfix : ''}`;
+  const physicainFullName = () => physician ?
+    `${physician.prefix ? physician.prefix + ' ' : ''}${physician.firstName} ${physician.secondName}${physician.postfix ? ' ' + physician.postfix : ''}`
+    : '';
 
   const UserLogo = () => <div className={styles.UserLogo}>
     <span className={styles.UserLogoChar}>{physician ? physician.firstName.slice(0, 1) : user.email.slice(0, 1)}</span>
@@ -93,6 +96,9 @@ const AuthPanel = observer(() => {
               {authed && <UserLogo />}
               {authed &&
               <p className={styles.UserName}>{physician ? physicainFullName() : user.email}</p>}
+            </div>
+            <div onClick={closeAside}>
+              <Menu />
             </div>
             <div className={styles.AsideBtnBlock}>
               {authed ? <Button onClick={handleLogOut} secondary>Log out</Button> :

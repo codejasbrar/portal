@@ -20,7 +20,7 @@ const OrdersPage = observer(() => {
 
   useEffect(() => {
     getCounters();
-  }, []);
+  }, [getCounters]);
 
   return <>
     <Route exact path={[

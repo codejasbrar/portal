@@ -31,7 +31,6 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
   const [opened, setOpened] = useState(false);
   const [option, setOption] = useState({} as SelectOption);
 
-
   const closeList = () => {
     setOpened(false);
   };
@@ -52,7 +51,7 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
     } else {
       setOption({} as SelectOption);
     }
-  }, [props.value])
+  }, [props.value]);
 
   return <div className={`${styles.SelectWrapper} ${props.className ? props.className : ''}`}>
     <p className={styles.SelectLabel}>{props.label}</p>
