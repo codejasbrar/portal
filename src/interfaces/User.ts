@@ -1,4 +1,4 @@
-export type Role = 'USER' | 'ADMIN' | 'PHYSICIAN' | 'CUSTOMER_SUCCESS' | 'SERVICE';
+export type Role = 'USER' | 'ADMIN' | 'PHYSICIAN' | 'CUSTOMER_SUCCESS' | 'SERVICE' | 'SCARLET_PARTNER';
 
 export type RolesPermissions = {
   [key in Role]: {
