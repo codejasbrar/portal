@@ -6,7 +6,8 @@ import CommonTableTheme from "../../../themes/CommonTableTheme";
 import MUIDataTable, {
   MUIDataTableCustomHeadRenderer,
   MUIDataTableMeta,
-  MUIDataTableOptions
+  MUIDataTableOptions,
+  Display
 } from "mui-datatables";
 import SearchBar from "../../../components/Table/Search/SearchBar";
 import SearchBarMobile from "../../../components/Table/SearchMobile/SearchBarMobile";
@@ -72,10 +73,25 @@ const columns = (sortParam: string, onSort: (sortParam: string) => void) => [
       sort: false,
       customBodyRender: (value: string, tableMeta: MUIDataTableMeta) => {
         const fileName = `${tableMeta.rowData[2]}_${tableMeta.rowData[0]}_labslip.pdf`;
-        return <button type="button"
-          className={styles.downloadLink}
-          onClick={() => getLabSlip(value, fileName)}>Download</button>
+        return tableMeta.rowData[5] ? (
+          <button
+            type="button"
+            className={styles.downloadLink}
+            onClick={() => getLabSlip(value, fileName)}
+          >
+            Download
+          </button>
+        ) : null;
       }
+    }
+  },
+  {
+    name: "canCreateLabSlip",
+    label: "canCreateLabSlip",
+    options: {
+      filter: true,
+      sort: false,
+      display: 'false' as Display
     }
   }
 ];
