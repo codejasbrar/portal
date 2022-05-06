@@ -26,7 +26,7 @@ const Datepicker = (props: DatepickerPropsTypes) => {
 
   const onDateSelect = (date: Date | Date[]) => {
     if (date) {
-      setDate(date);
+      setDate(date as any);
       onSelect(formatDate(date as Date));
     }
   };
