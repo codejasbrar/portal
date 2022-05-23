@@ -58,7 +58,8 @@ export interface OrdersResponse {
   size: number,
   sort: Sort,
   totalElements: number,
-  totalPages: number
+  totalPages: number,
+  canCreateLabSlip: boolean
 }
 
 export interface OrdersQuantity {
