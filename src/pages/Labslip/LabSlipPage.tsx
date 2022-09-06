@@ -64,6 +64,7 @@ const LabSlipPage = () => {
         planVariantName: labSlipInfo.order.planVariantName ?? '',
         planVariantPrettyName: labSlipInfo.order.planVariantPrettyName ?? '',
         packageId: labSlipInfo.order.packageId ?? null,
+        laboratoryId: labSlipInfo.laboratory,
         markers: [],
         fasting: true,
         status: 'PENDING',
