@@ -2,19 +2,19 @@ import React, {useState} from "react";
 
 //Styles
 import styles from "./Biomarkers.module.scss";
-import {Panel} from "../../../interfaces/Test";
+import {LabPanel, PlanPanel} from "../../../interfaces/Test";
 import {ReactComponent as ArrowIcon} from "../../../icons/arrow_down.svg";
-import LabPanel from "./LabPanel";
+import LabPanelComponent from "./LabPanel";
 
 type PlanPanelPropsTypes = {
-  panel: Panel,
+  panel: PlanPanel,
   selectable?: boolean,
-  onSelect?: (panels: Panel[], flag: string) => void,
-  onSelectLabPanel?: (panel: Panel) => void,
-  selectedPanels?: number[]
+  onSelect?: (panels: PlanPanel[], flag: string) => void,
+  onSelectLabPanel?: (panel: PlanPanel) => void,
+  selectedPanels?: string[]
 };
 
-const PlanPanel = (props: PlanPanelPropsTypes) => {
+const PlanPanelComponent = (props: PlanPanelPropsTypes) => {
   const {id, code, name, labPanels, prettyName} = props.panel;
   const {onSelect, selectedPanels, onSelectLabPanel} = props;
   const [listOpened, setListOpened] = useState(false);
@@ -25,7 +25,7 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
     if (!listOpened && !selectedNow) setListOpened(true);
     if (listOpened && selectedNow) setListOpened(false);
     if (onSelect) {
-      onSelect([props.panel, ...props.panel.labPanels as Panel[]], selectedNow ? 'remove' : 'add');
+      onSelect([props.panel, ...props.panel.labPanels as PlanPanel[]], selectedNow ? 'remove' : 'add');
     }
   };
 
@@ -44,7 +44,7 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
     </div>
     {labPanels && listOpened && <ul className={styles.PlanPanelList}>
       <p className={styles.PlanPanelListTitle}>Lab panels:</p>
-      {labPanels.map(panel => <LabPanel key={`${code}-${id}-${panel.code}`} selectedPanels={selectedPanels}
+      {labPanels.map(panel => <LabPanelComponent key={`${code}-${id}-${panel.code}`} selectedPanels={selectedPanels}
         onSelect={onSelectLabPanel}
         selectable
         panel={panel} />)}
@@ -52,4 +52,4 @@ const PlanPanel = (props: PlanPanelPropsTypes) => {
   </li>
 };
 
-export default PlanPanel;
+export default PlanPanelComponent;

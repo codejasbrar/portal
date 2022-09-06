@@ -89,7 +89,9 @@ const formFields: FormField[] = [
     label: 'State',
     required: true,
     placeholder: 'Please select state',
-    options: STATES_ABBRS.map(state => {return {name: state.name, value: state.abbr}})
+    options: STATES_ABBRS.map(state => {
+      return {name: state.name, value: state.abbr}
+    })
   },
   {
     type: 'text',
@@ -105,13 +107,26 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const {onSetLabSlipInfo, labSlipInfo} = props;
   const {customer, laboratory} = labSlipInfo;
+  const [labs, setLabs] = useState<SelectOption<number>[]>([]);
+  const [isNewCustomer, setIsNewCustomer] = useState(false);
+
+  useEffect(() => {
+    LabSlipApiService.getLabs().then(res => setLabs(res.map(lab => ({
+      name: lab.name,
+      value: lab.id
+    }))));
+  }, [])
 
   const onSearchChanged = (text: string) => {
-    if (customer && customer.id) onSetLabSlipInfo({
-      ...labSlipInfo,
-      customer: {} as Customer,
-      order: {} as OrderDetails
-    });
+    setIsNewCustomer(false);
+    if (customer && customer.id) {
+      onSetLabSlipInfo({
+        ...labSlipInfo,
+        laboratory: undefined,
+        customer: {} as Customer,
+        order: {} as OrderDetails
+      });
+    }
     setSearchText(text);
   };
 
@@ -143,18 +158,19 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   });
 
   const removeCustomer = () => {
-    onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: {} as OrderDetails});
+    onSetLabSlipInfo({...labSlipInfo, customer: {} as Customer, order: {} as OrderDetails, laboratory: undefined});
     setResults([] as Customer[])
   };
 
   const onSelectCustomer = (option: Option) => {
-    if(option.value === 'NEW_CUSTOMER') {
+    if (option.value === 'NEW_CUSTOMER') {
       onSetLabSlipInfo({...labSlipInfo, customer})
     } else {
       onSetLabSlipInfo({
         ...labSlipInfo,
         customer: results.filter(customer => customer.id === parseInt(option.value))[0],
-        order: {} as OrderDetails
+        order: {} as OrderDetails,
+        laboratory: undefined
       });
     }
   };
@@ -164,13 +180,15 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   };
 
   const onOrderSelect = (option: SelectOption) => {
+    const order = customer.orders.filter((order: OrderDetails) => order.id.toString() === option.value)[0];
     onSetLabSlipInfo({
       ...labSlipInfo,
-      order: customer.orders.filter((order: OrderDetails) => order.id.toString() === option.value)[0]
+      order,
+      laboratory: order.laboratoryId
     });
   };
 
-  const onLabSelect = (option: SelectOption) => {
+  const onLabSelect = (option: SelectOption<number>) => {
     onSetLabSlipInfo({...labSlipInfo, laboratory: option.value});
   };
 
@@ -182,12 +200,6 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
       <div className={`${styles.container} ${styles.LabslipTopContainer}`}>
         <h1 className={styles.heading30}>Create lab slip</h1>
         <div className={styles.LabslipInfoWrapper}>
-          <SingleSelect className={styles.LabslipInfoItem}
-            label="Select a lab"
-            options={[{name: "Quest 97520229", value: "Quest"}]}
-            value={laboratory}
-            onSelect={onLabSelect}
-            placeholder="Select a lab" />
           <div className={styles.LabslipInfoItem}>
             <Autocomplete classes={{wrapper: styles.LabslipInfoCustomer}}
               name="customer"
@@ -217,12 +229,19 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
                 disabled: pendingOrdersIds.includes(order.id)
               }
             }) : []}
-            disabled={!customer.id || (customer.orders && !customer.orders[0].id)}
+            disabled={!customer.id || (customer.orders && !customer.orders[0].id) || isNewCustomer}
             error={{
               valid: !pendingOrdersIds.includes(labSlipInfo.order.id),
               message: 'Order needs to be approved by the physician first before a custom lab slip can be created'
             }}
           />
+          <SingleSelect className={styles.LabslipInfoItem}
+            label="Select a lab"
+            options={labs}
+            value={laboratory}
+            onSelect={onLabSelect}
+            disabled={!labSlipInfo?.order?.id && !isNewCustomer}
+            placeholder="Select a lab" />
         </div>
       </div>
     </div>
@@ -231,8 +250,9 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
         <button type="button" onClick={closePopup} className={styles.LabslipCustomerPopupClose}><CloseIcon /></button>
         <h3 className={styles.heading20}>Add customer details</h3>
         <AddCustomerForm onSetCustomer={(customer: Customer) => {
-          onSetLabSlipInfo({...labSlipInfo, customer: customer});
+          onSetLabSlipInfo({...labSlipInfo, customer: customer, laboratory: undefined});
           closePopup();
+          setIsNewCustomer(true);
         }} fields={formFields} />
       </div>
     </Popup>

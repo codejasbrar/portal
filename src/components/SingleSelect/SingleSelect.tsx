@@ -7,29 +7,29 @@ import styles from "./SingleSelect.module.scss";
 import ClickOutside from "../ClickOutside/ClickOutside";
 import {ReactComponent as ArrowIcon} from "../../icons/arrow_down.svg";
 
-export type SelectOption = {
+export type SelectOption<T = string> = {
   name: string,
-  value: string,
+  value: T,
   disabled?: boolean
 };
 
-type SingleSelectPropsTypes = {
+type SingleSelectPropsTypes<T = string> = {
   label: string,
-  options: SelectOption[],
+  options: SelectOption<T>[],
   placeholder?: string,
   disabled?: boolean,
   className?: string
-  onSelect?: (option: SelectOption) => void,
-  value?: string,
+  onSelect?: (option: SelectOption<T>) => void,
+  value?: T,
   error?: {
     valid: boolean,
     message: string
   }
 };
 
-const SingleSelect = (props: SingleSelectPropsTypes) => {
+const SingleSelect = <T extends unknown>(props: SingleSelectPropsTypes<T>) => {
   const [opened, setOpened] = useState(false);
-  const [option, setOption] = useState({} as SelectOption);
+  const [option, setOption] = useState({} as SelectOption<T>);
 
   const closeList = () => {
     setOpened(false);
@@ -39,17 +39,17 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
     setOpened(!opened);
   };
 
-  const selectOption = (option: SelectOption) => {
+  const selectOption = (option: SelectOption<T>) => {
     setOption(option);
     if (props.onSelect) props.onSelect(option);
     closeList();
   };
 
   useEffect(() => {
-    if(props.value && props.options) {
+    if (props.value && props.options) {
       setOption(props.options.filter(option => option.value === props.value)[0]);
     } else {
-      setOption({} as SelectOption);
+      setOption({} as SelectOption<T>);
     }
   }, [props.value]);
 
@@ -65,7 +65,7 @@ const SingleSelect = (props: SingleSelectPropsTypes) => {
       <div className={`${styles.SelectDropdownWrapper} ${opened ? styles.SelectDropdownOpened : ''}`}
         style={{height: opened ? `${((props.options.length * 36) + 2)}px` : 0}}>
         <ul className={styles.SelectDropdown} tabIndex={0}>
-          {props.options.map((option: SelectOption) => <li tabIndex={1}
+          {props.options.map((option: SelectOption<T>) => <li tabIndex={1}
             key={`${option.name}`}
             className={`${styles.SelectDropdownItem} ${option.disabled ? styles.SelectDropdownItemDisabled : ''}`}
             onClick={() => selectOption(option)}>{option.name}</li>)}
