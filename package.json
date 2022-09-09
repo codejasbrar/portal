@@ -83,6 +83,7 @@
     "build:production": "cp ./configs/.env.prod ./.env && npm run build",
     "build:test": "cp ./configs/.env.test ./.env && npm run build",
     "build:test2": "cp ./configs/.env.test2 ./.env && npm run build",
+    "build:test3": "cp ./configs/.env.test3 ./.env && npm run build",
     "test": "node scripts/test.js"
   },
   "eslintConfig": {
