@@ -43,11 +43,33 @@ export interface Biomarker {
   addOn: boolean
 }
 
-export type Panel = {
+export interface LabPanel {
   id: number,
-  code: number,
+  code: string,
+  name: string,
+  laboratoryId: number,
+  biomarkers: Biomarker[]
+}
+
+export type PlanPanel = {
+  id: number,
+  code: string,
   name: string,
   prettyName?: string,
-  labPanels?: Panel[]
-  biomarkers?: Biomarker[],
+  labPanels?: LabPanel[]
 };
+
+export interface Lab {
+  id: number,
+  name: string,
+  fastingTemplateName: string,
+  noFastingTemplateName: string,
+  accountNumber: string,
+  accountName: string
+}
+
+export interface LabWithPlanPanels {
+  id: number,
+  name: string,
+  planPanels: PlanPanel[]
+}

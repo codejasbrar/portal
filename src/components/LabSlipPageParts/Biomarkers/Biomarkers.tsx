@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 
 //Styles
 import styles from "./Biomarkers.module.scss";
@@ -7,27 +7,44 @@ import LabSlipApiService from "../../../services/LabSlipApiService";
 import Input from "../../Input/Input";
 import {ReactComponent as SearchIcon} from "../../../icons/search.svg";
 import PanelsList from "./PanelsList";
-import {Panel} from "../../../interfaces/Test";
+import {LabPanel, LabWithPlanPanels, PlanPanel} from "../../../interfaces/Test";
+import {LabSlipInfo} from "../../../pages/Labslip/LabSlipPage";
 
 type BiomarkersPropsTypes = {
   onSetLoading: (state: boolean) => void,
-  onChangePanelsIdsArray: (panelsIds: number[]) => void,
-  onChangeLabPanelsArray: (panels: Panel[]) => void,
-  selectedPanels: number[] | undefined,
+  onChangePanelsIdsArray: (panelsIds: string[]) => void,
+  onChangeLabPanelsArray: (panels: PlanPanel[]) => void,
+  selectedPanels: string[] | undefined,
   preSelectedPanel: string;
+  labSlipInfo: LabSlipInfo;
 };
 
 const Biomarkers = (props: BiomarkersPropsTypes) => {
-  const [labPanels, setLabPanels] = useState([] as Panel[]);
-  const [planPanels, setPlanPanels] = useState([] as Panel[]);
-  const [selectedCodesArray, setSelectedCodes] = useState([] as number[]);
+  const [labPanels, setLabPanels] = useState([] as LabPanel[]);
+  const [labsWithPlanPanels, setLabsWithPlanPanels] = useState([] as LabWithPlanPanels[]);
+  const [selectedCodesArray, setSelectedCodes] = useState([] as string[]);
   const [searchText, setSearchText] = useState('');
-  const {onSetLoading, onChangePanelsIdsArray, selectedPanels, onChangeLabPanelsArray, preSelectedPanel} = props;
+  const {
+    onSetLoading,
+    onChangePanelsIdsArray,
+    selectedPanels,
+    onChangeLabPanelsArray,
+    preSelectedPanel,
+    labSlipInfo
+  } = props;
+
+  const filteredLabPanels = useMemo(() => {
+    return labSlipInfo.laboratory ?
+      labPanels.filter(panel => panel.laboratoryId === labSlipInfo.laboratory || panel.laboratoryId === null) :
+      []
+  }, [labPanels, labSlipInfo.laboratory]);
+
+  const planPanels = labsWithPlanPanels.find(lab => lab.id === labSlipInfo.laboratory)?.planPanels || [] as PlanPanel[];
 
   useEffect(() => {
     onChangePanelsIdsArray(selectedCodesArray);
-    onChangeLabPanelsArray(labPanels.filter(panel => selectedCodesArray.includes(panel.code)));
-  }, [selectedCodesArray, labPanels, onChangeLabPanelsArray, onChangePanelsIdsArray]);
+    onChangeLabPanelsArray(filteredLabPanels.filter(panel => selectedCodesArray.includes(panel.code)));
+  }, [selectedCodesArray, filteredLabPanels, onChangeLabPanelsArray, onChangePanelsIdsArray, labSlipInfo.laboratory]);
 
   useEffect(() => {
     if (!selectedPanels) setSelectedCodes([]);
@@ -40,20 +57,20 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
     } else {
       setSelectedCodes([]);
     }
-  }, [preSelectedPanel, planPanels]);
+  }, [preSelectedPanel, labsWithPlanPanels, labSlipInfo.laboratory]);
 
   useEffect(() => {
-    (async () => {
-      onSetLoading(true);
-      await LabSlipApiService.getPanels().then((responses) => {
-        setPlanPanels(responses[0].data);
-        setLabPanels(responses[1].data);
-        onSetLoading(false);
-      })
-    })();
+    onSetLoading(true);
+    Promise.all([
+      LabSlipApiService.getPlanPanels(),
+      LabSlipApiService.getLabPanels(),
+    ]).then(res => {
+      setLabsWithPlanPanels(res[0]);
+      setLabPanels(res[1]);
+    }).finally(() => onSetLoading(false));
   }, [onSetLoading]);
 
-  const compareSelectedPanels = () => labPanels.filter(panel => selectedCodesArray.includes(panel.code));
+  const compareSelectedPanels = () => filteredLabPanels.filter(panel => selectedCodesArray.includes(panel.code));
 
   return <section className={styles.container}>
     <div className={styles.Biomarkers}>
@@ -69,7 +86,7 @@ const Biomarkers = (props: BiomarkersPropsTypes) => {
         <PanelsList selected={selectedCodesArray}
           setSelected={setSelectedCodes}
           mode='lab'
-          panels={labPanels.filter(panel => panel.name.toLowerCase().includes(searchText.toLowerCase()))} />
+          panels={filteredLabPanels.filter(panel => panel.name.toLowerCase().includes(searchText.toLowerCase()))} />
         <PanelsList selected={selectedCodesArray}
           setSelected={setSelectedCodes}
           mode='plan'

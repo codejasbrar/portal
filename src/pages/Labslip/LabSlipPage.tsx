@@ -13,18 +13,18 @@ import Popup from "../../components/Popup/Popup";
 import {ReactComponent as SuccessIcon} from "../../icons/success.svg";
 import {Link} from "react-router-dom";
 import {OrderDetails} from "../../interfaces/Order";
-import {Panel} from "../../interfaces/Test";
+import {PlanPanel} from "../../interfaces/Test";
 import downloadPDF from "../../helpers/downloadPDF";
 import Button from "../../components/Button/Button";
 
 export type LabSlipInfo = {
-  laboratory: string,
+  laboratory: number | undefined,
   customer: Customer,
   order: OrderDetails
 }
 
 const defaultLabSlipInfo: LabSlipInfo = {
-  laboratory: '',
+  laboratory: undefined,
   customer: {} as Customer,
   order: {} as OrderDetails
 };
@@ -32,8 +32,8 @@ const defaultLabSlipInfo: LabSlipInfo = {
 const LabSlipPage = () => {
   const [loading, setLoading] = useState(false);
   const [labSlipInfo, setLabSlipInfo] = useState(defaultLabSlipInfo);
-  const [labPanels, setLabPanels] = useState([] as Panel[]);
-  const [labPanelsIds, setLabPanelsIds] = useState([] as number[] | undefined);
+  const [labPanels, setLabPanels] = useState([] as PlanPanel[]);
+  const [labPanelsIds, setLabPanelsIds] = useState([] as string[] | undefined);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [discardPopupActive, setDiscardPopupActive] = useState(false);
@@ -64,6 +64,7 @@ const LabSlipPage = () => {
         planVariantName: labSlipInfo.order.planVariantName ?? '',
         planVariantPrettyName: labSlipInfo.order.planVariantPrettyName ?? '',
         packageId: labSlipInfo.order.packageId ?? null,
+        laboratoryId: labSlipInfo.laboratory,
         markers: [],
         fasting: true,
         status: 'PENDING',
@@ -72,7 +73,7 @@ const LabSlipPage = () => {
     };
 
 
-    await LabSlipApiService.createOrder(labSlipInfo.laboratory, data).then((response) => {
+    await LabSlipApiService.createOrder(labSlipInfo.laboratory as number, data).then((response) => {
       setLoading(false);
       setSubmitted(true);
       setError('');
@@ -127,6 +128,7 @@ const LabSlipPage = () => {
         onChangePanelsIdsArray={setLabPanelsIds}
         selectedPanels={labPanelsIds}
         preSelectedPanel={labSlipInfo.order.planVariantName || ''}
+        labSlipInfo={labSlipInfo}
       />
       <SubmitPanel onDiscard={() => setDiscardPopupActive(true)}
         onSubmit={onApprove}

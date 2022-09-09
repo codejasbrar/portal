@@ -30,7 +30,8 @@ export interface OrderDetails {
   markers: string[],
   fasting: boolean,
   status: TestStatus
-  packageId: number
+  packageId: number,
+  laboratoryId: number
 }
 
 interface Pageable {

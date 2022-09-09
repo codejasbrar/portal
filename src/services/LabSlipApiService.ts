@@ -1,4 +1,6 @@
 import client from "./client";
+import {Lab, LabPanel, LabWithPlanPanels, PlanPanel} from "../interfaces/Test";
+import {AxiosResponse} from "axios";
 
 export type OrderStatus = "PENDING" | "APPROVED" | "APPROVED_NOT_SENT" | "REJECTED";
 
@@ -46,17 +48,29 @@ export default class LabSlipApiService {
       }
     });
 
-  static getPanels = async () =>
-    await Promise.all([
-      client.get('/planPanels'),
-      client.get('/labPanels',)
-    ]);
+  static getPlanPanels = async (): Promise<LabWithPlanPanels[]> =>
+    await client.get(`/planPanels/list`)
+      .then((response: AxiosResponse<LabWithPlanPanels[]>) => response.data.map(lab => ({
+        ...lab,
+        planPanels: lab.planPanels.map(planPanel => ({
+          ...planPanel,
+          code: planPanel.code || `${lab.id}-plan-${planPanel.id}`
+        }))
+      })));
+
+  static getLabPanels = async (): Promise<LabPanel[]> =>
+    await client.get(`/labPanels/list`)
+      .then(response => response.data);
+
+  static getLabs = async (): Promise<Lab[]> =>
+    await client.get(`/partners/laboratories/list`)
+      .then(response => response.data);
 
   static searchCustomer = async (searchString: string) =>
     await client.get(`/customers?search=${searchString}`)
       .then(response => response.data);
 
-  static createOrder = async (lab: string, postData: object) =>
+  static createOrder = async (lab: number, postData: object) =>
     await client.post(`/generateCustomLabSlip/${lab}`, {...postData}, {
       responseType: 'arraybuffer',
       headers: {

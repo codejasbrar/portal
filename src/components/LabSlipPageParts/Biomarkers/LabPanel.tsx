@@ -2,19 +2,19 @@ import React, {useState} from "react";
 
 //Styles
 import styles from "./Biomarkers.module.scss";
-import {Panel} from "../../../interfaces/Test";
+import {LabPanel, PlanPanel} from "../../../interfaces/Test";
 import {ReactComponent as ArrowIcon} from "../../../icons/arrow_down.svg";
 import Checkbox from "../../Checbox/Checkbox";
 
 type LabPanelPropsTypes = {
-  panel: Panel,
+  panel: LabPanel,
   selectable?: boolean,
-  onSelect?: (panel: Panel) => void,
-  selectedPanels?: number[],
-  onRemove?: (code: number) => void
+  onSelect?: (panel: LabPanel) => void,
+  selectedPanels?: string[],
+  onRemove?: (code: string) => void
 };
 
-const LabPanel = (props: LabPanelPropsTypes) => {
+const LabPanelComponent = (props: LabPanelPropsTypes) => {
   const {id, code, name, biomarkers} = props.panel;
   const {selectable, onSelect, selectedPanels, onRemove} = props;
   const [listOpened, setListOpened] = useState(false);
@@ -46,4 +46,4 @@ const LabPanel = (props: LabPanelPropsTypes) => {
   </li>
 };
 
-export default LabPanel;
+export default LabPanelComponent;

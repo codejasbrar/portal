@@ -2,22 +2,22 @@ import React from "react";
 
 //Styles
 import styles from "./Biomarkers.module.scss";
-import {Panel} from "../../../interfaces/Test";
-import PlanPanel from "./PlanPanel";
-import LabPanel from "./LabPanel";
+import {LabPanel, PlanPanel} from "../../../interfaces/Test";
+import PlanPanelComponent from "./PlanPanel";
+import LabPanelComponent from "./LabPanel";
 
 type PanelsListPropsTypes = {
-  panels: Panel[],
+  panels: Array<PlanPanel | LabPanel>,
   mode: 'lab' | 'plan' | 'all',
-  selected?: number[],
-  setSelected?: (codes: number[]) => void
+  selected?: string[],
+  setSelected?: (codes: string[]) => void
 };
 
 const PanelsList = (props: PanelsListPropsTypes) => {
   const {panels, mode, selected, setSelected} = props;
 
 
-  const onSelectPanel = (panel: Panel) => {
+  const onSelectPanel = (panel: PlanPanel) => {
     if (selected && setSelected) {
       if (selected.includes(panel.code)) {
         setSelected(selected.filter((code => code !== panel.code)));
@@ -26,7 +26,7 @@ const PanelsList = (props: PanelsListPropsTypes) => {
     }
   };
 
-  const onSelectPanels = (panels: Panel[], flag: string) => {
+  const onSelectPanels = (panels: PlanPanel[], flag: string) => {
     if (selected && setSelected) {
       const selectedSet = new Set(selected);
       panels.forEach(panel => {
@@ -40,12 +40,12 @@ const PanelsList = (props: PanelsListPropsTypes) => {
     }
   };
 
-  const onRemove = (code: number) => {
+  const onRemove = (code: string) => {
     if (selected && setSelected) setSelected(selected.filter(item => item !== code));
   };
 
   const onRemoveAll = () => {
-    if (setSelected) setSelected([] as number[]);
+    if (setSelected) setSelected([] as string[]);
   };
 
   switch (mode) {
@@ -53,18 +53,18 @@ const PanelsList = (props: PanelsListPropsTypes) => {
       return <>
         <h3 className={styles.heading20}>Lab panels:</h3>
         <ul className={styles.PanelsList}>
-          {!!panels.length ? panels.map((panel: Panel) => <LabPanel onSelect={onSelectPanel}
+          {!!panels.length ? panels.map((panel: PlanPanel) => <LabPanelComponent onSelect={onSelectPanel}
             key={`${panel.code}-${panel.id}`}
             selectable
             selectedPanels={selected}
-            panel={panel} />) : <span>No matches found...</span>}
+            panel={panel as LabPanel} />) : <span>No matches found...</span>}
         </ul>
       </>;
     case "plan":
       return <>
         <h3 className={styles.heading20}>Plan panels:</h3>
         <ul className={styles.PanelsList}>
-          {!!panels.length ? panels.map((panel: Panel) => <PlanPanel key={`${panel.code}${panel.id}`}
+          {!!panels.length ? panels.map((panel: PlanPanel) => <PlanPanelComponent key={`${panel.code}${panel.id}`}
             onSelectLabPanel={onSelectPanel}
             onSelect={onSelectPanels}
             selectable
@@ -78,8 +78,8 @@ const PanelsList = (props: PanelsListPropsTypes) => {
           <h4 className={styles.heading14}>All lab panels:</h4>
           <button type={'button'} onClick={onRemoveAll}>Remove all</button>
         </div>}
-        {!!panels.length && panels.map(panel => panel.labPanels ? <></> :
-          <LabPanel key={`${panel.code}1${panel.id}`} onRemove={onRemove} panel={panel} />)}
+        {!!panels.length && panels.map(panel => (panel as PlanPanel).labPanels ? <></> :
+          <LabPanelComponent key={`${panel.code}1${panel.id}`} onRemove={onRemove} panel={panel as LabPanel} />)}
       </ul>;
     default:
       return <></>;
