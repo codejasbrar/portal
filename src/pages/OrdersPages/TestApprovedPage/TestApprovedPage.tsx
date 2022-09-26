@@ -15,6 +15,7 @@ import Pagination from "../../../components/Table/Pagination/Pagination";
 import {Order, OrdersResponse} from "../../../interfaces/Order";
 import useResizeListener from "../../../hooks/useResizeListener";
 import usePageState from "../../../hooks/usePageState";
+import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {observer} from "mobx-react";
 import CountersStore from "../../../stores/CountersStore";
 import TestsStore from "../../../stores/TestsStore";
@@ -75,6 +76,24 @@ const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (
     }
   },
   {
+    name: "panicValueBiomarkers",
+    label: "Panic values",
+    options: {
+      filter: false,
+      sort: false,
+      customHeadRender: (columnMeta: MUIDataTableCustomHeadRenderer) => customHeadSortRender(columnMeta, sortParam, onSort),
+      customBodyRender : ( value:any ) => {
+        if ( value && value.length ) {
+          return (
+            <span className={styles.markersWrapper}> {value.map((item: string) => <span
+              className={styles.markersItem} key={item}><DangerIcon
+              className={styles.dangerIconLeft} />{item};</span>)} </span>
+          )
+        }
+      }
+    }
+  },
+  {
     name: "approved",
     label: "Approved",
     options: {
@@ -100,6 +119,8 @@ const TestApprovedPage = observer(() => {
 
   const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
 
+  const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
+
   return <section className={styles.tests}>
     <Link to={'/orders/navigation'} className={`${styles.menuLink} ${styles.showTabletHorizontal}`}>
       Main menu
@@ -118,14 +139,19 @@ const TestApprovedPage = observer(() => {
           totalPages={tests.totalPages}
           itemsPerPage={tests.size}
           searchItems={testsToView.length}
-          totalItems={tests.totalElements} />
+          totalItems={tests.totalElements} 
+          legend={havePanic}/>
       </MuiThemeProvider>
       :
       <div className={styles.mobileOrders}>
         <p className={styles.testsResultsInfo}>({count || 0} results)</p>
         <SearchBarMobile value={searchText} onChange={setSearchText} />
+        {havePanic && <div className={styles.legend}>
+          <DangerIcon className={styles.dangerIconLeft} /> Results with panic value
+        </div>}
         {testsToView
           .map((item: any, i: number) => (
+            
             <div key={i} className={styles.mobileOrdersItem}>
               <p className={styles.mobileOrdersTitle}>Test result ID: <span className={styles.mobileOrdersText}><Link
                 className={styles.mobileTestsLink}
@@ -139,9 +165,18 @@ const TestApprovedPage = observer(() => {
                 ID: <span className={styles.mobileOrdersText}>{item.orderId}</span>
               </p>
               <p className={styles.mobileOrdersTitle}>Customer
-                ID: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
+                IDs: <span className={styles.mobileOrdersText}>{item.customerId}</span></p>
               {/*<p className={styles.mobileOrdersTitle}>Criteria*/}
               {/*  met: <span className={styles.mobileOrdersText}>{item.criteriaMet ? "Yes" : "No"}</span></p>*/}
+              <p className={styles.mobileTestsTitle}>Panic
+                values: <span className={styles.mobileTestsText}>
+                  {item.panicValueBiomarkers && item.panicValueBiomarkers.length ?
+                    <span className={styles.markersWrapper}> {item.panicValueBiomarkers.map((item: string) => <span
+                      className={styles.markersItem}><DangerIcon
+                      className={styles.dangerIconLeft} />{item};</span>)} </span>
+                    : "None"}
+              </span>
+              </p>
               <p className={styles.mobileOrdersTitle}>Approved: <span className={styles.mobileOrdersText}>{item.approved.replace('T', ' ')}</span>
               </p>
             </div>
