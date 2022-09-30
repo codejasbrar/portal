@@ -240,7 +240,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
             options={labs}
             value={laboratory}
             onSelect={onLabSelect}
-            disabled={!labSlipInfo?.order?.id && !isNewCustomer}
+            disabled={!labSlipInfo?.customer?.id && !isNewCustomer}
             placeholder="Select a lab" />
         </div>
       </div>
