@@ -1,0 +1,157 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+parameters:
+- name: env
+  displayName: Environment
+  type: string
+  values:
+  - dev
+  - dev2
+  - dev3
+  - dev4
+  - dev5
+  - dev6
+  - dev7
+  - dev8
+  - test
+  - qa
+
+trigger: none
+pr: none
+
+variables:
+  - name: vgName
+    value: physician
+  - name: projectName
+    value: physician
+  - name: repoName
+    value: it-${{ variables.projectName }}
+  - name: acrUrl
+    value: segterraregistry.azurecr.io
+  - name: env
+    value: ${{ parameters.env }}
+  - name: namespace
+    value: it-${{ variables.env }}
+  - name: react.node.version
+    value: "12.22.2"
+  - name: physician-portal.domain-name
+    value: "${{ variables.projectName }}.${{ variables.env }}.segterra.com"
+  - name: physician-portal.api-domain-name
+    value: "${{ variables.projectName }}-api.${{ variables.env }}.segterra.com"
+  - group: "vg-it-default-${{ variables.vgName }}"
+  - group: "vg-it-${{ variables.env }}-${{ variables.vgName }}"
+
+name: "$(Date:yyyyMMdd).$(Rev:r) (${{ variables.env }})"
+
+stages:
+- stage: Prepare
+  displayName: Build ${{ variables.env }}
+  jobs:
+    - job: build
+      displayName: 'Building ...'
+      pool:
+        vmImage: "ubuntu-20.04"
+      variables:
+        npm_config_cache: $(Pipeline.Workspace)/.npm
+      steps:
+        - checkout: self
+
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '$(react.node.version)'
+          displayName: 'Install Node.js'
+
+        - task: Cache@2
+          inputs:
+            key: 'npm | "$(Agent.OS)" | package-lock.json'
+            restoreKeys: |
+               npm | "$(Agent.OS)"
+            path: $(npm_config_cache)
+          displayName: Cache npm
+
+        - script: npm ci
+          displayName: 'npm ci'
+
+        - script: |
+            echo "REACT_APP_HOST: $REACT_APP_HOST"
+            echo "REACT_APP_API_HOST: $REACT_APP_API_HOST"
+
+            #npm run build-env
+            npm run build
+          displayName: 'npm build'
+          env:
+            REACT_APP_HOST: https://$(physician-portal.domain-name)/
+            REACT_APP_API_HOST: https://$(physician-portal.api-domain-name)/
+
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'acr-connection'
+            repository: '$(repoName)'
+            command: 'buildAndPush'
+            Dockerfile: 'Azure/docker/Dockerfile'
+            buildContext: 'build'
+            tags: |
+              $(Build.BuildId)
+              $(env)
+
+- stage: Deploy
+  displayName: Deploy to ${{ variables.env }}
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploying ...'
+    pool:
+      vmImage: "ubuntu-20.04"
+    environment: 
+      name: ${{ variables.env }}
+      resourceName: it-${{ variables.env }}
+    strategy:
+      # Default deployment strategy, more coming...
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: Bash@3
+            displayName: 'ls -l'
+            inputs:
+              targetType: inline
+              script: |
+                pwd
+                ls -la
+          - task: replacetokens@3
+            inputs:
+              rootDirectory: 'Azure/manifests/'
+              targetFiles: '*.yaml'
+              encoding: 'auto'
+              writeBOM: true
+              actionOnMissing: 'fail'
+              keepToken: false
+              tokenPrefix: '{{'
+              tokenSuffix: '}}'
+              useLegacyPattern: false
+              enableTransforms: false
+              enableTelemetry: true
+          - task: Kubernetes@1
+            displayName: Create configmap
+            inputs:
+              useConfigMapFile: true
+              forceUpdateConfigMap: true
+              configMapName: $(projectName)-config
+              configMapFile: Azure/configs
+              namespace: '$(namespace)'
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'deploy'
+              manifests: 'Azure/manifests/deployment.yaml'
+              containers: '$(acrUrl)/$(repoName):$(Build.BuildId)'
+              rolloutStatusTimeout: '60'
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'deploy'
+              manifests: 'Azure/manifests/service.yaml'
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'deploy'
+              manifests: 'Azure/manifests/ingress-https.yaml'
