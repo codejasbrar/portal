@@ -125,7 +125,7 @@ const options = (onSelect: any, onSaved: any, approveAvailable: boolean, searchT
 } as MUIDataTableOptions);
 
 const TestsPage = observer(() => {
-   // setting value in local storage 
+   // setting value in localstorage 
    localStorage.setItem('url', '');
   const {approvePending} = rolesPermissions[UserStore.role];
   const width = useResizeListener();

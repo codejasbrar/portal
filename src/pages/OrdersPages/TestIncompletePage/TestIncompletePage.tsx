@@ -41,7 +41,7 @@ const options = (onSelect: any, onSaved: any, searchText: string, setSearchText:
 
 
 const TestIncompletePage = observer(() => {
-   // setting value in local storage 
+   // setting value in localstorage 
    localStorage.setItem('url', 'INCOMPLETE');
   const width = useResizeListener();
   const {incomplete} = TestsStore;

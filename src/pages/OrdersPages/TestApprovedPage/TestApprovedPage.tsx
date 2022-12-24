@@ -111,7 +111,7 @@ const options = (searchText: string, setSearchText: (searchText: string) => void
 } as MUIDataTableOptions);
 
 const TestApprovedPage = observer(() => {
-  // setting value in local storage 
+  // setting value in localstorage 
   localStorage.setItem('url', '');
   const width = useResizeListener();
   const {approved} = TestsStore;
