@@ -181,19 +181,40 @@ const TestDetailsPage = observer(() => {
   const enableApprove = (hasAccess && test.status === 'INCOMPLETE') || (!hasAccess && !test.approved && test.status !== 'INCOMPLETE');
   const data =localStorage.setItem("url", test.status);
 
+  // const backLink = useMemo(() => {
+  //     switch (test.status) {
+  //       case 'INCOMPLETE':
+  //         return 'tests-incomplete';
+  //       case 'APPROVED':
+  //         return 'tests-approved';
+  //       case 'PENDING':
+  //         return 'tests';
+  //       default:
+  //         return 'tests';
+  //     }
+  //   },
+  //   [test]);
+  const urlVal = localStorage.getItem('url');
   const backLink = useMemo(() => {
-      switch (test.status) {
-        case 'INCOMPLETE':
-          return 'tests-incomplete';
-        case 'APPROVED':
-          return 'tests-approved';
-        case 'PENDING':
-          return 'tests';
-        default:
-          return 'tests';
-      }
+      if(urlVal==='INCOMPLETE' && test.status==='PENDING')
+    {
+      return 'tests-incomplete';
+    }
+
+    if(urlVal==='' && test.status==='PENDING')
+    {
+      return 'tests';
+    }
+    
+    if(urlVal==='' && test.status==='APPROVED')
+    {
+      return 'tests-approved';
+    }
+    else {
+      return 'tests';
+    }
     },
-    [test]);
+    [test,urlVal]);
 
   return <>
     <section className={`${styles.wrapper} ${styles.detailsWrapper}`}>
