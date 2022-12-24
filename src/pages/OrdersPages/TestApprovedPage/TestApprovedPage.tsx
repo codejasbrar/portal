@@ -111,6 +111,8 @@ const options = (searchText: string, setSearchText: (searchText: string) => void
 } as MUIDataTableOptions);
 
 const TestApprovedPage = observer(() => {
+  // setting value in local storage 
+  localStorage.setItem('url', '');
   const width = useResizeListener();
   const {approved} = TestsStore;
   const [tests, page, sort, onSort, setPage, searchText, setSearchText] = usePageState('test', 'APPROVED', approved as OrdersResponse);
