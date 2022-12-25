@@ -23,7 +23,7 @@ import {observer} from "mobx-react";
 import UserStore from "../../../stores/UserStore";
 import TestsStore from "../../../stores/TestsStore";
 import rolesPermissions from "../../../constants/roles";
-
+export let pendingPagePag =0
 export const testsNotApprovedColumns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
@@ -136,7 +136,9 @@ const TestsPage = observer(() => {
 
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
 
-  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
+  const onClickLink = (id: number) => {
+    pendingPagePag=page
+    return tests.content.filter((test: Order) => test.id === id)[0];}
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
@@ -176,7 +178,10 @@ const TestsPage = observer(() => {
             <div key={i} className={styles.mobileTestsItem}>
               {item.commentsExist && <CommentIcon className={styles.mobileTestsComments} />}
               <p className={styles.mobileTestsTitle}>Test result
-                ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
+                ID: <span className={styles.mobileTestsText}> <Link 
+                onClick={()=>{
+                  pendingPagePag=page
+                }}  className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}
                 >{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Collected: <span className={styles.mobileTestsText}>{item.observed.replace('T', ' ')}</span>

@@ -18,7 +18,7 @@ import {ReactComponent as CommentIcon} from "../../../icons/comment.svg";
 import CountersStore from "../../../stores/CountersStore";
 import {observer} from "mobx-react";
 import TestsStore from "../../../stores/TestsStore";
-
+export let incompletePagePag =0
 const options = (onSelect: any, onSaved: any, searchText: string, setSearchText: (searchText: string) => void) => ({
   ...tableBaseOptions,
   selectableRows: 'multiple',
@@ -50,7 +50,9 @@ const TestIncompletePage = observer(() => {
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
   const count = CountersStore.counters.incompleteResults;
 
-  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
+  const onClickLink = (id: number) => {
+    incompletePagePag=page
+    return tests.content.filter((test: Order) => test.id === id)[0];}
 
   const onSelect = (selectedRows: { index: number, dataIndex: number }[]) => selectedRows.map(row => tests.content[row.index]);
 
@@ -95,7 +97,11 @@ const TestIncompletePage = observer(() => {
             <div key={i} className={styles.mobileTestsItem}>
               {item.commentsExist && <CommentIcon className={styles.mobileTestsComments} />}
               <p className={styles.mobileTestsTitle}>Test result
-                ID: <span className={styles.mobileTestsText}> <Link className={styles.mobileTestsLink}
+                ID: <span className={styles.mobileTestsText}> <Link
+                onClick={()=>{
+                  incompletePagePag=page
+                }} 
+                className={styles.mobileTestsLink}
                   to={`/orders/test/${item.hash}`}>{item.id}</Link></span></p>
               <p className={styles.mobileTestsTitle}>Collected: <span className={styles.mobileTestsText}>{item.observed.replace('T', ' ')}</span>
               </p>
