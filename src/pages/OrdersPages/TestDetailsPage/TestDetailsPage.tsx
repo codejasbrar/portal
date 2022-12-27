@@ -205,6 +205,11 @@ const TestDetailsPage = observer(() => {
     {
       return 'tests-incomplete';
     }
+    
+    if(urlVal==='' && test.status==='INCOMPLETE')
+    {
+      return 'tests-incomplete';
+    }
 
     if(urlVal==='' && test.status==='PENDING')
     {
