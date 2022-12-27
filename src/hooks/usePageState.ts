@@ -12,7 +12,9 @@ const getLocation=()=>{
   const location=window.location.href.slice(29)
   if(location==='tests-approved'){
     return approvedPagePag
-  }else if (location==='tests') {
+  }
+  else if (location==='tests') {
+    // alert('here')
     return pendingPagePag
 
   }
