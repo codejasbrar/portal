@@ -5,13 +5,29 @@ import {debounce} from "@material-ui/core";
 import OrdersStore from "../stores/OrdersStore";
 import TestsStore from "../stores/TestsStore";
 import reformatItem from "../helpers/reformatItem";
+import { approvedPagePag } from "../pages/OrdersPages/TestApprovedPage/TestApprovedPage";
+import { pendingPagePag } from "../pages/OrdersPages/TestPendingOrdersPage/TestPendingOrdersPage";
+import { incompletePagePag } from '../pages/OrdersPages/TestIncompletePage/TestIncompletePage'
+const getLocation=()=>{
+  const location=window.location.href.slice(29)
+  if(location==='tests-approved'){
+    return approvedPagePag
+  }
+  else if (location==='tests') {
+    // alert('here')
+    return pendingPagePag
 
+  }
+  else {
+    return incompletePagePag
+  }
+}
 const usePageState = (type: "order" | "test", status: string, data: OrdersResponse) => {
   const [searchText, setSearchText] = useState('');
   const {loadOrdersByStatus} = OrdersStore;
   const {loadResultsByStatus} = TestsStore;
   const [searchParams, setSearchParams] = useState({
-    page: 0,
+    page: getLocation(),
     sort: {param: 'received', direction: 'desc' as SortDirection},
     searchString: ''
   });
@@ -19,11 +35,13 @@ const usePageState = (type: "order" | "test", status: string, data: OrdersRespon
   const items = {...data, content: data.content ? data.content.map(reformatItem) : []};
 
   const onSearch = (value: string) => {
-    setSearchParams({...searchParams, page: 0, searchString: value});
+    setSearchParams({...searchParams, page: getLocation(), searchString: value});
   };
 
   const onSetPage = (page: number) => {
-    setSearchParams({...searchParams, page: page})
+    setSearchParams((prevState)=>(
+      {...prevState, page: page}
+    ))
   };
 
   const debouncedSearch = useMemo(() => debounce(onSearch, 700), [searchParams.searchString]);

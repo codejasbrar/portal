@@ -179,7 +179,7 @@ const TestDetailsPage = observer(() => {
   const notPanicMarkers = test.biomarkers?.map(biomarkerFormat).filter(marker => !marker.panic).sort(sortByName);
 
   const enableApprove = (hasAccess && test.status === 'INCOMPLETE') || (!hasAccess && !test.approved && test.status !== 'INCOMPLETE');
-  const data =localStorage.setItem("url", test.status);
+  // const data =localStorage.setItem("url", test.status);
 
   // const backLink = useMemo(() => {
   //     switch (test.status) {
@@ -197,6 +197,16 @@ const TestDetailsPage = observer(() => {
   const urlVal = localStorage.getItem('url');
   const backLink = useMemo(() => {
       if(urlVal==='INCOMPLETE' && test.status==='PENDING')
+    {
+      return 'tests-incomplete';
+    }
+
+    if(urlVal==='INCOMPLETE' && test.status==='INCOMPLETE')
+    {
+      return 'tests-incomplete';
+    }
+    
+    if(urlVal==='' && test.status==='INCOMPLETE')
     {
       return 'tests-incomplete';
     }

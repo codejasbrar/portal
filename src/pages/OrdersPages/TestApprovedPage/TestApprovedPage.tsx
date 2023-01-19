@@ -19,7 +19,7 @@ import {ReactComponent as DangerIcon} from "../../../icons/danger.svg";
 import {observer} from "mobx-react";
 import CountersStore from "../../../stores/CountersStore";
 import TestsStore from "../../../stores/TestsStore";
-
+export let approvedPagePag=0
 const columns = (onClickLink: (id: number) => Test, sortParam: string, onSort: (sortParam: string) => void) => [
   {
     name: "id",
@@ -119,8 +119,11 @@ const TestApprovedPage = observer(() => {
   const count = CountersStore.counters.approvedResults;
   const testsToView = tests.content || [];
 
-  const onClickLink = (id: number) => tests.content.filter((test: Order) => test.id === id)[0];
-
+  const onClickLink = (id: number) => {
+    //setting the page count of this current component 
+    approvedPagePag=page
+    return tests.content.filter((test: Order) => test.id === id)[0];
+  }
   const havePanic = !!testsToView.filter((test: Order) => !!test.panicValueBiomarkers?.length).length;
 
   return <section className={styles.tests}>
