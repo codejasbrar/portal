@@ -273,6 +273,7 @@ const TestDetailsPage = observer(() => {
                   mode={"result"}
                   type={test.status === "INCOMPLETE" ? 'pending' : 'approved'}
                   onSaved={loadTest} />}
+                <p className={styles.additional}><Link to="#">Additional information can be found in the link to the PDF version of patient results.</Link></p>
               </aside>
 
               <div className={styles.comment}>
