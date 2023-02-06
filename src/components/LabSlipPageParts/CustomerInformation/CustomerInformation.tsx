@@ -120,6 +120,7 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
   const onSearchChanged = (text: string) => {
     setIsNewCustomer(false);
     if (customer && customer.id) {
+      console.log(customer.id)
       onSetLabSlipInfo({
         ...labSlipInfo,
         laboratory: undefined,
@@ -211,7 +212,8 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
               onClear={removeCustomer}
               value={autoCompleteValue}
             />
-            {customer && !customer.id ? <p className={styles.LabslipInfoCustomerAdd}>
+            {customer && !customer?.id ? 
+            <p className={styles.LabslipInfoCustomerAdd}>
                 Customer does not exist? <button className={styles.linkPrimary} onClick={openPopup}>Add customer
                 details</button>
               </p> :
@@ -220,16 +222,17 @@ const CustomerInformation = (props: CustomerInformationPropsTypes) => {
           <SingleSelect className={styles.LabslipInfoItem}
             label="Select an order ID (optional)"
             placeholder="Order ID"
-            value={labSlipInfo.order.id ? labSlipInfo.order.id.toString() : ''}
+            value={labSlipInfo.order?.id ? labSlipInfo.order.id?.toString() : ''}
             onSelect={onOrderSelect}
-            options={customer && customer.orders && customer.orders[0].id ? customer.orders.map(order => {
+            options={customer && customer?.orders && customer?.orders[0]?.id ? customer?.orders?.map(order => {
+              console.log(order?.id.toString())
               return {
-                name: order.id.toString(),
-                value: order.id.toString(),
+                name: order?.id.toString(),
+                value: order?.id.toString() ||'',
                 disabled: pendingOrdersIds.includes(order.id)
               }
             }) : []}
-            disabled={!customer.id || (customer.orders && !customer.orders[0].id) || isNewCustomer}
+            disabled={!customer?.id || ((customer?.orders) && !customer?.orders[0]?.id) || isNewCustomer}
             error={{
               valid: !pendingOrdersIds.includes(labSlipInfo.order.id),
               message: 'Order needs to be approved by the physician first before a custom lab slip can be created'
