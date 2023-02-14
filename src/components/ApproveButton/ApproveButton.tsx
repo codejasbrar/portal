@@ -8,6 +8,7 @@ import {Order} from "../../interfaces/Order";
 import styles from "./ApproveButton.module.scss";
 import TestsStore from "../../stores/TestsStore";
 import OrdersStore from "../../stores/OrdersStore";
+import { useHistory } from "react-router-dom";
 
 type ApproveButtonPropsTypes = {
   text: string,
@@ -24,7 +25,8 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const [showPopup, setShowPopup] = useState(false);
   const {saveResults} = TestsStore;
   const {saveOrders} = OrdersStore;
-
+  const history = useHistory();
+ 
   const ItemsList = () => <div>
     <p className={styles.modalContentText}>
       Are you sure you want to {props.type && props.type === 'pending' ? 'set pending status' : 'approve'} the
@@ -42,12 +44,13 @@ const ApproveButton = (props: ApproveButtonPropsTypes) => {
   const onApprove = async () => {
     const hashes = props.selected.map((item: any) => item.hash);
     props.mode === 'order' ? await saveOrders(hashes) :
-      props.type && props.type === 'pending' ? await saveResults(hashes, 'INCOMPLETE') : await saveResults(hashes, 'PENDING');
+    props.type && props.type === 'pending' ? await saveResults(hashes, 'INCOMPLETE') : await saveResults(hashes, 'PENDING');
     await props.onSaved();
     if (props.onSelected) props.onSelected([]);
     if (props.mobile) {
       setShowPopup(false);
     }
+    history.push("/orders/tests-incomplete");
   };
 
   useEffect(() => () => {
